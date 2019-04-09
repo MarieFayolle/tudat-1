@@ -167,6 +167,24 @@ public:
     }
 
 
+    //! Function to set the beamwidth of the vehicle antenna
+    /*!
+     *  Function to set the beamwidth of the vehicle antenna
+     * \param antennaBeamwidth Beamwidth of the vehicle antenna
+     */
+    void setAntennaBeamwidth( const double antennaBeamwidth ){
+        antennaBeamwidth_ = antennaBeamwidth;
+    }
+
+    //! Function to retrieve the beamwidth of the vehicle antenna
+    /*!
+     * Function to retrieve the beamwidth of the vehicle antenna
+     * \return The beamwidth of the vehicle antenna
+     */
+    double getAntennaBeamwidth(){
+        return antennaBeamwidth_;
+    }
+
 
 private:
 
@@ -184,6 +202,9 @@ private:
 
     //! Wall emissivity of the vehicle (used for heating computations)
     double wallEmissivity_;
+
+    //! Beamwidth of the vehicle antenna
+    double antennaBeamwidth_;
 
     //! Angular position of the vehicle antenna (right ascension and declination in that order)
     std::pair< double, double > angularPositionAntenna_;
