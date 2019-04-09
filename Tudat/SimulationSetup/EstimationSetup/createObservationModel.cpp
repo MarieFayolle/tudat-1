@@ -319,38 +319,45 @@ std::vector< std::pair< std::string, std::string > > getAssociatedBodyNamesToLin
     case n_way_range:
     {
 
-        throw std::runtime_error( "Error, antenna coverage not yet implemented for n_way_range" );
+        if ( linkEnds.size( ) > 3  ){
 
-//        std::vector< int > matchingLinkEndIndices = getNWayLinkEndIndicesFromLinkEndId( linkEndToCheck, linkEnds );
-//        if( matchingLinkEndIndices.size( ) > 0 )
-//        {
-//            for( unsigned int i = 0; i < matchingLinkEndIndices.size( ); i++ )
-//            {
-//                if( matchingLinkEndIndices.at( i ) == 0 )
-//                {
-//                    linkEndIndices.push_back( std::make_pair( 0, 1 ) );
-//                }
-//                else if( matchingLinkEndIndices.at( i ) == static_cast< int >( linkEnds.size( ) )  - 1 )
-//                {
-//                    linkEndIndices.push_back( std::make_pair( 2 * ( linkEnds.size( ) - 1 ) - 1,
-//                                                              2 * ( linkEnds.size( ) - 1 ) - 2 ) );
-//                }
-//                else
-//                {
-//                    linkEndIndices.push_back(
-//                                std::make_pair( 2 * matchingLinkEndIndices.at( i ),
-//                                                2 * matchingLinkEndIndices.at( i ) + 1 ) );
-//                    linkEndIndices.push_back(
-//                                std::make_pair( 2 * matchingLinkEndIndices.at( i ) - 1,
-//                                                2 * matchingLinkEndIndices.at( i ) - 2 ) );
-//                }
-//            }
-//        }
-//        else
-//        {
-//            throw std::runtime_error( "Error, parsed irrelevant n-way range viability indices" );
-//        }
-        break;
+            throw std::runtime_error( "Error, antenna coverage not yet implemented for n_way_range with more than one reflector" );
+
+        }
+
+        else{
+
+            //  list of indices in link-end list for n-way observables that matches a given link end id.
+            std::vector< int > matchingLinkEndIndices = getNWayLinkEndIndicesFromLinkEndId( linkEndToCheck, linkEnds );
+            if( matchingLinkEndIndices.size( ) > 0 )
+            {
+                for( unsigned int i = 0; i < matchingLinkEndIndices.size( ); i++ )
+                {
+                    if( matchingLinkEndIndices.at( i ) == 0 )
+                    {
+                        bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( transmitter ).first, linkEnds.at( reflector1 ).first) );
+                    }
+                    else if( matchingLinkEndIndices.at( i ) == static_cast< int >( linkEnds.size( ) )  - 1 )
+                    {
+                        bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( receiver ).first, linkEnds.at( reflector1 ).first) );
+                    }
+                    else
+                    {
+                        bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( reflector1 ).first, linkEnds.at( receiver ).first) );
+                        bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( reflector1 ).first, linkEnds.at( transmitter ).first) );
+
+                    }
+                }
+            }
+
+            else
+            {
+                throw std::runtime_error( "Error, parsed irrelevant n-way range viability indices" );
+            }
+            break;
+
+
+        }
     }
     case angular_position:
         if( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
