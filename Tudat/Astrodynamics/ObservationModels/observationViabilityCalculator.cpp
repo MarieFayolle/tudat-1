@@ -9,6 +9,7 @@
  */
 
 #include "Tudat/Astrodynamics/ObservationModels/observationViabilityCalculator.h"
+#include "tudatApplications/master_thesis/Functions/PODmodel.h"
 
 namespace tudat
 {
@@ -56,6 +57,8 @@ bool MinimumElevationAngleCalculator::isObservationViable(
         const std::vector< double >& linkEndTimes )
 {
     bool isObservationPossible = 1;
+
+    std::cout << "size link end indices inside minimum elevation angle calculator: " << linkEndIndices_.size() << "\n\n";
 
     // Iterate over all sets of entries of input vector for which elvation angle is to be checked.
     for( unsigned int i = 0; i < linkEndIndices_.size( ); i++ )
@@ -133,6 +136,56 @@ bool OccultationCalculator::isObservationViable( const std::vector< Eigen::Vecto
     }//
 
     return isObservationPossible;
+}
+
+
+
+//! Function for determining whether the link is within the antenna coverage cone (wrt beamwidth) during the observataion.
+bool AntennaCoverageCalculator::isObservationViable( const std::vector< Eigen::Vector6d >& linkEndStates,
+                                                     const std::vector< double >& linkEndTimes )
+{
+    bool isObservationPossible = 1;
+    Eigen::Vector6d positionOfOccultingBody;
+
+    if ( linkEndIndices_.size() != antennaAngularPositionVector_.size() || linkEndIndices_.size() != antennaBeamwidthVector_.size() ){
+
+        throw std::runtime_error(" Error, unconsistent sizes when comparing link end indices with antenna properties in antenna "
+                                 "coverage calculator ");
+    }
+
+
+    else {
+
+        // Iterate over all sets of entries of input vector for which occultation is to be checked.
+        for( unsigned int i = 0; i < linkEndIndices_.size( ); i++ )
+        {
+            // Get position of occulting body
+            positionOfOccultingBody = stateFunctionOfOccultingBody_(
+                        ( linkEndTimes.at( linkEndIndices_.at( i ).first ) +
+                          linkEndTimes.at( linkEndIndices_.at( i ).second ) ) / 2.0 );
+
+
+
+            // Check if observed link end is visible from antenna of the observing link end.
+            if( ( visibilityConditionWithBeamwidthConstraintAndSphericalBodyOccultation( antennaBeamwidthVector_[i].first,
+                             radiusOfOccultingBody_, antennaAngularPositionVector_[i].first, linkEndStates.at( linkEndIndices_.at( i ).first ),
+                             linkEndStates.at( linkEndIndices_.at( i ).second ), positionOfOccultingBody ) == true )
+
+                    && ( visibilityConditionWithBeamwidthConstraintAndSphericalBodyOccultation( antennaBeamwidthVector_[i].second,
+                             radiusOfOccultingBody_, antennaAngularPositionVector_[i].second, linkEndStates.at( linkEndIndices_.at( i ).second ),
+                             linkEndStates.at( linkEndIndices_.at( i ).second ), positionOfOccultingBody) == true ) ){
+
+
+                isObservationPossible = 0;
+                break;
+
+            }
+        }
+
+        return isObservationPossible;
+
+    }
+
 }
 
 

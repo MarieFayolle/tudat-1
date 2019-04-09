@@ -53,6 +53,10 @@ std::pair< Eigen::Matrix< ObservationScalarType, Eigen::Dynamic, 1 >, bool > sim
             observationModel->computeObservationsWithLinkEndData(
                 observationTime, linkEndAssociatedWithTime, vectorOfTimes, vectorOfStates );
 
+    std::cout << "new link end: " << "\n\n";
+    for (int i = 0 ; i < vectorOfStates.size() ; i++){
+        std::cout << "state vector: " << vectorOfStates[i] << "\n\n";
+    }
     observationFeasible = isObservationViable( vectorOfStates, vectorOfTimes, linkViabilityCalculators );
 
     // Return pair of simulated ranges and reception times.
