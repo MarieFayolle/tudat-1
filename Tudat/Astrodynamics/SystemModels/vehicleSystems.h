@@ -147,6 +147,27 @@ public:
         return wallEmissivity_;
     }
 
+    //! Function to set the angular position of the vehicle antenna
+    /*!
+     * Function to set the angular position of the vehicle antenna
+     * \param angularPositionAntenna The angular position of the vehicle antenna (right ascension and declination in that order)
+     */
+    void setAntennaAngularPosition( const std::pair< double, double > angularPositionAntenna ){
+        angularPositionAntenna_ = angularPositionAntenna;
+    }
+
+
+    //! Function to retrieve the angular position of the vehicle antenna
+    /*!
+     * Function to retrieve the angular position of the vehicle antenna
+     * \return The angular position of the vehicle antenna (right ascension and declination in that order)
+     */
+    std::pair< double, double > getAntennaAngularPosition(){
+        return angularPositionAntenna_;
+    }
+
+
+
 private:
 
     //! Named list of engine models in the vehicle
@@ -163,6 +184,9 @@ private:
 
     //! Wall emissivity of the vehicle (used for heating computations)
     double wallEmissivity_;
+
+    //! Angular position of the vehicle antenna (right ascension and declination in that order)
+    std::pair< double, double > angularPositionAntenna_;
 
 };
 
