@@ -52,6 +52,7 @@ set(OBSERVATION_MODELS_HEADERS
 # Add static libraries.
 add_library(tudat_observation_models STATIC ${OBSERVATION_MODELS_SOURCES} ${OBSERVATION_MODELS_HEADERS})
 setup_tudat_library_target(tudat_observation_models "${SRCROOT}${OBSERVATIONMODELSDIR}")
+target_link_libraries(tudat_observation_models tudat_masterThesis)
 
 if(USE_CSPICE)
 

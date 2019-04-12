@@ -523,6 +523,9 @@ std::shared_ptr< AntennaCoverageCalculator > createAntennaCoverageCalculator(
         const ObservableType observationType,
         const std::shared_ptr< ObservationViabilitySettings > observationViabilitySettings )
 {
+
+    std::cout << "CREATE ANTENNA COVERAGE CALCULATOR" << "\n\n";
+
     if( observationViabilitySettings->observationViabilityType_ != antenna_visibility )
     {
         throw std::runtime_error( "Error when making antenna coverage calculator, inconsistent input" );
@@ -548,6 +551,7 @@ std::shared_ptr< AntennaCoverageCalculator > createAntennaCoverageCalculator(
     double occultingBodyRadius =
             bodyMap.at( observationViabilitySettings->getStringParameter( ) )->getShapeModel( )->getAverageRadius( );
     
+
     
 
     // Create antenna properties
@@ -584,24 +588,26 @@ std::shared_ptr< AntennaCoverageCalculator > createAntennaCoverageCalculator(
             }
 
 
-            if ( bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaBeamwidth() == TUDAT_NAN ||
-                 bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaBeamwidth() == TUDAT_NAN ){
+//            if ( bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaBeamwidth() == TUDAT_NAN ||
+//                 bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaBeamwidth() == TUDAT_NAN ){
 
-                throw std::runtime_error( "Error when making antenna coverage calculator, no beamwidth for vehicle antenna is provided." );
-            }
-            else{
+//                throw std::runtime_error( "Error when making antenna coverage calculator, no beamwidth for vehicle antenna is provided." );
+//            }
+//            else{
 
-                antennaBeamwidthVector.push_back( std::make_pair(
-                         bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaBeamwidth(),
-                         bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaBeamwidth() ) );
-            }
+//                antennaBeamwidthVector.push_back( std::make_pair(
+//                         bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaBeamwidth(),
+//                         bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaBeamwidth() ) );
+//            }
 
         }
     }
     
-    return std::make_shared< AntennaCoverageCalculator >( getLinkEndIndicesForObservationViability( linkEnds, observationType,
-                                                                      observationViabilitySettings->getAssociatedLinkEnd( ) ),
-                            stateOfOccultingBody, occultingBodyRadius, antennaAngularPositionVector, antennaBeamwidthVector );
+    std::cout << "TEST" << "\n\n";
+
+//    return std::make_shared< AntennaCoverageCalculator >( getLinkEndIndicesForObservationViability( linkEnds, observationType,
+//                                                                      observationViabilitySettings->getAssociatedLinkEnd( ) ),
+//                            stateOfOccultingBody, occultingBodyRadius, antennaAngularPositionVector, antennaBeamwidthVector );
 }
 
 
@@ -662,9 +668,8 @@ std::vector< std::shared_ptr< ObservationViabilityCalculator > > createObservati
                             bodyMap, linkEnds, observationType, relevantObservationViabilitySettings.at( i ) ) );
             break;
         case antenna_visibility:
-            
-            
-            
+            linkViabilityCalculators.push_back(
+                        createAntennaCoverageCalculator( bodyMap, linkEnds, observationType, relevantObservationViabilitySettings.at( i ) ) );
             break;
         default:
             throw std::runtime_error(
