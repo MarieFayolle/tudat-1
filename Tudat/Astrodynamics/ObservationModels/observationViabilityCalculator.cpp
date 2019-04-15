@@ -58,8 +58,6 @@ bool MinimumElevationAngleCalculator::isObservationViable(
 {
     bool isObservationPossible = 1;
 
-    std::cout << "size link end indices inside minimum elevation angle calculator: " << linkEndIndices_.size() << "\n\n";
-
     // Iterate over all sets of entries of input vector for which elvation angle is to be checked.
     for( unsigned int i = 0; i < linkEndIndices_.size( ); i++ )
     {
@@ -144,7 +142,7 @@ bool OccultationCalculator::isObservationViable( const std::vector< Eigen::Vecto
 bool AntennaCoverageCalculator::isObservationViable( const std::vector< Eigen::Vector6d >& linkEndStates,
                                                      const std::vector< double >& linkEndTimes )
 {
-    bool isObservationPossible = 1;
+    bool isObservationPossible = 0;
     Eigen::Vector6d positionOfOccultingBody;
 
     if ( linkEndIndices_.size() != antennaAngularPositionVector_.size() || linkEndIndices_.size() != antennaBeamwidthVector_.size() ){
@@ -176,7 +174,7 @@ bool AntennaCoverageCalculator::isObservationViable( const std::vector< Eigen::V
                              linkEndStates.at( linkEndIndices_.at( i ).second ), positionOfOccultingBody) == true ) ){
 
 
-                isObservationPossible = 0;
+                isObservationPossible = 1;
                 break;
 
             }

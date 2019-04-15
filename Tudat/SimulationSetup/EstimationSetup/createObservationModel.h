@@ -41,6 +41,15 @@ namespace tudat
 namespace observation_models
 {
 
+
+//! Function to retrieve the body names associated to the link ends (for antenna coverage viability calculator only).
+std::vector< std::pair< std::string, std::string > > getBodyNamesAssociatedToLinkEndsForAntennaCoverageViability(
+        const LinkEnds& linkEnds, const ObservableType observableType,  const LinkEndId linkEndToCheck, const LinkEndId oppositeLinkEnd );
+
+//! Function to retrieve the link end indices in link end states/times that are to be used in viability calculation for antenna coverage only.
+std::vector< std::pair< int, int > > getLinkEndIndicesForAntennaCoverageViability(
+        const LinkEnds& linkEnds, const ObservableType observableType,  const LinkEndId linkEndToCheck, const LinkEndId oppositeLinkEnd );
+
 //! Base class to define settings for creation of an observation bias model.
 /*!
  *  Base class to define settings for creation of an observation bias model. For each specific bias type, a derived class

@@ -384,9 +384,10 @@ public:
     ObservationViabilitySettings( const ObservationViabilityType observationViabilityType,
                                   const std::pair< std::string, std::string > associatedLinkEnd,
                                   const std::string stringParameter = "",
-                                  const double doubleParameter = TUDAT_NAN ):
+                                  const double doubleParameter = TUDAT_NAN,
+                                  const std::pair< std::string, std::string > oppositeLinkEnd = std::make_pair( "", "" )):
         observationViabilityType_( observationViabilityType ), associatedLinkEnd_( associatedLinkEnd ),
-        stringParameter_( stringParameter ), doubleParameter_( doubleParameter ){ }
+        stringParameter_( stringParameter ), doubleParameter_( doubleParameter ), oppositeLinkEnd_( oppositeLinkEnd ){ }
 
     //! Type of viability that is to be checked
     ObservationViabilityType observationViabilityType_;
@@ -406,6 +407,11 @@ public:
         return doubleParameter_;
     }
 
+    std::pair< std::string, std::string > getOppositeLinkEnd( )
+    {
+        return oppositeLinkEnd_;
+    }
+
 protected:
     //! Link end at which viability is to be checked
     std::pair< std::string, std::string > associatedLinkEnd_;
@@ -416,7 +422,7 @@ protected:
      * Elevation angle: none; Avoidance angle: body for which avoidance angle is to be calculated; Occultation: body for which
      * occultation is to be calculated
      */
-    std::string stringParameter_;
+    std::string stringParameter_;   
 
     //! Double parameter providing additional specification for viability check
     /*!
@@ -424,6 +430,10 @@ protected:
      *  Elevation angle: minimum allowed elevation angle; Avoidance angle: minimum allowed avoidance angle; Occultation: none
      */
     double doubleParameter_;
+
+
+    //! Opposite link end at which viability might also have to be checked (for antenna coverage viability only)
+    std::pair< std::string, std::string > oppositeLinkEnd_;
 };
 
 //! Typedef for a list of observation viability calculators, sorted by observable type and link ends.

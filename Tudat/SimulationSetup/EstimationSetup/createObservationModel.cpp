@@ -235,23 +235,231 @@ std::vector< std::pair< int, int > > getLinkEndIndicesForObservationViability(
 
 
 
-
-//! Function to retrieve the link end indices in link end states/times that are to be used in viability calculation
-std::vector< std::pair< std::string, std::string > > getAssociatedBodyNamesToLinkEndsForAntennaViability(
-        const LinkEnds& linkEnds, const ObservableType observableType,  const LinkEndId linkEndToCheck )
+//! Function to retrieve the link end indices in link end states/times that are to be used in viability calculation for antenna coverage only.
+std::vector< std::pair< int, int > > getLinkEndIndicesForAntennaCoverageViability(
+        const LinkEnds& linkEnds, const ObservableType observableType,  const LinkEndId linkEndToCheck, const LinkEndId oppositeLinkEnd )
 {
-    std::vector< std::pair< std::string, std::string > > bodyNamesForLinkEnds;
+    std::vector< std::pair< int, int > > linkEndIndices;
+
+    bool relevantViabilitySettings = false;
 
     switch( observableType )
     {
     case one_way_range:
-        if( ( linkEnds.at( transmitter ) == linkEndToCheck ) ||
+        if( ( ( linkEnds.at( transmitter ) == linkEndToCheck ) ||
                 ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) && ( linkEndToCheck.second == "" ) ) )
+                && ( ( linkEnds.at( receiver ) == oppositeLinkEnd ) ||
+                     ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) && ( oppositeLinkEnd.second == "" ) ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 0, 1 ) );
+        }
+        else if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                     oppositeLinkEnd.second == "" ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 1, 0 ) );
+        }
+        else
+        {
+            throw std::runtime_error( "Error, parsed irrelevant 1-way range viability indices" );
+        }
+        break;
+    case one_way_doppler:
+        if( ( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+                                                                  ( linkEndToCheck.second == "" ) ) )
+                && ( ( linkEnds.at( receiver ) == oppositeLinkEnd ) || ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) &&
+                                                                           ( oppositeLinkEnd.second == "" ) ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 0, 1 ) );
+        }
+        else if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                     oppositeLinkEnd.second == "" ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 1, 0 ) );
+        }
+        else
+        {
+            throw std::runtime_error( "Error, parsed irrelevant 1-way doppler viability indices" );
+        }
+        break;
+
+    case two_way_doppler:
+
+        relevantViabilitySettings = false;
+
+        if( ( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+                                                                  ( linkEndToCheck.second == "" ) ) )
+                && ( ( linkEnds.at( reflector1 ) == oppositeLinkEnd ) || ( ( linkEnds.at( reflector1 ).first == oppositeLinkEnd.first ) &&
+                                                                           ( oppositeLinkEnd.second == "" ) ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 0, 1 ) );
+            relevantViabilitySettings = true;
+        }
+        if( ( linkEnds.at( reflector1 ) == linkEndToCheck || ( ( linkEnds.at( reflector1 ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                       oppositeLinkEnd.second == "" ) )
+                 && ( linkEnds.at( receiver ) == oppositeLinkEnd || ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) &&
+                                                                       oppositeLinkEnd.second == "" ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 2, 3 ) );
+            linkEndIndices.push_back( std::make_pair( 1, 0 ) );
+            relevantViabilitySettings = true;
+        }
+        if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( reflector1 ) == oppositeLinkEnd || ( ( linkEnds.at( reflector1 ).first == oppositeLinkEnd.first ) &&
+                                                                     oppositeLinkEnd.second == "" ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 3, 2 ) );
+            relevantViabilitySettings = true;
+        }
+        if ( relevantViabilitySettings == false )
+        {
+            throw std::runtime_error( "Error, parsed irrelevant 1-way doppler viability indices" );
+        }
+
+        break;
+
+    case one_way_differenced_range:
+        if( ( linkEnds.at( transmitter ) == linkEndToCheck || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+                                                              linkEndToCheck.second == "" ) )
+                && ( linkEnds.at( receiver ) == oppositeLinkEnd || ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) &&
+                                                                       oppositeLinkEnd.second == "" ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 0, 1 ) );
+            linkEndIndices.push_back( std::make_pair( 2, 3 ) );
+        }
+        else if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                     oppositeLinkEnd.second == "" ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 1, 0 ) );
+            linkEndIndices.push_back( std::make_pair( 3, 2 ) );
+        }
+        else
+        {
+            throw std::runtime_error( "Error, parsed irrelevant 1-way differenced range viability indices" );
+        }
+        break;
+    case n_way_range:
+    {
+
+        relevantViabilitySettings = false;
+
+        if ( linkEnds.size( ) > 3  ){
+
+            throw std::runtime_error( "Error, antenna coverage not yet implemented for n_way_range with more than one reflector." );
+
+        }
+
+        else{
+
+            if( ( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+                                                                      ( linkEndToCheck.second == "" ) ) )
+                    && ( ( linkEnds.at( reflector1 ) == oppositeLinkEnd ) || ( ( linkEnds.at( reflector1 ).first == oppositeLinkEnd.first ) &&
+                                                                               ( oppositeLinkEnd.second == "" ) ) ) )
+            {
+                linkEndIndices.push_back( std::make_pair( 0, 1 ) );
+                relevantViabilitySettings = true;
+            }
+            if( ( linkEnds.at( reflector1 ) == linkEndToCheck || ( ( linkEnds.at( reflector1 ).first == linkEndToCheck.first ) &&
+                                                                    linkEndToCheck.second == "" ) )
+                     && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                           oppositeLinkEnd.second == "" ) )
+                     && ( linkEnds.at( receiver ) == oppositeLinkEnd || ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) &&
+                                                                           oppositeLinkEnd.second == "" ) ) )
+            {
+                linkEndIndices.push_back( std::make_pair( 2, 3 ) );
+                linkEndIndices.push_back( std::make_pair( 1, 0 ) );
+                relevantViabilitySettings = true;
+            }
+            if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+                                                                    linkEndToCheck.second == "" ) )
+                     && ( linkEnds.at( reflector1 ) == oppositeLinkEnd || ( ( linkEnds.at( reflector1 ).first == oppositeLinkEnd.first ) &&
+                                                                         oppositeLinkEnd.second == "" ) ) )
+            {
+                linkEndIndices.push_back( std::make_pair( 3, 2 ) );
+                relevantViabilitySettings = true;
+            }
+            if ( relevantViabilitySettings == false )
+            {
+                throw std::runtime_error( "Error, parsed irrelevant n-way range viability indices" );
+            }
+        }
+
+        break;
+    }
+    case angular_position:
+        if( ( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+                                                                  ( linkEndToCheck.second == "" ) ) )
+                && ( ( linkEnds.at( receiver ) == oppositeLinkEnd ) || ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) &&
+                                                                           ( oppositeLinkEnd.second == "" ) ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 0, 1 ) );
+        }
+        else if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                     oppositeLinkEnd.second == "" ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 1, 0 ) );
+        }
+        else
+        {
+            throw std::runtime_error( "Error, parsed irrelevant angular position viability indices" );
+        }
+        break;
+    case position_observable:
+
+        throw std::runtime_error( "Error, parsed irrelevant position observable viability indices" );
+        break;
+    case euler_angle_313_observable:
+
+        throw std::runtime_error( "Error, parsed irrelevant euler angle observable viability indices" );
+        break;
+    case velocity_observable:
+
+        throw std::runtime_error( "Error, parsed irrelevant position observable viability indices" );
+        break;
+    default:
+        throw std::runtime_error( "Error, observable type " + std::to_string(
+                                      observableType ) + " not recognized when making viability link ends" );
+
+    }
+
+    return linkEndIndices;
+}
+
+
+
+
+//! Function to retrieve the body names associated to the link ends (for antenna coverage viability calculator only).
+std::vector< std::pair< std::string, std::string > > getBodyNamesAssociatedToLinkEndsForAntennaCoverageViability(
+        const LinkEnds& linkEnds, const ObservableType observableType,  const LinkEndId linkEndToCheck, const LinkEndId oppositeLinkEnd )
+{
+    std::vector< std::pair< std::string, std::string > > bodyNamesForLinkEnds;
+
+    bool relevantViabilitySettings = false;
+
+    switch( observableType )
+    {
+    case one_way_range:
+        if( ( ( linkEnds.at( transmitter ) == linkEndToCheck ) ||
+                ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) && ( linkEndToCheck.second == "" ) ) )
+                && ( ( linkEnds.at( receiver ) == oppositeLinkEnd ) ||
+                     ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) && ( oppositeLinkEnd.second == "" ) ) ) )
         {
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( transmitter ).first, linkEnds.at( receiver ).first) );
         }
-        else if( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+        else if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
                                                                 linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                     oppositeLinkEnd.second == "" ) ) )
         {
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( receiver ).first, linkEnds.at( transmitter ).first) );
         }
@@ -261,13 +469,17 @@ std::vector< std::pair< std::string, std::string > > getAssociatedBodyNamesToLin
         }
         break;
     case one_way_doppler:
-        if( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+        if( ( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
                                                                   ( linkEndToCheck.second == "" ) ) )
+                && ( ( linkEnds.at( receiver ) == oppositeLinkEnd ) || ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) &&
+                                                                           ( oppositeLinkEnd.second == "" ) ) ) )
         {
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( transmitter ).first, linkEnds.at( receiver ).first ) );
         }
-        else if( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+        else if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
                                                                 linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                     oppositeLinkEnd.second == "" ) ) )
         {
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( receiver ).first, linkEnds.at( transmitter ).first ) );
         }
@@ -277,36 +489,58 @@ std::vector< std::pair< std::string, std::string > > getAssociatedBodyNamesToLin
         }
         break;
     case two_way_doppler:
-        if( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+
+        relevantViabilitySettings = false;
+
+        if( ( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
                                                                   ( linkEndToCheck.second == "" ) ) )
+                && ( ( linkEnds.at( reflector1 ) == oppositeLinkEnd ) || ( ( linkEnds.at( reflector1 ).first == oppositeLinkEnd.first ) &&
+                                                                         ( oppositeLinkEnd.second == "" ) ) ) )
         {
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( transmitter ).first, linkEnds.at( reflector1 ).first ) );
+            std::cout << "if transmitter: " << linkEnds.at( transmitter ).first << " & " << linkEnds.at( reflector1 ).first << "\n\n";
+            relevantViabilitySettings = true;
         }
-        else if( linkEnds.at( reflector1 ) == linkEndToCheck || ( ( linkEnds.at( reflector1 ).first == linkEndToCheck.first ) &&
+        if( ( linkEnds.at( reflector1 ) == linkEndToCheck || ( ( linkEnds.at( reflector1 ).first == linkEndToCheck.first ) &&
                                                                 linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                       oppositeLinkEnd.second == "" ) )
+                 && ( linkEnds.at( receiver ) == oppositeLinkEnd || ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) &&
+                                                                         oppositeLinkEnd.second == "" ) ) )
         {
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( reflector1 ).first, linkEnds.at( receiver ).first ) );
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( reflector1 ).first, linkEnds.at( transmitter ).first ) );
+            std::cout << "if reflector1: " << linkEnds.at( reflector1 ).first << " & " << linkEnds.at( receiver ).first << "\n\n";
+            std::cout << " and: " << linkEnds.at( reflector1 ).first << " & " << linkEnds.at( transmitter ).first << "\n\n";
+            relevantViabilitySettings = true;
         }
-        else if( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+        if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
                                                                 linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( reflector1 ) == oppositeLinkEnd || ( ( linkEnds.at( reflector1 ).first == oppositeLinkEnd.first ) &&
+                                                                     oppositeLinkEnd.second == "" ) ) )
         {
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( receiver ).first, linkEnds.at( reflector1 ).first ) );
+            std::cout << "if receiver: " << linkEnds.at( receiver ).first << " & " << linkEnds.at( reflector1 ).first << "\n\n";
+            relevantViabilitySettings = true;
         }
-        else
+        if ( relevantViabilitySettings == false )
         {
-            throw std::runtime_error( "Error, parsed irrelevant 1-way doppler viability indices" );
+            throw std::runtime_error( "Error, parsed irrelevant 2-way doppler viability indices" );
         }
         break;
     case one_way_differenced_range:
-        if( linkEnds.at( transmitter ) == linkEndToCheck || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+        if( ( linkEnds.at( transmitter ) == linkEndToCheck || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
                                                               linkEndToCheck.second == "" ) )
+                && ( linkEnds.at( receiver ) == oppositeLinkEnd || ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) &&
+                                                                       oppositeLinkEnd.second == "" ) ) )
         {
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( transmitter ).first, linkEnds.at( receiver ).first ) );
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( transmitter ).first, linkEnds.at( receiver ).first ) );
         }
-        else if( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+        else if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
                                                                 linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                     oppositeLinkEnd.second == "" ) ) )
         {
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( receiver ).first, linkEnds.at( transmitter ).first ) );
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( receiver ).first, linkEnds.at( transmitter ).first ) );
@@ -319,54 +553,63 @@ std::vector< std::pair< std::string, std::string > > getAssociatedBodyNamesToLin
     case n_way_range:
     {
 
+        relevantViabilitySettings = false;
+
         if ( linkEnds.size( ) > 3  ){
 
-            throw std::runtime_error( "Error, antenna coverage not yet implemented for n_way_range with more than one reflector" );
+            throw std::runtime_error( "Error, antenna coverage not yet implemented for n_way_range with more than one reflector." );
 
         }
 
-        else{
+        else{            
 
-            //  list of indices in link-end list for n-way observables that matches a given link end id.
-            std::vector< int > matchingLinkEndIndices = getNWayLinkEndIndicesFromLinkEndId( linkEndToCheck, linkEnds );
-            if( matchingLinkEndIndices.size( ) > 0 )
+            if( ( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+                                                                      ( linkEndToCheck.second == "" ) ) )
+                    && ( ( linkEnds.at( reflector1 ) == oppositeLinkEnd ) || ( ( linkEnds.at( reflector1 ).first == oppositeLinkEnd.first ) &&
+                                                                             ( oppositeLinkEnd.second == "" ) ) ) )
             {
-                for( unsigned int i = 0; i < matchingLinkEndIndices.size( ); i++ )
-                {
-                    if( matchingLinkEndIndices.at( i ) == 0 )
-                    {
-                        bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( transmitter ).first, linkEnds.at( reflector1 ).first) );
-                    }
-                    else if( matchingLinkEndIndices.at( i ) == static_cast< int >( linkEnds.size( ) )  - 1 )
-                    {
-                        bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( receiver ).first, linkEnds.at( reflector1 ).first) );
-                    }
-                    else
-                    {
-                        bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( reflector1 ).first, linkEnds.at( receiver ).first) );
-                        bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( reflector1 ).first, linkEnds.at( transmitter ).first) );
-
-                    }
-                }
+                bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( transmitter ).first, linkEnds.at( reflector1 ).first ) );
+                relevantViabilitySettings = true;
+            }
+            if( ( linkEnds.at( reflector1 ) == linkEndToCheck || ( ( linkEnds.at( reflector1 ).first == linkEndToCheck.first ) &&
+                                                                    linkEndToCheck.second == "" ) )
+                     && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                           oppositeLinkEnd.second == "" ) )
+                     && ( linkEnds.at( receiver ) == oppositeLinkEnd || ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) &&
+                                                                             oppositeLinkEnd.second == "" ) ) )
+            {
+                bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( reflector1 ).first, linkEnds.at( receiver ).first ) );
+                bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( reflector1 ).first, linkEnds.at( transmitter ).first ) );
+                relevantViabilitySettings = true;
+            }
+            if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+                                                                    linkEndToCheck.second == "" ) )
+                     && ( linkEnds.at( reflector1 ) == oppositeLinkEnd || ( ( linkEnds.at( reflector1 ).first == oppositeLinkEnd.first ) &&
+                                                                         oppositeLinkEnd.second == "" ) ) )
+            {
+                bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( receiver ).first, linkEnds.at( reflector1 ).first ) );
+                relevantViabilitySettings = true;
             }
 
-            else
+            if ( relevantViabilitySettings == false )
             {
                 throw std::runtime_error( "Error, parsed irrelevant n-way range viability indices" );
             }
-            break;
-
-
         }
+        break;
     }
     case angular_position:
-        if( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+        if( ( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
                                                                   ( linkEndToCheck.second == "" ) ) )
+                && ( ( linkEnds.at( receiver ) == oppositeLinkEnd ) || ( ( linkEnds.at( receiver ).first == oppositeLinkEnd.first ) &&
+                                                                           ( oppositeLinkEnd.second == "" ) ) ) )
         {
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( transmitter ).first, linkEnds.at( receiver ).first ) );
         }
-        else if( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+        else if( ( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
                                                                 linkEndToCheck.second == "" ) )
+                 && ( linkEnds.at( transmitter ) == oppositeLinkEnd || ( ( linkEnds.at( transmitter ).first == oppositeLinkEnd.first ) &&
+                                                                     oppositeLinkEnd.second == "" ) ) )
         {
             bodyNamesForLinkEnds.push_back( std::make_pair( linkEnds.at( receiver ).first, linkEnds.at( transmitter ).first ) );
         }
@@ -550,17 +793,18 @@ std::shared_ptr< AntennaCoverageCalculator > createAntennaCoverageCalculator(
     }
     double occultingBodyRadius =
             bodyMap.at( observationViabilitySettings->getStringParameter( ) )->getShapeModel( )->getAverageRadius( );
-    
 
     
 
     // Create antenna properties
+    std::vector< std::pair< int, int > > linkEndsIndices = getLinkEndIndicesForAntennaCoverageViability( linkEnds, observationType,
+                                                                              observationViabilitySettings->getAssociatedLinkEnd( ),
+                                                                              observationViabilitySettings->getOppositeLinkEnd( ) );
 
-    std::vector< std::pair< int, int > > linkEndsIndices = getLinkEndIndicesForObservationViability( linkEnds, observationType,
-                                                                              observationViabilitySettings->getAssociatedLinkEnd() );
 
-    std::vector< std::pair< std::string, std::string > > bodyNamesAssociatedToEachLinkEnd = getAssociatedBodyNamesToLinkEndsForAntennaViability(
-                linkEnds, observationType, observationViabilitySettings->getAssociatedLinkEnd( ));
+
+    std::vector< std::pair< std::string, std::string > > bodyNamesAssociatedToEachLinkEnd = getBodyNamesAssociatedToLinkEndsForAntennaCoverageViability(
+                linkEnds, observationType, observationViabilitySettings->getAssociatedLinkEnd( ), observationViabilitySettings->getOppositeLinkEnd( ) );
 
 
     std::vector< std::pair< std::pair< double, double >, std::pair< double, double > > > antennaAngularPositionVector;
@@ -588,26 +832,25 @@ std::shared_ptr< AntennaCoverageCalculator > createAntennaCoverageCalculator(
             }
 
 
-//            if ( bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaBeamwidth() == TUDAT_NAN ||
-//                 bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaBeamwidth() == TUDAT_NAN ){
+            if ( bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaBeamwidth() == TUDAT_NAN ||
+                 bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaBeamwidth() == TUDAT_NAN ){
 
-//                throw std::runtime_error( "Error when making antenna coverage calculator, no beamwidth for vehicle antenna is provided." );
-//            }
-//            else{
+                throw std::runtime_error( "Error when making antenna coverage calculator, no beamwidth for vehicle antenna is provided." );
+            }
+            else{
 
-//                antennaBeamwidthVector.push_back( std::make_pair(
-//                         bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaBeamwidth(),
-//                         bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaBeamwidth() ) );
-//            }
+                antennaBeamwidthVector.push_back( std::make_pair(
+                         bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaBeamwidth(),
+                         bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaBeamwidth() ) );
+            }
 
         }
     }
     
-    std::cout << "TEST" << "\n\n";
 
-//    return std::make_shared< AntennaCoverageCalculator >( getLinkEndIndicesForObservationViability( linkEnds, observationType,
-//                                                                      observationViabilitySettings->getAssociatedLinkEnd( ) ),
-//                            stateOfOccultingBody, occultingBodyRadius, antennaAngularPositionVector, antennaBeamwidthVector );
+    return std::make_shared< AntennaCoverageCalculator >( getLinkEndIndicesForAntennaCoverageViability( linkEnds, observationType,
+                            observationViabilitySettings->getAssociatedLinkEnd( ), observationViabilitySettings->getOppositeLinkEnd() ),
+                            stateOfOccultingBody, occultingBodyRadius, antennaAngularPositionVector, antennaBeamwidthVector );
 }
 
 
@@ -668,6 +911,7 @@ std::vector< std::shared_ptr< ObservationViabilityCalculator > > createObservati
                             bodyMap, linkEnds, observationType, relevantObservationViabilitySettings.at( i ) ) );
             break;
         case antenna_visibility:
+
             linkViabilityCalculators.push_back(
                         createAntennaCoverageCalculator( bodyMap, linkEnds, observationType, relevantObservationViabilitySettings.at( i ) ) );
             break;
@@ -695,9 +939,48 @@ createObservationViabilityCalculators(
 
     for( unsigned int i = 0; i < linkEnds.size( ); i++ )
     {
-        viabilityCalculators[ linkEnds.at( i ) ] =
-                createObservationViabilityCalculators(
-                    bodyMap, linkEnds.at( i ), observationType, observationViabilitySettings );
+        bool isLinkEndAssociatedToProperViabilityCalculator = false;
+
+        LinkEnds currentLinkEnd = linkEnds.at(i);
+        std::vector< std::shared_ptr< ObservationViabilitySettings > > currentViabilitySettings = observationViabilitySettings;
+
+        std::vector< std::shared_ptr< ObservationViabilitySettings > >::iterator iteratorViabilitySettings = currentViabilitySettings.begin();
+
+        for ( int j = 0 ; j < observationViabilitySettings.size() ; j++){
+
+        bool areAllLinkEndsSuitableForAntennaCoverageCalculator = true;
+
+            for ( LinkEnds::iterator iteratorLinkEnd = currentLinkEnd.begin() ; iteratorLinkEnd != currentLinkEnd.end() ; iteratorLinkEnd++ ){
+                if ( observationViabilitySettings[j]->observationViabilityType_ == antenna_visibility &&
+                     ( iteratorLinkEnd->second.first != observationViabilitySettings[j]->getAssociatedLinkEnd().first &&
+                       iteratorLinkEnd->second.first != observationViabilitySettings[j]->getOppositeLinkEnd().first) ){
+
+                    areAllLinkEndsSuitableForAntennaCoverageCalculator = false;
+                }
+            }
+
+            if ( areAllLinkEndsSuitableForAntennaCoverageCalculator == false ){
+                currentViabilitySettings.erase( iteratorViabilitySettings );
+            }
+            else{
+                isLinkEndAssociatedToProperViabilityCalculator = true;
+            }
+
+            iteratorViabilitySettings++;
+
+        }
+
+        if ( isLinkEndAssociatedToProperViabilityCalculator == true ){
+            viabilityCalculators[ linkEnds.at( i ) ] =
+                    createObservationViabilityCalculators(
+                        bodyMap, linkEnds.at( i ), observationType, currentViabilitySettings );
+        }
+
+    }
+
+    if ( viabilityCalculators.size() == 0 ){
+        throw std::runtime_error( "Error when creating observation model, viability calculator not properly defined for observation type "
+                                  + std::to_string( observationType ) + "." );
     }
 
     return viabilityCalculators;
@@ -715,13 +998,58 @@ createObservationViabilityCalculators(
     for( std::map< ObservableType, std::vector< LinkEnds > >::const_iterator observableIterator = linkEndsPerObservable.begin( );
          observableIterator != linkEndsPerObservable.end( ); observableIterator++ )
     {
+
+        ObservableType currentObservableType = observableIterator->first;
+
         for( unsigned int i = 0; i < observableIterator->second.size( ); i++ )
         {
-            viabilityCalculators[ observableIterator->first ][ observableIterator->second.at( i ) ] =
-                    createObservationViabilityCalculators(
-                        bodyMap, observableIterator->second.at( i ), observableIterator->first, observationViabilitySettings );
+
+            LinkEnds currentLinkEnd = observableIterator->second[i];
+            bool isLinkEndAssociatedToProperViabilityCalculator = false;
+
+
+            std::vector< std::shared_ptr< ObservationViabilitySettings > > currentViabilitySettings = observationViabilitySettings;
+            std::vector< std::shared_ptr< ObservationViabilitySettings > >::iterator iteratorViabilitySettings = currentViabilitySettings.begin();
+
+            for ( int j = 0 ; j < observationViabilitySettings.size() ; j++){
+
+                bool areAllLinkEndsSuitableForAntennaCoverageCalculator = true;
+
+                for ( LinkEnds::iterator iteratorLinkEnd = currentLinkEnd.begin() ; iteratorLinkEnd != currentLinkEnd.end() ; iteratorLinkEnd++ ){
+                    if ( observationViabilitySettings[j]->observationViabilityType_ == antenna_visibility &&
+                        ( iteratorLinkEnd->second.first != observationViabilitySettings[j]->getAssociatedLinkEnd().first &&
+                          iteratorLinkEnd->second.first != observationViabilitySettings[j]->getOppositeLinkEnd().first) ){
+
+                        areAllLinkEndsSuitableForAntennaCoverageCalculator = false;
+                    }
+                }
+
+                if ( areAllLinkEndsSuitableForAntennaCoverageCalculator == false ){
+                    currentViabilitySettings.erase( iteratorViabilitySettings );
+                }
+                else{
+                    isLinkEndAssociatedToProperViabilityCalculator = true;
+                }
+
+                iteratorViabilitySettings++;
+
+            }
+
+            if ( isLinkEndAssociatedToProperViabilityCalculator == true ){
+                viabilityCalculators[ currentObservableType ][ currentLinkEnd ] = createObservationViabilityCalculators(
+                            bodyMap, currentLinkEnd, currentObservableType, currentViabilitySettings );
+            }
+
         }
+
+        if ( viabilityCalculators.size( ) == 0 ){
+            throw std::runtime_error( "Error when creating observation model, viability calculator not properly defined for observation type "
+                                      + std::to_string( currentObservableType ) + "." );
+        }
+
     }
+
+
 
     return viabilityCalculators;
 }
