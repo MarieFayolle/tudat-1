@@ -171,7 +171,7 @@ bool AntennaCoverageCalculator::isObservationViable( const std::vector< Eigen::V
 
                     && ( visibilityConditionWithBeamwidthConstraintAndSphericalBodyOccultation( antennaBeamwidthVector_[i].second,
                              radiusOfOccultingBody_, antennaAngularPositionVector_[i].second, linkEndStates.at( linkEndIndices_.at( i ).second ),
-                             linkEndStates.at( linkEndIndices_.at( i ).second ), positionOfOccultingBody) == true ) ){
+                             linkEndStates.at( linkEndIndices_.at( i ).first ), positionOfOccultingBody) == true ) ){
 
 
                 isObservationPossible = 1;

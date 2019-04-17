@@ -69,7 +69,7 @@ ObservationViabilitySettingsList filterObservationViabilitySettings(
         // Iterate over all link ends
         for( LinkEnds::const_iterator linkEndIterator = linkEnds.begin( ); linkEndIterator != linkEnds.end( ); linkEndIterator++ )
         {
-            // Check if present viabilitytt setting is relevant
+            // Check if present viability setting is relevant
             if( linkEndIterator->second == observationViabilitySettings.at( i )->getAssociatedLinkEnd( ) ||
                     ( ( observationViabilitySettings.at( i )->getAssociatedLinkEnd( ).second == "" ) &&
                       ( observationViabilitySettings.at( i )->getAssociatedLinkEnd( ).first == linkEndIterator->second.first ) ) )
@@ -78,6 +78,72 @@ ObservationViabilitySettingsList filterObservationViabilitySettings(
                 break;
             }
         }
+    }
+
+    return filteredViabilitySettings;
+}
+
+//! Function to filter list of observationViabilitySettings, so that only those relevant for single set of link ends are retained
+ObservationViabilitySettingsList filterObservationViabilitySettingsForAntennaCalculator(
+        const ObservationViabilitySettingsList& observationViabilitySettings,
+        const LinkEnds& linkEnds )
+{
+    ObservationViabilitySettingsList filteredViabilitySettings;
+
+    // Iterate over all viability settings
+    for( unsigned int i = 0; i < observationViabilitySettings.size( ); i++ )
+    {
+
+        std::vector< bool > isRelevantViabilitySettingsVector;
+        bool isRelevantViabilitySettings = true;
+
+        // Iterate over all link ends
+        for( LinkEnds::const_iterator linkEndIterator = linkEnds.begin( ); linkEndIterator != linkEnds.end( ); linkEndIterator++ )
+        {
+            if ( observationViabilitySettings.at(i)->observationViabilityType_ == antenna_visibility ){
+
+                // Check if present viabilitytt setting is relevant
+                if( ( linkEndIterator->second == observationViabilitySettings.at( i )->getAssociatedLinkEnd( ) ||
+                        ( ( observationViabilitySettings.at( i )->getAssociatedLinkEnd( ).second == "" ) &&
+                          ( observationViabilitySettings.at( i )->getAssociatedLinkEnd( ).first == linkEndIterator->second.first ) ) )
+                        || ( ( linkEndIterator->second == observationViabilitySettings.at( i )->getOppositeLinkEnd() ) ||
+                             ( ( observationViabilitySettings.at( i )->getOppositeLinkEnd( ).second == "" ) &&
+                               ( observationViabilitySettings.at( i )->getOppositeLinkEnd( ).first == linkEndIterator->second.first ) ) ) )
+                {
+                    isRelevantViabilitySettingsVector.push_back( true );
+                }
+                else{
+                    isRelevantViabilitySettingsVector.push_back( false );
+                }
+
+            }
+            else{
+
+                // Check if present viabilitytt setting is relevant
+                if( linkEndIterator->second == observationViabilitySettings.at( i )->getAssociatedLinkEnd( ) ||
+                        ( ( observationViabilitySettings.at( i )->getAssociatedLinkEnd( ).second == "" ) &&
+                          ( observationViabilitySettings.at( i )->getAssociatedLinkEnd( ).first == linkEndIterator->second.first ) ) )
+                {
+                    isRelevantViabilitySettingsVector.push_back( true );
+                }
+                else{
+                    isRelevantViabilitySettingsVector.push_back( false );
+                }
+            }
+
+        }
+
+        for ( int i = 0 ; i < isRelevantViabilitySettingsVector.size() ; i++ ){
+            if ( isRelevantViabilitySettingsVector[ i ] == false ){
+                isRelevantViabilitySettings = false;
+            }
+        }
+
+        if ( isRelevantViabilitySettings == true ){
+            filteredViabilitySettings.push_back( observationViabilitySettings.at( i ) );
+//            break;
+        }
+
     }
 
     return filteredViabilitySettings;
@@ -769,6 +835,7 @@ std::shared_ptr< AntennaCoverageCalculator > createAntennaCoverageCalculator(
 
     std::cout << "CREATE ANTENNA COVERAGE CALCULATOR" << "\n\n";
 
+
     if( observationViabilitySettings->observationViabilityType_ != antenna_visibility )
     {
         throw std::runtime_error( "Error when making antenna coverage calculator, inconsistent input" );
@@ -865,7 +932,7 @@ std::vector< std::shared_ptr< ObservationViabilityCalculator > > createObservati
     std::vector< std::shared_ptr< ObservationViabilityCalculator > > linkViabilityCalculators;
 
     std::vector< std::shared_ptr< ObservationViabilitySettings > > relevantObservationViabilitySettings =
-            filterObservationViabilitySettings( observationViabilitySettings, linkEnds );
+            filterObservationViabilitySettingsForAntennaCalculator( observationViabilitySettings, linkEnds );
 
     for( unsigned int i = 0; i < relevantObservationViabilitySettings.size( ); i++ )
     {
@@ -914,6 +981,7 @@ std::vector< std::shared_ptr< ObservationViabilityCalculator > > createObservati
 
             linkViabilityCalculators.push_back(
                         createAntennaCoverageCalculator( bodyMap, linkEnds, observationType, relevantObservationViabilitySettings.at( i ) ) );
+
             break;
         default:
             throw std::runtime_error(
@@ -1007,7 +1075,6 @@ createObservationViabilityCalculators(
             LinkEnds currentLinkEnd = observableIterator->second[i];
             bool isLinkEndAssociatedToProperViabilityCalculator = false;
 
-
             std::vector< std::shared_ptr< ObservationViabilitySettings > > currentViabilitySettings = observationViabilitySettings;
             std::vector< std::shared_ptr< ObservationViabilitySettings > >::iterator iteratorViabilitySettings = currentViabilitySettings.begin();
 
@@ -1029,9 +1096,9 @@ createObservationViabilityCalculators(
                 }
                 else{
                     isLinkEndAssociatedToProperViabilityCalculator = true;
+                    iteratorViabilitySettings++;
                 }
 
-                iteratorViabilitySettings++;
 
             }
 
