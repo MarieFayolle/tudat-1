@@ -203,6 +203,7 @@ std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartia
         if( linkEndIterator->second.first == parameterToEstimate->getParameterName( ).second.first &&
                 linkEndIterator->second.second != "" )
         {
+
             // Set current body name and object.
             currentBodyName = linkEndIterator->second.first;
             currentBody = bodyMap.at( currentBodyName );
@@ -211,8 +212,10 @@ std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartia
             // with the rotation matrix partial created from createRotationMatrixPartialsWrtParameter function.
             if( estimatable_parameters::isParameterRotationMatrixProperty( parameterToEstimate->getParameterName( ).first ) )
             {
+
                 if( currentBody->getGroundStationMap( ).count( linkEndIterator->second.second ) == 0 )
                 {
+
                     throw std::runtime_error(
                                 "Error when making cartesian state partial w.r.t. rotation parameter, ground station " +
                                 linkEndIterator->second.second + " not found on body " + linkEndIterator->second.first );
@@ -231,6 +234,7 @@ std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartia
             }
             else
             {
+
                 // Check which parameter is requested and create position partial if direct dependency between position and
                 // parameter exists.
                 switch( parameterToEstimate->getParameterName( ).first )
@@ -242,6 +246,10 @@ std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartia
                 case estimatable_parameters::arc_wise_radiation_pressure_coefficient:
                     break;
                 case estimatable_parameters::arc_wise_constant_drag_coefficient:
+                    break;
+                case estimatable_parameters::full_degree_tidal_love_number:
+                    break;
+                case estimatable_parameters::single_degree_variable_tidal_love_number:
                     break;
                 case estimatable_parameters::ground_station_position:
 
