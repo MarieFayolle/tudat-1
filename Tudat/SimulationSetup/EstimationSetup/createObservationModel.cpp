@@ -943,43 +943,6 @@ std::shared_ptr< AntennaCoverageCalculator > createAntennaCoverageCalculator(
 
             else{
 
-//                // First antenna inertial orientation
-//                std::pair< double, double > angularOrientationAntenna =
-//                        bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaAngularPosition();
-
-//                Eigen::Vector3d sphericalBodyFixedAntennaOrientation =
-//                        ( Eigen::Vector3d( ) << 1.0, mathematical_constants::PI / 2.0 - angularOrientationAntenna.second,
-//                          angularOrientationAntenna.first ).finished();
-
-//                Eigen::Vector3d cartesianBodyFixedAntennaOrientation = coordinate_conversions::convertSphericalToCartesian(
-//                            sphericalBodyFixedAntennaOrientation );
-
-//                Eigen::Vector3d cartesianInertialAntennaOrientation = bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getRotationalEphemeris()
-//                        ->getRotationToBaseFrame( 0.0 ).toRotationMatrix() * cartesianBodyFixedAntennaOrientation;
-
-//                Eigen::Vector3d sphericalInertialAntennaOrientation = coordinate_conversions::convertCartesianToSpherical(
-//                            cartesianInertialAntennaOrientation );
-
-//                std::pair< double, double > firstAntennaInertialOrientation = std::make_pair( sphericalInertialAntennaOrientation[ 2 ],
-//                        mathematical_constants::PI / 2.0 - sphericalInertialAntennaOrientation[ 1 ]);
-
-
-//                // Second antenna inertial orientation
-//                angularOrientationAntenna = bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaAngularPosition();
-
-//                sphericalBodyFixedAntennaOrientation = ( Eigen::Vector3d( ) << 1.0, mathematical_constants::PI / 2.0 - angularOrientationAntenna.second,
-//                          angularOrientationAntenna.first ).finished();
-
-//                cartesianBodyFixedAntennaOrientation = coordinate_conversions::convertSphericalToCartesian( sphericalBodyFixedAntennaOrientation );
-
-//                cartesianInertialAntennaOrientation = bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getRotationalEphemeris()
-//                        ->getRotationToBaseFrame( 0.0 ).toRotationMatrix() * cartesianBodyFixedAntennaOrientation;
-
-//                sphericalInertialAntennaOrientation = coordinate_conversions::convertCartesianToSpherical( cartesianInertialAntennaOrientation );
-
-//                std::pair< double, double > secondAntennaInertialOrientation = std::make_pair( sphericalInertialAntennaOrientation[ 2 ],
-//                        mathematical_constants::PI / 2.0 - sphericalInertialAntennaOrientation[ 1 ]);
-
 
                 rotationalEphemeridesVector.push_back(
                             std::make_pair(  std::dynamic_pointer_cast< ephemerides::TidallyLockedRotationalEphemeris >(
@@ -987,8 +950,6 @@ std::shared_ptr< AntennaCoverageCalculator > createAntennaCoverageCalculator(
                                              std::dynamic_pointer_cast< ephemerides::TidallyLockedRotationalEphemeris >(
                                                  bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getRotationalEphemeris() ) ) );
 
-//                // Return inertial antennae orientation vector
-//                antennaAngularPositionVector.push_back( std::make_pair( firstAntennaInertialOrientation, secondAntennaInertialOrientation) );
             }
 
 
