@@ -15,6 +15,7 @@
 
 
 #include "Tudat/SimulationSetup/EstimationSetup/createObservationModel.h"
+#include "Tudat/Astrodynamics/Ephemerides/tidallyLockedRotationalEphemeris.h"
 
 namespace tudat
 {
@@ -876,6 +877,8 @@ std::shared_ptr< AntennaCoverageCalculator > createAntennaCoverageCalculator(
 
     std::vector< std::pair< std::pair< double, double >, std::pair< double, double > > > antennaAngularPositionVector;
     std::vector< std::pair< double, double > > antennaBeamwidthVector;
+    std::vector< std::pair< std::shared_ptr< ephemerides::TidallyLockedRotationalEphemeris >,
+                            std::shared_ptr< ephemerides::TidallyLockedRotationalEphemeris > > > rotationalEphemeridesVector;
 
     if ( linkEndsIndices.size() != bodyNamesAssociatedToEachLinkEnd.size() ){
         throw std::runtime_error(" Error, sizes non consistent between link end indices and associated body names when creating antenna"
@@ -885,25 +888,37 @@ std::shared_ptr< AntennaCoverageCalculator > createAntennaCoverageCalculator(
 
         for ( int i = 0 ; i < bodyNamesAssociatedToEachLinkEnd.size() ; i++ ){
 
+            // Check if antenna orientations are defined
             if ( bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaAngularPosition()
-                 == std::make_pair( TUDAT_NAN, TUDAT_NAN ) ||
-                 bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaAngularPosition()
-                                  == std::make_pair( TUDAT_NAN, TUDAT_NAN ) ){
+                 == std::make_pair( TUDAT_NAN, TUDAT_NAN ) ){
+                throw std::runtime_error( "Error when making antenna coverage calculator, no angular position for antenna is provided"
+                                          "for body" + bodyNamesAssociatedToEachLinkEnd[i].first + "." );
+            }
+            else if ( bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaAngularPosition()
+                      == std::make_pair( TUDAT_NAN, TUDAT_NAN ) ){
+                throw std::runtime_error( "Error when making antenna coverage calculator, no angular position for antenna is provided"
+                                          "for body" + bodyNamesAssociatedToEachLinkEnd[i].second + "." );
 
-                throw std::runtime_error( "Error when making antenna coverage calculator, no angular position for antenna is provided." );
             }
             else{
+
+                // Return body-fixed antennar orientation
                 antennaAngularPositionVector.push_back( std::make_pair(
-                         bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaAngularPosition(),
-                         bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaAngularPosition()) );
+                               bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaAngularPosition(),
+                               bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaAngularPosition() ) );
+
             }
 
 
+
+
+            // Check if antenna beamwidth is defined
             if ( bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaBeamwidth() == TUDAT_NAN ||
                  bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaBeamwidth() == TUDAT_NAN ){
 
                 throw std::runtime_error( "Error when making antenna coverage calculator, no beamwidth for vehicle antenna is provided." );
             }
+
             else{
 
                 antennaBeamwidthVector.push_back( std::make_pair(
@@ -911,13 +926,80 @@ std::shared_ptr< AntennaCoverageCalculator > createAntennaCoverageCalculator(
                          bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaBeamwidth() ) );
             }
 
+
+
+
+            // Check whether rotational models are consistent or not
+            if ( std::dynamic_pointer_cast< ephemerides::TidallyLockedRotationalEphemeris >(
+                          bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getRotationalEphemeris() ) == nullptr ){
+                throw std::runtime_error( "Error when making antenna coverage calculator, no tidally locked rotational model"
+                                          "is provided for body"+ bodyNamesAssociatedToEachLinkEnd[i].first + "." );
+            }
+            else if ( std::dynamic_pointer_cast< ephemerides::TidallyLockedRotationalEphemeris >(
+                          bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getRotationalEphemeris() ) == nullptr ){
+                throw std::runtime_error( "Error when making antenna coverage calculator, no tidally locked rotational model"
+                                          "is provided for body"+ bodyNamesAssociatedToEachLinkEnd[i].second + "." );
+            }
+
+            else{
+
+//                // First antenna inertial orientation
+//                std::pair< double, double > angularOrientationAntenna =
+//                        bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getVehicleSystems()->getAntennaAngularPosition();
+
+//                Eigen::Vector3d sphericalBodyFixedAntennaOrientation =
+//                        ( Eigen::Vector3d( ) << 1.0, mathematical_constants::PI / 2.0 - angularOrientationAntenna.second,
+//                          angularOrientationAntenna.first ).finished();
+
+//                Eigen::Vector3d cartesianBodyFixedAntennaOrientation = coordinate_conversions::convertSphericalToCartesian(
+//                            sphericalBodyFixedAntennaOrientation );
+
+//                Eigen::Vector3d cartesianInertialAntennaOrientation = bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getRotationalEphemeris()
+//                        ->getRotationToBaseFrame( 0.0 ).toRotationMatrix() * cartesianBodyFixedAntennaOrientation;
+
+//                Eigen::Vector3d sphericalInertialAntennaOrientation = coordinate_conversions::convertCartesianToSpherical(
+//                            cartesianInertialAntennaOrientation );
+
+//                std::pair< double, double > firstAntennaInertialOrientation = std::make_pair( sphericalInertialAntennaOrientation[ 2 ],
+//                        mathematical_constants::PI / 2.0 - sphericalInertialAntennaOrientation[ 1 ]);
+
+
+//                // Second antenna inertial orientation
+//                angularOrientationAntenna = bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getVehicleSystems()->getAntennaAngularPosition();
+
+//                sphericalBodyFixedAntennaOrientation = ( Eigen::Vector3d( ) << 1.0, mathematical_constants::PI / 2.0 - angularOrientationAntenna.second,
+//                          angularOrientationAntenna.first ).finished();
+
+//                cartesianBodyFixedAntennaOrientation = coordinate_conversions::convertSphericalToCartesian( sphericalBodyFixedAntennaOrientation );
+
+//                cartesianInertialAntennaOrientation = bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getRotationalEphemeris()
+//                        ->getRotationToBaseFrame( 0.0 ).toRotationMatrix() * cartesianBodyFixedAntennaOrientation;
+
+//                sphericalInertialAntennaOrientation = coordinate_conversions::convertCartesianToSpherical( cartesianInertialAntennaOrientation );
+
+//                std::pair< double, double > secondAntennaInertialOrientation = std::make_pair( sphericalInertialAntennaOrientation[ 2 ],
+//                        mathematical_constants::PI / 2.0 - sphericalInertialAntennaOrientation[ 1 ]);
+
+
+                rotationalEphemeridesVector.push_back(
+                            std::make_pair(  std::dynamic_pointer_cast< ephemerides::TidallyLockedRotationalEphemeris >(
+                                                 bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].first )->getRotationalEphemeris() ),
+                                             std::dynamic_pointer_cast< ephemerides::TidallyLockedRotationalEphemeris >(
+                                                 bodyMap.at( bodyNamesAssociatedToEachLinkEnd[i].second )->getRotationalEphemeris() ) ) );
+
+//                // Return inertial antennae orientation vector
+//                antennaAngularPositionVector.push_back( std::make_pair( firstAntennaInertialOrientation, secondAntennaInertialOrientation) );
+            }
+
+
         }
     }
     
 
     return std::make_shared< AntennaCoverageCalculator >( getLinkEndIndicesForAntennaCoverageViability( linkEnds, observationType,
                             observationViabilitySettings->getAssociatedLinkEnd( ), observationViabilitySettings->getOppositeLinkEnd() ),
-                            stateOfOccultingBody, occultingBodyRadius, antennaAngularPositionVector, antennaBeamwidthVector );
+                            stateOfOccultingBody, occultingBodyRadius, antennaAngularPositionVector, antennaBeamwidthVector,
+                            rotationalEphemeridesVector );
 }
 
 

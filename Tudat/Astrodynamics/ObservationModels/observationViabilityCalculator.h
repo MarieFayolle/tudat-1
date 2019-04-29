@@ -23,6 +23,7 @@
 #include "Tudat/Astrodynamics/GroundStations/groundStation.h"
 #include "Tudat/Astrodynamics/ObservationModels/linkTypeDefs.h"
 #include "Tudat/Astrodynamics/ObservationModels/observableTypes.h"
+#include "Tudat/Astrodynamics/Ephemerides/tidallyLockedRotationalEphemeris.h"
 
 namespace tudat
 {
@@ -297,12 +298,15 @@ public:
             const std::function< Eigen::Vector6d( const double ) > stateFunctionOfOccultingBody,
             const double radiusOfOccultingBody,
             const std::vector< std::pair< std::pair< double, double >, std::pair< double, double > > > antennaAngularPositionVector,
-            const std::vector< std::pair< double, double > > antennaBeamwidthVector):
+            const std::vector< std::pair< double, double > > antennaBeamwidthVector,
+            const std::vector< std::pair< std::shared_ptr< ephemerides::TidallyLockedRotationalEphemeris >,
+                                          std::shared_ptr< ephemerides::TidallyLockedRotationalEphemeris > > > rotationalEphemeridesVector ):
         linkEndIndices_( linkEndIndices ),
         stateFunctionOfOccultingBody_( stateFunctionOfOccultingBody ),
         radiusOfOccultingBody_( radiusOfOccultingBody ),
         antennaAngularPositionVector_( antennaAngularPositionVector ),
-        antennaBeamwidthVector_( antennaBeamwidthVector ){ }
+        antennaBeamwidthVector_( antennaBeamwidthVector ),
+        rotationalEphemeridesVector_( rotationalEphemeridesVector ){ }
 
     //! Function for determining whether the link is possible during the observataion.
     /*!
@@ -341,6 +345,10 @@ private:
 
     //! Vector of beamwidth for antennae (for bodies involved in the link end)
     std::vector< std::pair< double, double > > antennaBeamwidthVector_;
+
+    //! Vector of rotational ephemerides (for bodies involved in the link end)
+    std::vector< std::pair< std::shared_ptr< ephemerides::TidallyLockedRotationalEphemeris >,
+                                              std::shared_ptr< ephemerides::TidallyLockedRotationalEphemeris > > > rotationalEphemeridesVector_;
 };
 
 

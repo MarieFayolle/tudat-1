@@ -163,14 +163,53 @@ bool AntennaCoverageCalculator::isObservationViable( const std::vector< Eigen::V
                           linkEndTimes.at( linkEndIndices_.at( i ).second ) ) / 2.0 );
 
 
+            // Get first antenna inertial orientation
+            std::pair< double, double > angularOrientationAntenna = antennaAngularPositionVector_[i].first;
+
+            Eigen::Vector3d sphericalBodyFixedAntennaOrientation = ( Eigen::Vector3d( ) << 1.0,
+                                                                     mathematical_constants::PI / 2.0 - angularOrientationAntenna.second,
+                                                                     angularOrientationAntenna.first ).finished();
+
+            Eigen::Vector3d cartesianBodyFixedAntennaOrientation = coordinate_conversions::convertSphericalToCartesian(
+                        sphericalBodyFixedAntennaOrientation );
+
+            Eigen::Vector3d cartesianInertialAntennaOrientation = rotationalEphemeridesVector_[i].first
+                    ->getRotationToBaseFrame( linkEndTimes.at( linkEndIndices_.at( i ).first ) ).toRotationMatrix()
+                    * cartesianBodyFixedAntennaOrientation;
+
+            Eigen::Vector3d sphericalInertialAntennaOrientation = coordinate_conversions::convertCartesianToSpherical(
+                        cartesianInertialAntennaOrientation );
+
+            std::pair< double, double > firstAntennaInertialOrientation = std::make_pair( sphericalInertialAntennaOrientation[ 2 ],
+                    mathematical_constants::PI / 2.0 - sphericalInertialAntennaOrientation[ 1 ]);
+
+
+            // Get second antenna inertial orientation
+            angularOrientationAntenna = antennaAngularPositionVector_[i].second;
+
+            sphericalBodyFixedAntennaOrientation = ( Eigen::Vector3d( ) << 1.0, mathematical_constants::PI / 2.0 - angularOrientationAntenna.second,
+                      angularOrientationAntenna.first ).finished();
+
+            cartesianBodyFixedAntennaOrientation = coordinate_conversions::convertSphericalToCartesian( sphericalBodyFixedAntennaOrientation );
+
+            cartesianInertialAntennaOrientation = rotationalEphemeridesVector_[i].first
+                    ->getRotationToBaseFrame( linkEndTimes.at( linkEndIndices_.at( i ).first ) ).toRotationMatrix()
+                    * cartesianBodyFixedAntennaOrientation;
+
+            sphericalInertialAntennaOrientation = coordinate_conversions::convertCartesianToSpherical( cartesianInertialAntennaOrientation );
+
+            std::pair< double, double > secondAntennaInertialOrientation = std::make_pair( sphericalInertialAntennaOrientation[ 2 ],
+                    mathematical_constants::PI / 2.0 - sphericalInertialAntennaOrientation[ 1 ]);
+
+
 
             // Check if observed link end is visible from antenna of the observing link end.
             if( ( visibilityConditionWithBeamwidthConstraintAndSphericalBodyOccultation( antennaBeamwidthVector_[i].first,
-                             radiusOfOccultingBody_, antennaAngularPositionVector_[i].first, linkEndStates.at( linkEndIndices_.at( i ).first ),
+                             radiusOfOccultingBody_, firstAntennaInertialOrientation, linkEndStates.at( linkEndIndices_.at( i ).first ),
                              linkEndStates.at( linkEndIndices_.at( i ).second ), positionOfOccultingBody ) == true )
 
                     && ( visibilityConditionWithBeamwidthConstraintAndSphericalBodyOccultation( antennaBeamwidthVector_[i].second,
-                             radiusOfOccultingBody_, antennaAngularPositionVector_[i].second, linkEndStates.at( linkEndIndices_.at( i ).second ),
+                             radiusOfOccultingBody_, secondAntennaInertialOrientation, linkEndStates.at( linkEndIndices_.at( i ).second ),
                              linkEndStates.at( linkEndIndices_.at( i ).first ), positionOfOccultingBody) == true ) ){
 
 
