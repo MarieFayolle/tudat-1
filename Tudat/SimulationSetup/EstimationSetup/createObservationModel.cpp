@@ -95,6 +95,8 @@ ObservationViabilitySettingsList filterObservationViabilitySettingsForAntennaCal
     for( unsigned int i = 0; i < observationViabilitySettings.size( ); i++ )
     {
 
+        if ( observationViabilitySettings[ i ]->observationViabilityType_ == antenna_visibility ){
+
         std::vector< bool > isRelevantViabilitySettingsVector;
         bool isRelevantViabilitySettings = true;
 
@@ -142,7 +144,27 @@ ObservationViabilitySettingsList filterObservationViabilitySettingsForAntennaCal
 
         if ( isRelevantViabilitySettings == true ){
             filteredViabilitySettings.push_back( observationViabilitySettings.at( i ) );
-//            break;
+        }
+
+        }
+
+
+        // If the viability type is not related to the spacecraft antenna
+        else {
+
+            // Iterate over all link ends
+            for( LinkEnds::const_iterator linkEndIterator = linkEnds.begin( ); linkEndIterator != linkEnds.end( ); linkEndIterator++ )
+            {
+                // Check if present viability setting is relevant
+                if( linkEndIterator->second == observationViabilitySettings.at( i )->getAssociatedLinkEnd( ) ||
+                        ( ( observationViabilitySettings.at( i )->getAssociatedLinkEnd( ).second == "" ) &&
+                          ( observationViabilitySettings.at( i )->getAssociatedLinkEnd( ).first == linkEndIterator->second.first ) ) )
+                {
+                    filteredViabilitySettings.push_back( observationViabilitySettings.at( i ) );
+                    break;
+                }
+            }
+
         }
 
     }
@@ -1104,6 +1126,7 @@ createObservationViabilityCalculators(
         const std::map< ObservableType, std::vector< LinkEnds > > linkEndsPerObservable,
         const std::vector< std::shared_ptr< ObservationViabilitySettings > >& observationViabilitySettings )
 {
+
     PerObservableObservationViabilityCalculatorList viabilityCalculators;
 
     for( std::map< ObservableType, std::vector< LinkEnds > >::const_iterator observableIterator = linkEndsPerObservable.begin( );
@@ -1133,6 +1156,7 @@ createObservationViabilityCalculators(
                         areAllLinkEndsSuitableForAntennaCoverageCalculator = false;
                     }
                 }
+
 
                 if ( areAllLinkEndsSuitableForAntennaCoverageCalculator == false ){
                     currentViabilitySettings.erase( iteratorViabilitySettings );
