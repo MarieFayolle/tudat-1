@@ -280,7 +280,7 @@ public:
         const double backLambertianCoefficient, const double reflectivityCoefficient,
         const double specularReflectionCoefficient,
         const std::vector< std::string >& occultingBodies = std::vector< std::string >( ),
-        const std::vector< std::string >& centralBodies = std::vector< std::string >( )):
+        const std::vector< std::string >& centralBodies = std::vector< std::string >( ) ):
         RadiationPressureInterfaceSettings( solar_sailing_radiation_pressure_interface, sourceBody, occultingBodies ),
         updateFunction_ (updateFunction), area_( area ), coneAngleFunction_( coneAngle ),
         clockAngleFunction_( clockAngle ), frontEmissivityCoefficient_( frontEmissivityCoefficient ),
@@ -317,7 +317,7 @@ public:
      *  Function to set cone angle.
      *  \param cone angle.
      */
-    void setConeAngle( std::function< double( ) > coneAngle ){coneAngleFunction_=coneAngle;}
+    void setConeAngle( std::function< double( ) > coneAngle ){ coneAngleFunction_ = coneAngle; }
 
     //! Function to return clock angle
     /*!
@@ -331,7 +331,7 @@ public:
      *  Function to set clock angle.
      *  \param clock angle.
      */
-    void setClockAngle( std::function< double(  ) > clockAngle ){ clockAngleFunction_=clockAngle; }
+    void setClockAngle( std::function< double(  ) > clockAngle ){ clockAngleFunction_ = clockAngle; }
 
     //! Function to return front emissivity coefficient
     /*!
