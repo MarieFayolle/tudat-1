@@ -21,6 +21,7 @@ set(ACCELERATION_PARTIALS_SOURCES
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/tidalLoveNumberPartialInterface.cpp"
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/directTidalDissipationAccelerationPartial.cpp"
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/panelledRadiationPressureAccelerationPartial.cpp"
+  "${SRCROOT}${ACCELERATIONPARTIALSDIR}/solarSailingRadiationPressureAccelerationPartial.cpp"
 )
 
 # Set the header files.
@@ -39,6 +40,7 @@ set(ACCELERATION_PARTIALS_HEADERS
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/tidalLoveNumberPartialInterface.h"
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/directTidalDissipationAccelerationPartial.h"
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/panelledRadiationPressureAccelerationPartial.h"
+  "${SRCROOT}${ACCELERATIONPARTIALSDIR}/solarSailingRadiationPressureAccelerationPartial.h"
 )
 
 # Add static libraries.

@@ -305,8 +305,8 @@ BOOST_AUTO_TEST_CASE( testSolarSailForceModelUranus )
     const double coneAngle = 0.0;
     const double clockAngle = 0.0;
 
-    Eigen::Vector3d velocityVector = std::sqrt(earthGravitationalParameter/distanceSunToUranus)
-        *Eigen::Vector3d( std::sqrt( 2.0 ) / 2.0, std::sqrt( 2.0 ) / 2.0, 0.0 );
+    Eigen::Vector3d velocityVector = std::sqrt( earthGravitationalParameter / distanceSunToUranus )
+        * Eigen::Vector3d( std::sqrt( 2.0 ) / 2.0, std::sqrt( 2.0 ) / 2.0, 0.0 );
 
 
     const Eigen::Vector3d computedSolarSailForce

@@ -13,6 +13,7 @@
 
 #include "Tudat/Astrodynamics/ElectroMagnetism/solarSailAcceleration.h"
 #include "Tudat/Astrodynamics/ElectroMagnetism/solarSailForce.h"
+#include "Tudat/Astrodynamics/ElectroMagnetism/radiationPressureInterface.h"
 
 namespace tudat
 {
@@ -35,6 +36,7 @@ Eigen::Vector3d computeSolarSailAcceleration(
         const double clockAngle,
         const double mass )
 {
+
     return computeSolarSailForce(
                 frontEmissivityCoefficient, backEmissivityCoefficient, frontLambertianCoefficient,
                 backLambertianCoefficient, reflectivityCoefficient, specularReflectionCoefficient, vectorToSource,

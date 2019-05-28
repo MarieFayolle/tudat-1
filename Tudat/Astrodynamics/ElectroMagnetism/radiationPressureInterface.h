@@ -520,10 +520,10 @@ public:
             const std::function< Eigen::Vector3d( ) > sourcePositionFunction,
             const std::function< Eigen::Vector3d( ) > targetPositionFunction,
             const std::function< Eigen::Vector3d( ) > targetVelocityFunction,
-            const std::function< void( const double ) > updateFunction,
+//            const std::function< void( const double ) > updateFunction,
             const double area,
-            const std::function< double(  ) > coneAngle,
-            const std::function< double(  ) > clockAngle,
+            const std::function< double( const double ) > coneAngle,
+            const std::function< double( const double  ) > clockAngle,
             const double frontEmissivityCoefficient,
             const double backEmissivityCoefficient,
             const double frontLambertianCoefficient,
@@ -540,7 +540,7 @@ public:
             sourcePower, sourcePositionFunction, targetPositionFunction, TUDAT_NAN, area,
             occultingBodyPositions, occultingBodyRadii, sourceRadius ),
             targetVelocityFunction_( targetVelocityFunction ),
-            updateFunctionConeAndClockAngles_( updateFunction ),
+//            updateFunctionConeAndClockAngles_( updateFunction ),
             coneAngleFunction_( coneAngle ),
             clockAngleFunction_( clockAngle ),
             frontEmissivityCoefficient_( frontEmissivityCoefficient ),
@@ -562,11 +562,10 @@ public:
     {
         updateInterfaceBase( currentTime );
 
-        currentConeAngle_ = coneAngleFunction_();
-        currentClockAngle_ = clockAngleFunction_();
-        updateFunctionConeAndClockAngles_( currentTime_ );
+        currentConeAngle_ = coneAngleFunction_( currentTime );
+        currentClockAngle_ = clockAngleFunction_( currentTime );
 
-        currentUnitVelocityVector_ = (targetVelocityFunction_() - centralBodyVelocity_[0]()).normalized();
+        currentUnitVelocityVector_ = ( targetVelocityFunction_( ) - centralBodyVelocity_[0]( ) ).normalized( );
 
     }
 
@@ -616,7 +615,7 @@ public:
      *  Function to return the cone angle function
      *  \return The cone angle function.
      */
-    std::function< double( ) > getConeAngleFunction( ) const
+    std::function< double( const double ) > getConeAngleFunction( ) const
     {
         return coneAngleFunction_;
     }
@@ -626,7 +625,7 @@ public:
      *  Function to return the clock angle function
      *  \return The clock angle function.
      */
-    std::function< double( ) > getClockAngleFunction( ) const
+    std::function< double( const double ) > getClockAngleFunction( ) const
     {
         return clockAngleFunction_;
     }
@@ -711,10 +710,10 @@ private:
     std::function< void( const double ) > updateFunctionConeAndClockAngles_;
 
     //! Function returning current cone angle of the target body.
-    std::function< double(  ) > coneAngleFunction_;
+    std::function< double( const double  ) > coneAngleFunction_;
 
     //! Function returning current clock angle of the target body.
-    std::function< double(  ) > clockAngleFunction_;
+    std::function< double( const double  ) > clockAngleFunction_;
 
     //! Current cone angle of the body (in rad).
     double currentConeAngle_;

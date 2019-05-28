@@ -26,8 +26,8 @@
 #include <Eigen/Core>
 
 #include "Tudat/Astrodynamics/BasicAstrodynamics/accelerationModel.h"
-
 #include "Tudat/Astrodynamics/ElectroMagnetism/solarSailForce.h"
+#include "Tudat/Astrodynamics/ElectroMagnetism/radiationPressureInterface.h"
 
 namespace tudat
 {
@@ -206,6 +206,39 @@ public:
         this->updateMembers( );
     }
 
+
+    //! Constructor for setting up the acceleration model, with input RadiationPressureInterface (and massFunction)
+    /*!
+     *  Constructor for setting up the acceleration model, with input RadiationPressureInterface (and massFunction). The massFunction
+     *  is only used to convert force to acceleration. All radiation pressure properties are taken from the
+     *  RadiationPressureInterface object.
+     *  \param radiationPressureInterface Object in which radiation pressure properties of accelerated body due to radiation
+     *  from body causing acceleration is stored.
+     *  \param massFunction Function returning the current mass of the body being accelerated
+     */
+    SolarSailAcceleration( const std::shared_ptr< SolarSailingRadiationPressureInterface > radiationPressureInterface,
+                           const std::function< double( ) > massFunction ):
+        sourcePositionFunction_( std::bind( &RadiationPressureInterface::getCurrentSolarVector, radiationPressureInterface ) ),
+//        sourcePositionFunction_( radiationPressureInterface->getSourcePositionFunction() ),
+        acceleratedBodyPositionFunction_( radiationPressureInterface->getTargetPositionFunction() ),
+        acceleratedBodyVelocityFunction_( radiationPressureInterface->getTargetVelocityFunction() ),
+        centralBodyVelocityFunction_( radiationPressureInterface->getCentralBodyVelocity()[0] ),
+        radiationPressureFunction_( std::bind( &RadiationPressureInterface::getCurrentRadiationPressure, radiationPressureInterface ) ),
+        coneAngleFunction_( std::bind( &SolarSailingRadiationPressureInterface::getCurrentConeAngle, radiationPressureInterface ) ),
+        clockAngleFunction_( std::bind( &SolarSailingRadiationPressureInterface::getCurrentClockAngle, radiationPressureInterface ) ),
+        frontEmissivityCoefficientFunction_( std::bind( &SolarSailingRadiationPressureInterface::getFrontEmissivityCoefficient, radiationPressureInterface ) ),
+        backEmissivityCoefficientFunction_( std::bind( &SolarSailingRadiationPressureInterface::getBackEmissivityCoefficient, radiationPressureInterface ) ),
+        frontLambertianCoefficientFunction_( std::bind( &SolarSailingRadiationPressureInterface::getFrontLambertianCoefficient, radiationPressureInterface ) ),
+        backLambertianCoefficientFunction_( std::bind( &SolarSailingRadiationPressureInterface::getBackLambertianCoefficient, radiationPressureInterface ) ),
+        reflectivityCoefficientFunction_( std::bind( &SolarSailingRadiationPressureInterface::getReflectivityCoefficient, radiationPressureInterface ) ),
+        specularReflectionCoefficientFunction_( std::bind( &SolarSailingRadiationPressureInterface::getSpecularReflectionCoefficient, radiationPressureInterface ) ),
+        areaFunction_( std::bind( &RadiationPressureInterface::getArea, radiationPressureInterface ) ),
+        massFunction_( massFunction )
+    {
+        this->updateMembers( );
+    }
+
+
     //! Get solar sail acceleration.
     /*!
      * Returns the solar sail acceleration. No arguments are passed to this function.
@@ -222,7 +255,7 @@ public:
                     currentFrontEmissivityCoefficient_, currentBackEmissivityCoefficient_,
                     currentFrontLambertianCoefficient_, currentBackLambertianCoefficient_,
                     currentReflectivityCoefficient_, currentSpecularReflectionCoefficient_,
-                    currentVectorToSource_, currentVelocityUnitVector_,
+                    currentNormalizedVectorToSource_, currentNormalizedVelocityVector_,
                     currentRadiationPressure_, currentArea_,
                     currentConeAngle_, currentClockAngle_, currentMass_ );
     }
@@ -244,14 +277,15 @@ public:
             currentBackLambertianCoefficient_ = backLambertianCoefficientFunction_( );
             currentReflectivityCoefficient_ = reflectivityCoefficientFunction_( );
             currentSpecularReflectionCoefficient_ = specularReflectionCoefficientFunction_( );
-            currentVectorToSource_ = ( sourcePositionFunction_( )
-                                       - acceleratedBodyPositionFunction_( ) ).normalized( );
-            currentVelocityUnitVector_=(acceleratedBodyVelocityFunction_()-centralBodyVelocityFunction_()).normalized();
+            currentNormalizedVectorToSource_ = ( sourcePositionFunction_( ) - acceleratedBodyPositionFunction_( ) ).normalized( );
+            currentNormalizedVelocityVector_= ( acceleratedBodyVelocityFunction_( ) - centralBodyVelocityFunction_( ) ).normalized( );
             currentRadiationPressure_ = radiationPressureFunction_( );
             currentArea_ = areaFunction_( );
             currentConeAngle_ = coneAngleFunction_( );
             currentClockAngle_ = clockAngleFunction_( );
             currentMass_ = massFunction_( );
+            currentDistanceToSource_ = ( sourcePositionFunction_( ) - acceleratedBodyPositionFunction_( ) ).norm();
+            currentVelocityWrtSource_ = ( acceleratedBodyVelocityFunction_( ) - centralBodyVelocityFunction_( ) ).norm( );
         }
 
     }
@@ -266,13 +300,78 @@ public:
         return massFunction_;
     }
 
+    //! Returns the current normalized vector from the accelerated body to the source body
+    /*!
+     *  Returns the current normalized vector from the accelerated body to the source body, as set by the last call to the updateMembers function
+     *  \return The current normalized vector from the accelerated body to the source body
+     */
+    Eigen::Vector3d getCurrentVectorToSource( )
+    {
+        return currentNormalizedVectorToSource_;
+    }
+
+    //! Returns the current normalized velocity vector vector of the accelerated body w.r.t. the source body.
+    /*!
+     *  Returns the current normalized velocity vector vector of the accelerated body w.r.t. the source body.
+     *  \return The current normalized velocity vector of the accelerated body w.r.t. the source body.
+     */
+    Eigen::Vector3d getCurrentVelocityVector( )
+    {
+        return currentNormalizedVelocityVector_;
+    }
+
+    //! Returns the current distance from the accelerated body to the source body
+    /*!
+     *  Returns the current distance from the accelerated body to the source body, as set by the last call to the updateMembers function
+     *  (i.e. norm of the current vector from accelerated body to the source)
+     *  \return The current distance from the accelerated body to the source body
+     */
+    double getCurrentDistanceToSource( )
+    {
+        return currentDistanceToSource_;
+    }
+
+    //! Returns the current velocity of the accelerated body w.r.t. the source body
+    /*!
+     *  Returns the current distance of the accelerated body w.r.t. the source body, as set by the last call to the updateMembers function
+     *  (i.e. norm of the current velocity vector of the accelerated body w.r.t. source body)
+     *  \return The current velocity of the accelerated body w.r.t. the source body
+     */
+    double getCurrentVelocityWrtSource( )
+    {
+        return currentVelocityWrtSource_;
+    }
+
+    //! Returns the current radiation pressure at the accelerated body
+    /*!
+     *  Returns the current radiation pressure at the accelerated body, as set by the last call to the updateMembers function
+     *  (i.e. incident flux, in W/m^2, divided by speed of light)
+     *  \return The current radiation pressure at the accelerated body
+     */
+    double getCurrentRadiationPressure( )
+    {
+        return currentRadiationPressure_;
+    }
+
+    //! Returns the current mass of the accelerated body
+    /*!
+     *  Returns the current mass of the accelerated body, as set by the last call to the updateMembers function
+     *  \return The current mass of the accelerated body
+     */
+    double getCurrentMass( )
+    {
+        return currentMass_;
+    }
+
+
+
 private:
 
     //! Function pointer returning position of source.
     /*!
      * Function pointer returning position of source (3D vector).
      */
-    const Vector3dReturningFunction sourcePositionFunction_;
+    Vector3dReturningFunction sourcePositionFunction_;
 
     //! Function pointer returning position of accelerated body.
     /*!
@@ -407,13 +506,13 @@ private:
     /*!
      * Current vector from accelerated body to source (3D vector).
      */
-    Eigen::Vector3d currentVectorToSource_;
+    Eigen::Vector3d currentNormalizedVectorToSource_;
 
     //! Current velocity unit vector of the propagated body.
     /*!
      * Current velocity unit vector of the propagated body (3D vector).
      */
-    Eigen::Vector3d currentVelocityUnitVector_;
+    Eigen::Vector3d currentNormalizedVelocityVector_;
 
     //! Current radiation pressure.
     /*!
@@ -444,6 +543,18 @@ private:
      * Current mass of accelerated body [kg].
      */
     double currentMass_;
+
+    //! Current distance between accelerated body and source body.
+    /*!
+     * Current distance between accelerated body and source body [m].
+     */
+    double currentDistanceToSource_;
+
+    //! Current velocity of the accelerated body w.r.t. the source body.
+    /*!
+     * Current velocity of the accelerated body w.r.t. the source body [m/s].
+     */
+    double currentVelocityWrtSource_;
 
 };
 

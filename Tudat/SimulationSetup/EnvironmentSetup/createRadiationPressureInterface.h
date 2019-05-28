@@ -272,17 +272,17 @@ public:
 
     SolarSailRadiationInterfaceSettings(
         const std::string& sourceBody,
-        const std::function< void(const double) > updateFunction,
+//        const std::function< void(const double) > updateFunction,
         const double area,
-        const std::function< double(  ) > coneAngle,
-        const std::function< double(  ) > clockAngle,
+        const std::function< double( const double ) > coneAngle,
+        const std::function< double( const double ) > clockAngle,
         const double frontEmissivityCoefficient, const double backEmissivityCoefficient, const double frontLambertianCoefficient,
         const double backLambertianCoefficient, const double reflectivityCoefficient,
         const double specularReflectionCoefficient,
         const std::vector< std::string >& occultingBodies = std::vector< std::string >( ),
         const std::vector< std::string >& centralBodies = std::vector< std::string >( ) ):
         RadiationPressureInterfaceSettings( solar_sailing_radiation_pressure_interface, sourceBody, occultingBodies ),
-        updateFunction_ (updateFunction), area_( area ), coneAngleFunction_( coneAngle ),
+        /*updateFunction_ (updateFunction),*/ area_( area ), coneAngleFunction_( coneAngle ),
         clockAngleFunction_( clockAngle ), frontEmissivityCoefficient_( frontEmissivityCoefficient ),
         backEmissivityCoefficient_( backEmissivityCoefficient ),
         frontLambertianCoefficient_( frontLambertianCoefficient ),
@@ -310,28 +310,28 @@ public:
      *  Function to return cone angle
      *  \return Cone angle
      */
-    std::function< double(  ) > getConeAngle(  ) {return coneAngleFunction_;}
+    std::function< double( const double ) > getConeAngle(  ) {return coneAngleFunction_;}
 
     //! Function to set cone angle.
     /*!
      *  Function to set cone angle.
      *  \param cone angle.
      */
-    void setConeAngle( std::function< double( ) > coneAngle ){ coneAngleFunction_ = coneAngle; }
+    void setConeAngle( std::function< double( const double ) > coneAngle ){ coneAngleFunction_ = coneAngle; }
 
     //! Function to return clock angle
     /*!
      *  Function to return clock angle
      *  \return Cone angle
      */
-    std::function< double(  ) > getClockAngle(  ) { return clockAngleFunction_; }
+    std::function< double( const double ) > getClockAngle(  ) { return clockAngleFunction_; }
 
     //! Function to set clock angle.
     /*!
      *  Function to set clock angle.
      *  \param clock angle.
      */
-    void setClockAngle( std::function< double(  ) > clockAngle ){ clockAngleFunction_ = clockAngle; }
+    void setClockAngle( std::function< double( const double ) > clockAngle ){ clockAngleFunction_ = clockAngle; }
 
     //! Function to return front emissivity coefficient
     /*!
@@ -424,8 +424,8 @@ public:
      */
     std::vector< std::string > getCentralBodies( ){ return centralBodies_; }
 
-    //! Update function
-    std::function< void( const double ) > updateFunction_;
+//    //! Update function
+//    std::function< void( const double ) > updateFunction_;
 
 private:
 
@@ -433,10 +433,10 @@ private:
     double area_;
 
     //! Cone angle of the sail
-    std::function< double(  ) > coneAngleFunction_;
+    std::function< double( const double ) > coneAngleFunction_;
 
     //! Clock angle of the sail
-    std::function< double(  ) > clockAngleFunction_;
+    std::function< double( const double ) > clockAngleFunction_;
 
     //! Front emissivity coefficient of the sail
     double frontEmissivityCoefficient_;

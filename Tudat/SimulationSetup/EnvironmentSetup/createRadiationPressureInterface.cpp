@@ -301,7 +301,7 @@ std::shared_ptr< electro_magnetism::RadiationPressureInterface > createRadiation
         std::vector< std::string > centralBodies = solarSailRadiationSettings->getCentralBodies();
         std::vector< std::function< Eigen::Vector3d( ) > > centralBodyPositions;
         std::vector< std::function< Eigen::Vector3d( ) > > centralBodyVelocity;
-        getCentralBodiesInformation( bodyMap, occultingBodies, centralBodyPositions, centralBodyVelocity );
+        getCentralBodiesInformation( bodyMap, centralBodies, centralBodyPositions, centralBodyVelocity );
 
         // Create function returning radiated power.
         std::function< double( ) > radiatedPowerFunction;
@@ -325,7 +325,7 @@ std::shared_ptr< electro_magnetism::RadiationPressureInterface > createRadiation
                 std::bind( &Body::getPosition, sourceBody ),
                 std::bind( &Body::getPosition, bodyMap.at( bodyName ) ),
                 std::bind( &Body::getVelocity, bodyMap.at( bodyName ) ),
-                solarSailRadiationSettings->updateFunction_,
+//                solarSailRadiationSettings->updateFunction_,
                 solarSailRadiationSettings->getArea( ),
                 solarSailRadiationSettings->getConeAngle(),
                 solarSailRadiationSettings->getClockAngle(),

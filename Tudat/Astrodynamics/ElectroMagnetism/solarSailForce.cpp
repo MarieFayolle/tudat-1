@@ -9,8 +9,11 @@
  *
  */
 
+#include "Tudat/Mathematics/BasicMathematics/linearAlgebra.h"
 #include "Tudat/Astrodynamics/ElectroMagnetism/solarSailForce.h"
 #include <iostream>
+#include <math.h>
+#include <vector>
 
 namespace tudat
 {
@@ -20,59 +23,64 @@ namespace electro_magnetism
 //! Compute solar sail force using a non-ideal reflective model.
 Eigen::Vector3d computeSolarSailForce(const double frontEmissivityCoefficient, const double backEmissivityCoefficient, const double frontLambertianCoefficient,
         const double backLambertianCoefficient , const double reflectivityCoefficient, const double specularReflectionCoefficient,
-        const Eigen::Vector3d& vectorToSource,
-        const Eigen::Vector3d& velocityUnitVector,
+        const Eigen::Vector3d& normalisedVectorToSource,
+        const Eigen::Vector3d& normalisedVelocityVector,
         const double radiationPressure,
         const double area, const double coneAngle, const double clockAngle)
 {
 
-    //see literature study for the definitions of these equations:
-    //I define a constant to improve the readability of the formulas
-    double A= frontLambertianCoefficient*reflectivityCoefficient*(1-specularReflectionCoefficient) + (1-reflectivityCoefficient)*
-              (frontEmissivityCoefficient*frontLambertianCoefficient-backEmissivityCoefficient*backLambertianCoefficient) /
-              (frontEmissivityCoefficient+backEmissivityCoefficient);
 
+    double A = frontLambertianCoefficient * reflectivityCoefficient * ( 1.0 - specularReflectionCoefficient )
+            + ( 1.0 - reflectivityCoefficient ) * ( frontEmissivityCoefficient * frontLambertianCoefficient - backEmissivityCoefficient * backLambertianCoefficient)
+            / ( frontEmissivityCoefficient + backEmissivityCoefficient );
 
-    double cosConeAngle=cos(coneAngle);
+    double cosinusConeAngle = cos( coneAngle );
+    double sinusConeAngle = sin( coneAngle );
 
-    //double radPressure=4.56e-6; //[N/m^2]
-    double Force_magnitude = radiationPressure*area*cosConeAngle* std::sqrt( std::pow( cosConeAngle*(1+reflectivityCoefficient*specularReflectionCoefficient) + A, 2 )
-                           + std::pow((1-specularReflectionCoefficient*reflectivityCoefficient)*sin(coneAngle) , 2 ) );
+    // Compute force magnitude.
+    double forceMagnitude = radiationPressure * area * cosinusConeAngle
+            * std::sqrt( std::pow( cosinusConeAngle * ( 1.0 + reflectivityCoefficient * specularReflectionCoefficient ) + A, 2 )
+                         + std::pow( ( 1.0 - specularReflectionCoefficient * reflectivityCoefficient ) * sinusConeAngle , 2 ) );
 
     //I now have to compute the phi and theta angles, useful for retrieving the force direction:
-    double phi = atan2(( (1-specularReflectionCoefficient*reflectivityCoefficient)*cosConeAngle*sin(coneAngle) ),
-                       ( (1+reflectivityCoefficient*specularReflectionCoefficient)*std::pow( cosConeAngle, 2 ) +
-                       frontLambertianCoefficient*(1-specularReflectionCoefficient)*reflectivityCoefficient*cosConeAngle +
-                       (1-reflectivityCoefficient)*(frontEmissivityCoefficient*frontLambertianCoefficient -
-                       backEmissivityCoefficient*backLambertianCoefficient)/( frontEmissivityCoefficient+backEmissivityCoefficient )*cosConeAngle ));
-    double theta = coneAngle-phi;
+    double phi = atan2( ( ( 1.0 - specularReflectionCoefficient * reflectivityCoefficient ) * cosinusConeAngle * sinusConeAngle ),
+                        ( ( 1.0 + reflectivityCoefficient * specularReflectionCoefficient ) * std::pow( cosinusConeAngle, 2 )
+                          + A * cosinusConeAngle ) );
 
+    double theta = coneAngle - phi;
 
-    Eigen::Vector3d ForceDirectionLocalFrame = { cos(theta), sin(theta)*sin(clockAngle), sin(theta)*cos(clockAngle) }; //this is the unit vector of the force defined in the (r,theta,k)
+    // Compute the normalised direction vector of the force defined in the (r,theta,k) frame.
+    Eigen::Vector3d forceDirectionLocalFrame = ( Eigen::Vector3d() << cos( theta ), sin( theta ) * sin( clockAngle ), sin( theta ) * cos( clockAngle ) ).finished();
 
-    // For efficiency, I define the vectors' components
-    //I have to put a minus sign in front of the vectorToSource, because this is the vector which goes from the body to the source of
-    //radiation, whereas I need the one from the source of radiation to the body
-    double sX=-vectorToSource[0];
-    double sY=-vectorToSource[1];
-    double sZ=-vectorToSource[2];
-    double vX=velocityUnitVector[0];
-    double vY=velocityUnitVector[1];
-    double vZ=velocityUnitVector[2];
+    Eigen::Vector3d normalisedVectorFromSource = - normalisedVectorToSource;
 
+    // Compute the rotation matrix from local to inertial reference frame.
     Eigen::Matrix3d rotationMatrixFromLocalToInertial;
-    rotationMatrixFromLocalToInertial(0,0) = sX;
-    rotationMatrixFromLocalToInertial(0,1) = vX*std::pow(sZ,2)-vZ*sX*sZ-vY*sX*sY+vX*std::pow(sY,2);
-    rotationMatrixFromLocalToInertial(0,2) = vZ*sY-vY*sZ;
-    rotationMatrixFromLocalToInertial(1,0) = sY;
-    rotationMatrixFromLocalToInertial(1,1) = vY*std::pow(sZ,2)-vZ*sY*sZ+vY*std::pow(sX,2)-vX*sY*sX;
-    rotationMatrixFromLocalToInertial(1,2) = vX*sZ-vZ*sX;
-    rotationMatrixFromLocalToInertial(2,0) = sZ;
-    rotationMatrixFromLocalToInertial(2,1) = vZ*std::pow(sY,2)-vY*sY*sZ-vX*sZ*sX+vZ*std::pow(sX,2);
-    rotationMatrixFromLocalToInertial(2,2) = vY*sX-vX*sY;
-    Eigen::Vector3d ForceDirection=rotationMatrixFromLocalToInertial*ForceDirectionLocalFrame;
 
-    return Force_magnitude*ForceDirection;
+    rotationMatrixFromLocalToInertial(0,0) = normalisedVectorFromSource[0];
+    rotationMatrixFromLocalToInertial(0,1) =
+            normalisedVelocityVector[0] * ( std::pow( normalisedVectorFromSource[2], 2 ) + std::pow( normalisedVectorFromSource[1], 2 ) )
+            - normalisedVectorFromSource[0] *
+            ( normalisedVectorFromSource[1] * normalisedVelocityVector[1] + normalisedVectorFromSource[2] * normalisedVelocityVector[2] );
+    rotationMatrixFromLocalToInertial(0,2) = normalisedVectorFromSource.cross( normalisedVelocityVector )[0];
+
+    rotationMatrixFromLocalToInertial(1,0) = normalisedVectorFromSource[1];
+    rotationMatrixFromLocalToInertial(1,1) =
+            normalisedVelocityVector[1] *  ( std::pow( normalisedVectorFromSource[2], 2 ) + std::pow( normalisedVectorFromSource[0], 2 ) )
+            - normalisedVectorFromSource[1] *
+            ( normalisedVectorFromSource[0] * normalisedVelocityVector[0] + normalisedVectorFromSource[2] * normalisedVelocityVector[2] );
+    rotationMatrixFromLocalToInertial(1,2) = normalisedVectorFromSource.cross( normalisedVelocityVector )[1];
+
+    rotationMatrixFromLocalToInertial(2,0) = normalisedVectorFromSource[2];
+    rotationMatrixFromLocalToInertial(2,1) =
+            normalisedVelocityVector[2] * ( std::pow( normalisedVectorFromSource[1], 2 ) + std::pow( normalisedVectorFromSource[0], 2 ) )
+            - normalisedVectorFromSource[2] *
+            ( normalisedVectorFromSource[1] * normalisedVelocityVector[1] + normalisedVectorFromSource[0] * normalisedVelocityVector[0] );
+    rotationMatrixFromLocalToInertial(2,2) = normalisedVectorFromSource.cross( normalisedVelocityVector )[2];
+
+    Eigen::Vector3d forceDirection = rotationMatrixFromLocalToInertial * forceDirectionLocalFrame;
+
+    return forceMagnitude * forceDirection;
 }
 
 } // namespace electro_magnetism

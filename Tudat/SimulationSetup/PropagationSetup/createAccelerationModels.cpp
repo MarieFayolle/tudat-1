@@ -838,12 +838,21 @@ createSolarSailAccelerationModel(
             nameOfBodyUndergoingAcceleration +
             " for body " + nameOfBodyExertingAcceleration );
     }
-    std::shared_ptr< RadiationPressureInterface > radiationPressureInterface =
-        bodyUndergoingAcceleration->getRadiationPressureInterfaces( ).at(
-            nameOfBodyExertingAcceleration );
+
+    // Get radiation pressure interface from body undergoing acceleration, containing data on how body responds to radiation pressure.
+    std::shared_ptr< SolarSailingRadiationPressureInterface > radiationPressureInterface =
+            std::dynamic_pointer_cast< SolarSailingRadiationPressureInterface >(
+                bodyUndergoingAcceleration->getRadiationPressureInterfaces( ).at( nameOfBodyExertingAcceleration ) );
+
+//    std::shared_ptr< RadiationPressureInterface > radiationPressureInterface =
+//        bodyUndergoingAcceleration->getRadiationPressureInterfaces( ).at(
+//            nameOfBodyExertingAcceleration );
 
     // Create acceleration model.
-    return std::make_shared< SolarSailAcceleration >(
+    return /*std::make_shared< SolarSailAcceleration >(
+                radiationPressureInterface, std::bind( &Body::getBodyMass, bodyUndergoingAcceleration ) );*/
+
+            std::make_shared< SolarSailAcceleration >(
         std::bind( &Body::getPosition, bodyExertingAcceleration ),
         std::bind( &Body::getPosition, bodyUndergoingAcceleration ),
         std::bind( &Body::getVelocity, bodyUndergoingAcceleration ),
