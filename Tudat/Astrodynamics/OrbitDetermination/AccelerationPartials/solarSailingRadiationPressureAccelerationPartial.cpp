@@ -29,6 +29,8 @@ void SolarSailingRadiationPressurePartial::update( const double currentTime )
         if( currentRadiationPressure > 0.0 && currentAcceleration.norm( ) > 0.0 )
         {
             Eigen::Vector3d unitVectorFromSource = - unitVectorToSource;
+            Eigen::Vector3d vectorFromSource = distanceToSource * unitVectorFromSource;
+            Eigen::Vector3d velocityVector = velocityWrtSource * unitVelocityVector;
 
             Eigen::Matrix3d currentSourceUnitVectorPartial =  1.0 / distanceToSource * (
                         Eigen::Matrix3d::Identity( ) - unitVectorFromSource * unitVectorFromSource.transpose( ) );
@@ -36,12 +38,16 @@ void SolarSailingRadiationPressurePartial::update( const double currentTime )
             Eigen::Matrix3d currentVelocityUnitVectorPartial = 1.0 / velocityWrtSource * (
                         Eigen::Matrix3d::Identity( ) - unitVelocityVector * unitVelocityVector.transpose( ) );          
 
-            double A = radiationPressureInterface_->getFrontLambertianCoefficient() * radiationPressureInterface_->getReflectivityCoefficient()
-                    * ( 1.0 -  radiationPressureInterface_->getSpecularReflectionCoefficient() )
-                    + ( 1.0 - radiationPressureInterface_->getReflectivityCoefficient() )
-                    * ( radiationPressureInterface_->getFrontEmissivityCoefficient() * radiationPressureInterface_->getFrontLambertianCoefficient()
-                        - radiationPressureInterface_->getBackEmissivityCoefficient() * radiationPressureInterface_->getBackLambertianCoefficient() )
-                    / ( radiationPressureInterface_->getFrontEmissivityCoefficient() + radiationPressureInterface_->getBackEmissivityCoefficient() );
+            double frontEmissivityCoefficient = radiationPressureInterface_->getFrontEmissivityCoefficient();
+            double backEmissivityCoefficient = radiationPressureInterface_->getBackEmissivityCoefficient();
+            double frontLambertianCoefficient = radiationPressureInterface_->getFrontLambertianCoefficient();
+            double backLambertianCoefficient = radiationPressureInterface_->getBackLambertianCoefficient();
+            double specularReflectionCoefficient = radiationPressureInterface_->getSpecularReflectionCoefficient();
+            double reflectivityCoefficient = radiationPressureInterface_->getReflectivityCoefficient();
+
+            double A = frontLambertianCoefficient * reflectivityCoefficient * ( 1.0 - specularReflectionCoefficient )
+                    + ( 1.0 - reflectivityCoefficient ) * ( frontEmissivityCoefficient * frontLambertianCoefficient - backEmissivityCoefficient * backLambertianCoefficient)
+                    / ( frontEmissivityCoefficient + backEmissivityCoefficient );
 
             double cosinusConeAngle = cos( radiationPressureInterface_->getCurrentConeAngle() );
             double sinusConeAngle = sin( radiationPressureInterface_->getCurrentConeAngle() );
@@ -58,8 +64,18 @@ void SolarSailingRadiationPressurePartial::update( const double currentTime )
                                                          sin( theta ) * sin( radiationPressureInterface_->getCurrentClockAngle() ),
                                                          sin( theta ) * cos( radiationPressureInterface_->getCurrentClockAngle() ) ).finished();
 
+//            double forceMagnitude = currentRadiationPressure * radiationPressureAcceleration_->getCurrentArea() * cosinusConeAngle
+//                    * std::sqrt( std::pow( cosinusConeAngle * ( 1.0 + radiationPressureInterface_->getReflectivityCoefficient()
+//                                                                *  radiationPressureInterface_->getSpecularReflectionCoefficient() ) + A, 2 )
+//                                 + std::pow( ( 1.0 - radiationPressureInterface_->getSpecularReflectionCoefficient() * radiationPressureInterface_->getReflectivityCoefficient() ) * sinusConeAngle , 2 ) );
+
+//            double calculatedAccelerationMagnitude = currentRadiationPressure * radiationPressureInterface_->getArea() / currentMass * cosinusConeAngle
+//                    * std::sqrt( std::pow( ( 1.0 + specularReflectionCoefficient * reflectivityCoefficient ) * cosinusConeAngle + A , 2 )
+//                                 + std::pow( ( 1.0 - specularReflectionCoefficient * reflectivityCoefficient ) * sinusConeAngle, 2 ) );
+
             Eigen::Matrix< double, 1, 3 > currentRadiationPressurePositionPartial =
                     2.0 * currentRadiationPressure * unitVectorToSource.transpose( ) / ( distanceToSource );
+
 
             for ( int j = 0 ; j < 3 ; j++ ){
 
@@ -93,16 +109,18 @@ void SolarSailingRadiationPressurePartial::update( const double currentTime )
 
                 }
 
+
                 currentPartialWrtPosition_.block( j, 0, 1, 3 ) = ( currentAccelerationMagnitude
-                        * currentPartialRotationMatrixWrtPosition * forceDirectionLocalFrame ).transpose()
+                        * currentPartialRotationMatrixWrtPosition * forceDirectionLocalFrame ).transpose();
 
                 currentPartialWrtVelocity_.block( j, 0, 1, 3 ) = ( currentAccelerationMagnitude
                         * currentPartialRotationMatrixWrtVelocity * forceDirectionLocalFrame ).transpose();
 
             }
 
-            currentPartialWrtPosition_ += currentAccelerationMagnitude / currentRadiationPressure /* currentMass*/
-                    * currentRadiationPressurePositionPartial.transpose() * ( currentAcceleration.normalized().transpose() ); // << "\n\n";
+            currentPartialWrtPosition_ += currentAccelerationMagnitude / currentRadiationPressure
+                    * currentRadiationPressurePositionPartial.transpose() * ( currentAcceleration.normalized().transpose() );
+
 
         }
 

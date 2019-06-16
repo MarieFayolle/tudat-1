@@ -29,7 +29,6 @@ Eigen::Vector3d computeSolarSailForce(const double frontEmissivityCoefficient, c
         const double area, const double coneAngle, const double clockAngle)
 {
 
-
     double A = frontLambertianCoefficient * reflectivityCoefficient * ( 1.0 - specularReflectionCoefficient )
             + ( 1.0 - reflectivityCoefficient ) * ( frontEmissivityCoefficient * frontLambertianCoefficient - backEmissivityCoefficient * backLambertianCoefficient)
             / ( frontEmissivityCoefficient + backEmissivityCoefficient );
@@ -42,6 +41,7 @@ Eigen::Vector3d computeSolarSailForce(const double frontEmissivityCoefficient, c
             * std::sqrt( std::pow( cosinusConeAngle * ( 1.0 + reflectivityCoefficient * specularReflectionCoefficient ) + A, 2 )
                          + std::pow( ( 1.0 - specularReflectionCoefficient * reflectivityCoefficient ) * sinusConeAngle , 2 ) );
 
+
     //I now have to compute the phi and theta angles, useful for retrieving the force direction:
     double phi = atan2( ( ( 1.0 - specularReflectionCoefficient * reflectivityCoefficient ) * cosinusConeAngle * sinusConeAngle ),
                         ( ( 1.0 + reflectivityCoefficient * specularReflectionCoefficient ) * std::pow( cosinusConeAngle, 2 )
@@ -50,7 +50,8 @@ Eigen::Vector3d computeSolarSailForce(const double frontEmissivityCoefficient, c
     double theta = coneAngle - phi;
 
     // Compute the normalised direction vector of the force defined in the (r,theta,k) frame.
-    Eigen::Vector3d forceDirectionLocalFrame = ( Eigen::Vector3d() << cos( theta ), sin( theta ) * sin( clockAngle ), sin( theta ) * cos( clockAngle ) ).finished();
+    Eigen::Vector3d forceDirectionLocalFrame = ( Eigen::Vector3d() << cos( theta ), sin( theta ) * sin( clockAngle ),
+                                                 sin( theta ) * cos( clockAngle ) ).finished();
 
     Eigen::Vector3d normalisedVectorFromSource = - normalisedVectorToSource;
 

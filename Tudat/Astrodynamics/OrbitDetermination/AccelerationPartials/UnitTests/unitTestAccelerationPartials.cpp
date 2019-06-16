@@ -1456,7 +1456,7 @@ BOOST_AUTO_TEST_CASE( testSolarSailingRadiationPressureAccelerationPartials )
     velocityPerturbation<< 0.1, 0.1, 0.1;
 
     // Calculate numerical partials.
-    std::function< void( ) > updateFunction = std::bind( &RadiationPressureInterface::updateInterface,
+    std::function< void( ) > updateFunction = std::bind( &SolarSailingRadiationPressureInterface::updateInterface,
                                                              radiationPressureInterface, 0.0 );
     testPartialWrtSunPosition = calculateAccelerationWrtStatePartials(
                 sunStateSetFunction, accelerationModel, bodyMap[ "Sun" ]->getState( ), positionPerturbation, 0, updateFunction );
@@ -1471,8 +1471,6 @@ BOOST_AUTO_TEST_CASE( testSolarSailingRadiationPressureAccelerationPartials )
     std::cout << "test analytical partials wrt vehicle position: " << partialWrtVehiclePosition << "\n\n";
     std::cout << "test numerical partials wrt vehicle velocity: " << testPartialWrtVehicleVelocity << "\n\n";
     std::cout << "test analytical partials wrt vehicle velocity: " << partialWrtVehicleVelocity << "\n\n";
-//    //    testPartialWrtEmissivities = calculateAccelerationWrtParameterPartials(
-//    //                panelEmissivitiesParameter, accelerationModel, emissivityPerturbations );
 
 //    // Compare numerical and analytical results.
 //    TUDAT_CHECK_MATRIX_CLOSE_FRACTION( testPartialWrtSunPosition,

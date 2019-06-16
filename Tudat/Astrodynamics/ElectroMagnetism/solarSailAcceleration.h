@@ -219,7 +219,6 @@ public:
     SolarSailAcceleration( const std::shared_ptr< SolarSailingRadiationPressureInterface > radiationPressureInterface,
                            const std::function< double( ) > massFunction ):
         sourcePositionFunction_( std::bind( &RadiationPressureInterface::getCurrentSolarVector, radiationPressureInterface ) ),
-//        sourcePositionFunction_( radiationPressureInterface->getSourcePositionFunction() ),
         acceleratedBodyPositionFunction_( radiationPressureInterface->getTargetPositionFunction() ),
         acceleratedBodyVelocityFunction_( radiationPressureInterface->getTargetVelocityFunction() ),
         centralBodyVelocityFunction_( radiationPressureInterface->getCentralBodyVelocity()[0] ),
@@ -361,6 +360,16 @@ public:
     double getCurrentMass( )
     {
         return currentMass_;
+    }
+
+    //! Returns the current area of the accelerated body
+    /*!
+     *  Returns the current area of the accelerated body, as set by the last call to the updateMembers function
+     *  \return The current area of the accelerated body
+     */
+    double getCurrentArea( )
+    {
+        return currentArea_;
     }
 
 
