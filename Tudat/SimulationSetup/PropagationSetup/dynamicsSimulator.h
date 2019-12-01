@@ -1012,7 +1012,7 @@ Eigen::Matrix< StateScalarType, Eigen::Dynamic, 1 > getArcInitialStateFromPrevio
             currentArcInitialState =
                     std::make_shared< interpolators::LagrangeInterpolator<
                     TimeType, Eigen::Matrix< StateScalarType, Eigen::Dynamic, 1 >, long double > >(
-                        initialStateInterpolationMap, 8 )->interpolate( currentArcInitialTime );
+                        initialStateInterpolationMap, 6 )->interpolate( currentArcInitialTime );
 
         }
     }

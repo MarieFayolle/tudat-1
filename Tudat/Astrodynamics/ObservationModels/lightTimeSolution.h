@@ -363,6 +363,8 @@ public:
                             "; current light-time corrections are: "  +
                             std::to_string( currentCorrection_ ) + " and input time was " +
                             std::to_string( static_cast< double >( time ) );
+//                    std::cout << "receiver state: " << receiverState << "\n\n";
+//                    std::cout << "transmitter state: " << transmitterState << "\n\n";
                    std::cerr << errorMessage << std::endl;
                 }
 
