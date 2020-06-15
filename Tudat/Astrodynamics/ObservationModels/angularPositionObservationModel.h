@@ -132,7 +132,8 @@ public:
     /*!
      * Function to get the object to calculate light time.
      * \return Object to calculate light time.
-     */    std::shared_ptr< observation_models::LightTimeCalculator< ObservationScalarType, TimeType > > getLightTimeCalculator( )
+     */
+    std::shared_ptr< observation_models::LightTimeCalculator< ObservationScalarType, TimeType > > getLightTimeCalculator( )
     {
         return lightTimeCalculator_;
     }

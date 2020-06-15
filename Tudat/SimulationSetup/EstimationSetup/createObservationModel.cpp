@@ -227,6 +227,28 @@ std::vector< std::pair< int, int > > getLinkEndIndicesForObservationViability(
 
         throw std::runtime_error( "Error, parsed irrelevant position observable viability indices" );
         break;
+    case apparent_distance:
+        if( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+                                                                  ( linkEndToCheck.second == "" ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 0, 2 ) );
+        }
+        else if( linkEnds.at( transmitter2 ) == linkEndToCheck || ( ( linkEnds.at( transmitter2 ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 1, 2 ) );
+        }
+        else if( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 2, 0 ) );
+            linkEndIndices.push_back( std::make_pair( 2, 1 ) );
+        }
+        else
+        {
+            throw std::runtime_error( "Error, parsed irrelevant apparent distance viability indices" );
+        }
+        break;
     default:
         throw std::runtime_error( "Error, observable type " + std::to_string(
                                       observableType ) + " not recognized when making viability link ends" );

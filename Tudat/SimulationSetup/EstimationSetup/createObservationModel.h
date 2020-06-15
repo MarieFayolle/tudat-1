@@ -29,6 +29,7 @@
 #include "Tudat/Astrodynamics/ObservationModels/positionObservationModel.h"
 #include "Tudat/Astrodynamics/ObservationModels/eulerAngleObservationModel.h"
 #include "Tudat/Astrodynamics/ObservationModels/velocityObservationModel.h"
+#include "Tudat/Astrodynamics/ObservationModels/apparentDistanceObservationModel.h"
 #include "Tudat/Astrodynamics/ObservationModels/observationSimulator.h"
 #include "Tudat/Astrodynamics/ObservationModels/observationViabilityCalculator.h"
 #include "Tudat/SimulationSetup/EnvironmentSetup/body.h"
@@ -1127,6 +1128,51 @@ public:
                     ObservationScalarType, TimeType > >(
                         lightTimeCalculators, retransmissionTimesFunction_,
                         observationBias );
+            break;
+        }
+        case apparent_distance:
+        {
+            // Check consistency input.
+            if( linkEnds.size( ) != 3 )
+            {
+                std::string errorMessage =
+                        "Error when making apparent distance model, " +
+                        std::to_string( linkEnds.size( ) ) + " link ends found";
+                throw std::runtime_error( errorMessage );
+            }
+            if( linkEnds.count( receiver ) == 0 )
+            {
+                throw std::runtime_error( "Error when making apparent distance model, no receiver found" );
+            }
+            if( linkEnds.count( transmitter ) == 0 )
+            {
+                throw std::runtime_error( "Error when making apparent distance model, no transmitter found" );
+            }
+            if( linkEnds.count( transmitter2 ) == 0 )
+            {
+                throw std::runtime_error( "Error when making apparent distance model, no second transmitter found" );
+            }
+
+
+            std::shared_ptr< ObservationBias< 1 > > observationBias;
+            if( observationSettings->biasSettings_ != nullptr )
+            {
+                observationBias =
+                        createObservationBiasCalculator(
+                            linkEnds, observationSettings->observableType_, observationSettings->biasSettings_,bodyMap );
+            }
+
+            // Create observation model
+            observationModel = std::make_shared< ApparentDistanceObservationModel<
+                    ObservationScalarType, TimeType > >(
+                        createLightTimeCalculator< ObservationScalarType, TimeType >(
+                            linkEnds.at( transmitter ), linkEnds.at( receiver ),
+                            bodyMap, observationSettings->lightTimeCorrectionsList_ ),
+                        createLightTimeCalculator< ObservationScalarType, TimeType >(
+                            linkEnds.at( transmitter2 ), linkEnds.at( receiver ),
+                            bodyMap, observationSettings->lightTimeCorrectionsList_ ),
+                        observationBias );
+
             break;
         }
 
