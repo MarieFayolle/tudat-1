@@ -98,7 +98,8 @@ static std::map< PropagationDependentVariables, std::string > dependentVariableT
     { single_gravity_field_variation_acceleration_terms, "singleGravityFieldVariationAccelerationTerms" },
     { acceleration_partial_wrt_body_translational_state, "accelerationPartialWrtBodyTranslationalState" },
     { local_dynamic_pressure_dependent_variable, "localDynamicPressure" },
-    { local_aerodynamic_heat_rate_dependent_variable, "localAerodynamicHeatRate" }
+    { local_aerodynamic_heat_rate_dependent_variable, "localAerodynamicHeatRate" },
+    { total_acceleration_partial_wrt_body_translational_state, "totalAccelerationPartialWrtBodyTranslationalState" }
 };
 
 //! `PropagationDependentVariables` not supported by `json_interface`.

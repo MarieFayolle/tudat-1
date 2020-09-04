@@ -195,13 +195,16 @@ std::string getDependentVariableName( const PropagationDependentVariables propag
         variableName = "Single-source time-variable gravity field per-term acceleration correction ";
         break;
     case acceleration_partial_wrt_body_translational_state:
-        variableName = "Acceleration partial w.r.t body state ";
+        variableName = "Acceleration partial w.r.t body state";
         break;
     case current_body_mass_dependent_variable:
         variableName = "Current body mass ";
         break;
     case radiation_pressure_coefficient_dependent_variable:
         variableName = "Radiation pressure coefficient ";
+        break;
+    case total_acceleration_partial_wrt_body_translational_state:
+        variableName = "Total acceleration partial w.r.t. translational state";
         break;
     default:
         std::string errorMessage = "Error, dependent variable " +
@@ -291,15 +294,31 @@ std::string getDependentVariableId(
             variableId += ", exerted by " + dependentVariableSettings->secondaryBody_;
         }
     }
-    else
+    else if ( ( dependentVariableSettings->dependentVariableType_ != acceleration_partial_wrt_body_translational_state )
+              && ( dependentVariableSettings->dependentVariableType_ != total_acceleration_partial_wrt_body_translational_state ) )
     {
         variableId += "of " + dependentVariableSettings->associatedBody_;
         if( dependentVariableSettings->secondaryBody_ != "" )
         {
             variableId += " w.r.t. " + dependentVariableSettings->secondaryBody_;
         }
-
     }
+    else if ( dependentVariableSettings->dependentVariableType_ == total_acceleration_partial_wrt_body_translational_state )
+    {
+        variableId += ", for acceleration of " + dependentVariableSettings->associatedBody_;
+        std::shared_ptr< TotalAccelerationPartialWrtStateSaveSettings > totalAccelerationPartialVariableSettings =
+                std::dynamic_pointer_cast< TotalAccelerationPartialWrtStateSaveSettings >( dependentVariableSettings );
+        variableId += " w.r.t. state of " + totalAccelerationPartialVariableSettings->derivativeWrtBody_;
+    }
+    else if ( dependentVariableSettings->dependentVariableType_ == acceleration_partial_wrt_body_translational_state )
+    {
+        std::shared_ptr< AccelerationPartialWrtStateSaveSettings > accelerationPartialDependentVariableSettings =
+                std::dynamic_pointer_cast< AccelerationPartialWrtStateSaveSettings >( dependentVariableSettings );
+        variableId += ", for " + basic_astrodynamics::getAccelerationModelName(
+                    accelerationPartialDependentVariableSettings->accelerationModelType_ ) + "exerted by " + dependentVariableSettings->secondaryBody_
+                + " on " + dependentVariableSettings->associatedBody_ + " w.r.t. state of " + accelerationPartialDependentVariableSettings->derivativeWrtBody_;
+    }
+
     return variableId;
 }
 

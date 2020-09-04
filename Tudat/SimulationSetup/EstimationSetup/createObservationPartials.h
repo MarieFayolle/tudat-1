@@ -16,13 +16,17 @@
 #include "Tudat/Astrodynamics/ObservationModels/oneWayRangeObservationModel.h"
 #include "Tudat/Astrodynamics/ObservationModels/oneWayDopplerObservationModel.h"
 #include "Tudat/Astrodynamics/ObservationModels/angularPositionObservationModel.h"
-
+#include "Tudat/Astrodynamics/ObservationModels/apparentDistanceObservationModel.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createAngularPositionPartials.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createOneWayRangePartials.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createDopplerPartials.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createDifferencedOneWayRangeRatePartials.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createNWayRangePartials.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createEulerAngleObservationPartials.h"
+#include "Tudat/SimulationSetup/EstimationSetup/createApparentDistancePartials.h"
+#include "Tudat/SimulationSetup/EstimationSetup/createMutualApproximationPartials.h"
+#include "Tudat/SimulationSetup/EstimationSetup/variationalEquationsSolver.h"
+
 namespace tudat
 {
 
@@ -158,6 +162,54 @@ PerLinkEndPerLightTimeSolutionCorrections getLightTimeCorrectionsList(
             {
                 break;
             }
+            case observation_models::apparent_distance:
+            {
+                std::shared_ptr< observation_models::ApparentDistanceObservationModel< ObservationScalarType, TimeType> > apparentDistanceModel =
+                        std::dynamic_pointer_cast< observation_models::ApparentDistanceObservationModel
+                        < ObservationScalarType, TimeType > >( observationModelIterator->second );
+                currentLightTimeCorrections.push_back(
+                            apparentDistanceModel->getLightTimeCalculatorFirstTransmitter( )->getLightTimeCorrection( ) );
+                currentLightTimeCorrections.push_back(
+                            apparentDistanceModel->getLightTimeCalculatorSecondTransmitter( )->getLightTimeCorrection( ) );
+                break;
+            }
+            case observation_models::mutual_approximation:
+            {
+                if ( std::dynamic_pointer_cast< observation_models::MutualApproximationObservationModel
+                     < ObservationScalarType, TimeType > >( observationModelIterator->second ) != nullptr )
+                {
+                    std::shared_ptr< observation_models::MutualApproximationObservationModel< ObservationScalarType, TimeType> > mutualApproximationModel =
+                            std::dynamic_pointer_cast< observation_models::MutualApproximationObservationModel
+                            < ObservationScalarType, TimeType > >( observationModelIterator->second );
+                    currentLightTimeCorrections.push_back(
+                                mutualApproximationModel->getLightTimeCalculatorFirstTransmitter( )->getLightTimeCorrection( ) );
+                    currentLightTimeCorrections.push_back(
+                                mutualApproximationModel->getLightTimeCalculatorSecondTransmitter( )->getLightTimeCorrection( ) );
+                }
+                else if ( std::dynamic_pointer_cast< observation_models::ModifiedMutualApproximationObservationModel
+                          < ObservationScalarType, TimeType > >( observationModelIterator->second ) != nullptr )
+                {
+                    std::shared_ptr< observation_models::ModifiedMutualApproximationObservationModel< ObservationScalarType, TimeType> > mutualApproximationModel =
+                            std::dynamic_pointer_cast< observation_models::ModifiedMutualApproximationObservationModel
+                            < ObservationScalarType, TimeType > >( observationModelIterator->second );
+                    currentLightTimeCorrections.push_back(
+                                mutualApproximationModel->getLightTimeCalculatorFirstTransmitter( )->getLightTimeCorrection( ) );
+                    currentLightTimeCorrections.push_back(
+                                mutualApproximationModel->getLightTimeCalculatorSecondTransmitter( )->getLightTimeCorrection( ) );
+                }
+                break;
+            }
+            case observation_models::mutual_approximation_with_impact_parameter:
+            {
+                std::shared_ptr< observation_models::MutualApproximationWithImpactParameterObservationModel< ObservationScalarType, TimeType> > mutualApproximationModel =
+                        std::dynamic_pointer_cast< observation_models::MutualApproximationWithImpactParameterObservationModel
+                        < ObservationScalarType, TimeType > >( observationModelIterator->second );
+                currentLightTimeCorrections.push_back(
+                            mutualApproximationModel->getLightTimeCalculatorFirstTransmitter( )->getLightTimeCorrection( ) );
+                currentLightTimeCorrections.push_back(
+                            mutualApproximationModel->getLightTimeCalculatorSecondTransmitter( )->getLightTimeCorrection( ) );
+                break;
+            }
             default:
                 std::string errorMessage =
                         "Error in light time correction list creation, observable type " +
@@ -249,7 +301,9 @@ public:
             observationModelList,
             const simulation_setup::NamedBodyMap& bodyMap,
             const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< ObservationScalarType > >
-            parametersToEstimate );
+            parametersToEstimate,
+            const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface
+                    = std::shared_ptr< propagators::DependentVariablesInterface >( ) );
 };
 
 //! Interface class for creating observation partials for observables of size 1.
@@ -281,7 +335,9 @@ public:
             observationModelList,
             const simulation_setup::NamedBodyMap& bodyMap,
             const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< ObservationScalarType > >
-            parametersToEstimate )
+            parametersToEstimate,
+            const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface
+                    = std::shared_ptr< propagators::DependentVariablesInterface >( ) )
     {
         std::map< observation_models::LinkEnds, std::pair< std::map< std::pair< int, int >,
                 std::shared_ptr< ObservationPartial< 1 > > >,
@@ -311,6 +367,20 @@ public:
             observationPartialList = createNWayRangePartials< ObservationScalarType >(
                         utilities::createVectorFromMapKeys( observationModelList ), bodyMap, parametersToEstimate,
                         getLightTimeCorrectionsList( observationModelList ) );
+            break;
+        case observation_models::apparent_distance:
+            observationPartialList = createApparentDistancePartials< ObservationScalarType >(
+                        utilities::createVectorFromMapKeys( observationModelList ), bodyMap, parametersToEstimate,
+                        getLightTimeCorrectionsList( observationModelList ) );
+            break;
+        case observation_models::mutual_approximation:
+            if ( dependentVariablesInterface == nullptr )
+            {
+                throw std::runtime_error( "Error when creating mutual approximation partials, no dependent variables interface object found." );
+            }
+            observationPartialList = createMutualApproximationPartials< ObservationScalarType >(
+                        utilities::createVectorFromMapKeys( observationModelList ), bodyMap, parametersToEstimate,
+                        getLightTimeCorrectionsList( observationModelList ), dependentVariablesInterface );
             break;
         default:
             std::string errorMessage =
@@ -351,7 +421,9 @@ public:
             std::shared_ptr< observation_models::ObservationModel< 2, ObservationScalarType, TimeType > > > observationModelList,
             const simulation_setup::NamedBodyMap& bodyMap,
             const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< ObservationScalarType > >
-            parametersToEstimate )
+            parametersToEstimate,
+            const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface
+                    = std::shared_ptr< propagators::DependentVariablesInterface >( ) )
     {
         std::map< observation_models::LinkEnds, std::pair< std::map< std::pair< int, int >,
                 std::shared_ptr< ObservationPartial< 2 > > >,
@@ -404,7 +476,9 @@ public:
             observationModelList,
             const simulation_setup::NamedBodyMap& bodyMap,
             const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< ObservationScalarType > >
-            parametersToEstimate )
+            parametersToEstimate,
+            const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface
+                    = std::shared_ptr< propagators::DependentVariablesInterface >( ) )
     {
         std::map< observation_models::LinkEnds, std::pair< std::map< std::pair< int, int >,
                 std::shared_ptr< ObservationPartial< 3 > > >,
@@ -435,7 +509,7 @@ public:
 
 };
 
-//! Interface class for creating observation partials for observables of size 3.
+//! Interface class for creating observation partials for observables of size 6.
 template< typename ObservationScalarType, typename TimeType >
 class ObservationPartialCreator< 6, ObservationScalarType, TimeType >
 {
@@ -464,7 +538,9 @@ public:
             observationModelList,
             const simulation_setup::NamedBodyMap& bodyMap,
             const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< ObservationScalarType > >
-            parametersToEstimate )
+            parametersToEstimate,
+            const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface
+                    = std::shared_ptr< propagators::DependentVariablesInterface >( ) )
     {
         std::map< observation_models::LinkEnds, std::pair< std::map< std::pair< int, int >,
                 std::shared_ptr< ObservationPartial< 6 > > >,
@@ -512,7 +588,9 @@ public:
             observationModelList,
             const simulation_setup::NamedBodyMap& bodyMap,
             const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< ObservationScalarType > >
-            parametersToEstimate )
+            parametersToEstimate,
+            const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface
+                    = std::shared_ptr< propagators::DependentVariablesInterface >( ) )
     {
         std::map< observation_models::LinkEnds, std::pair< std::map< std::pair< int, int >,
                 std::shared_ptr< ObservationPartial< Eigen::Dynamic > > >,

@@ -43,10 +43,17 @@ Eigen::Matrix< double, 1, 3 > calculatePartialOfDeclinationWrtLinkEndPosition(
 
     // Set partial vector
     double range = relativeRangeVector.norm( );
-    Eigen::Matrix< double, 1, 3 > partial = partialMultiplier * relativeRangeVector.transpose( ) / range;
+//    Eigen::Matrix< double, 1, 3 > partial = partialMultiplier * relativeRangeVector.transpose( ) / range;
 
-    partial *= relativeRangeVector( 2 ) / ( range * range );
-    partial += -partialMultiplier * ( Eigen::Vector3d::UnitZ( ) ).transpose( ) / range;
+//    partial *= relativeRangeVector( 2 ) / ( range * range );
+//    partial += -partialMultiplier * ( Eigen::Vector3d::UnitZ( ) ).transpose( ) / range;
+
+    Eigen::Matrix< double, 1, 3 > partial = Eigen::Matrix< double, 1, 3 >::Zero( );
+    partial( 0 ) = relativeRangeVector( 0 ) * relativeRangeVector( 2 );
+    partial( 1 ) = relativeRangeVector( 1 ) * relativeRangeVector( 2 );
+    partial( 2 ) = - ( relativeRangeVector( 0 ) * relativeRangeVector( 0 ) + relativeRangeVector( 1 ) * relativeRangeVector( 1 ) );
+    partial *= partialMultiplier /
+            ( range * range * std::sqrt( relativeRangeVector( 0 ) * relativeRangeVector( 0 ) + relativeRangeVector( 1 ) * relativeRangeVector( 1 ) ) );
 
     return partial;
 }
@@ -69,6 +76,7 @@ Eigen::Matrix< double, 2, 3 > calculatePartialOfAngularPositionWrtLinkEndPositio
 void AngularPositionScaling::update( const std::vector< Eigen::Vector6d >& linkEndStates,
                                      const std::vector< double >& times,
                                      const observation_models::LinkEndType fixedLinkEnd,
+                                     const observation_models::LinkEnds linkEnds,
                                      const Eigen::VectorXd currentObservation )
 {
     Eigen::Vector3d relativeRangeVector = ( linkEndStates[ 1 ] - linkEndStates[ 0 ] ).segment( 0, 3 );

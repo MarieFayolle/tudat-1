@@ -21,6 +21,7 @@ namespace observation_partials
 void OneWayRangeScaling::update( const std::vector< Eigen::Vector6d >& linkEndStates,
                                  const std::vector< double >& times,
                                  const observation_models::LinkEndType fixedLinkEnd,
+                                 const observation_models::LinkEnds linkEnds,
                                  const Eigen::VectorXd currentObservation )
 {
     // Compute Euclidean distance vector

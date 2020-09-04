@@ -547,9 +547,18 @@ BOOST_AUTO_TEST_CASE( testVaryingCentralBodyHybridArcVariationalEquations )
     Eigen::VectorXd singleArcInitialState = getInitialStatesOfBodies(
                 singleArcBodiesToPropagate, singleArcCentralBodies, bodyMap, initialTime );
 
+    std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > dependentVariablesList;
+    dependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >
+                                      ( total_acceleration_dependent_variable, "Io" ) );
+
+    // Create object with list of dependent variables
+    std::shared_ptr< DependentVariableSaveSettings > dependentVariablesToSave =
+            std::make_shared< DependentVariableSaveSettings >( dependentVariablesList );
+
     std::shared_ptr< TranslationalStatePropagatorSettings< double > > singleArcPropagatorSettings =
             std::make_shared< TranslationalStatePropagatorSettings< double > >
-            ( singleArcCentralBodies, singleArcAccelerationModelMap, singleArcBodiesToPropagate,singleArcInitialState, finalTime );
+            ( singleArcCentralBodies, singleArcAccelerationModelMap, singleArcBodiesToPropagate,singleArcInitialState, finalTime,
+              cowell, dependentVariablesToSave );
 
     std::vector< std::string > multiArcBodiesToPropagate =
     { "Spacecraft", "Spacecraft", "Spacecraft", "Spacecraft", "Spacecraft", "Spacecraft" };
@@ -694,36 +703,43 @@ BOOST_AUTO_TEST_CASE( testVaryingCentralBodyHybridArcVariationalEquations )
                 HybridArcVariationalEquationsSolver< >(
                     bodyMap, singleArcIntegratorSettings, multiArcIntegratorSettings,
                     hybridArcPerBodyPropagatorSettings, parametersToEstimatePerBody, arcStartTimesPerBody.at(
-                        singleArcBodiesToPropagate.at( i ) ), true, false, true );
+                        singleArcBodiesToPropagate.at( i ) ), true, false, true, dependentVariablesToSave );
 
-        std::vector< std::vector< std::map< double, Eigen::MatrixXd > > > perBodyMultiArcVariationalSolution =
-                perCentralBodyVariationalEquations.getMultiArcSolver( )->getNumericalVariationalEquationsSolution( );
-        std::vector< std::map< double, Eigen::VectorXd > > perBodyMultiArcStateSolution =
-                perCentralBodyVariationalEquations.getMultiArcSolver( )->getDynamicsSimulator( )->getEquationsOfMotionNumericalSolution( );
+        // Retrieve dependent variables interface.
+        std::shared_ptr< HybridArcDependentVariablesInterface > dependentVariablesInterface =
+                std::dynamic_pointer_cast< HybridArcDependentVariablesInterface >(
+                perCentralBodyVariationalEquations.getDependentVariablesInterface( ) );
 
-        for( unsigned int j = 0; j < perBodyIndicesInFullPropagation.at( singleArcBodiesToPropagate.at( i ) ).size( ); j++ )
-        {
-            for( unsigned int k = 0; k < 2; k++ )
-            {
-                std::map< double, Eigen::MatrixXd > fullMultiArcMatrixHistory = fullMultiArcVariationalSolution.at(
-                            perBodyIndicesInFullPropagation.at( singleArcBodiesToPropagate.at( i ) ).at( j ) ).at( k );
-                std::map< double, Eigen::MatrixXd > perBodyMultiMatrixHistory = perBodyMultiArcVariationalSolution.at( j ).at( k );
+        std::cout << "dependent variables from interface: " << dependentVariablesInterface->getDependentVariables( ( finalTime - initialTime ) / 2.0 ).transpose( ) << "\n\n";
 
-                auto fullIterator = fullMultiArcMatrixHistory.begin( );
-                auto perBodyIterator = perBodyMultiMatrixHistory.begin( );
+//        std::vector< std::vector< std::map< double, Eigen::MatrixXd > > > perBodyMultiArcVariationalSolution =
+//                perCentralBodyVariationalEquations.getMultiArcSolver( )->getNumericalVariationalEquationsSolution( );
+//        std::vector< std::map< double, Eigen::VectorXd > > perBodyMultiArcStateSolution =
+//                perCentralBodyVariationalEquations.getMultiArcSolver( )->getDynamicsSimulator( )->getEquationsOfMotionNumericalSolution( );
 
-                BOOST_CHECK_EQUAL( fullMultiArcMatrixHistory.size( ), perBodyMultiMatrixHistory.size( ) );
+//        for( unsigned int j = 0; j < perBodyIndicesInFullPropagation.at( singleArcBodiesToPropagate.at( i ) ).size( ); j++ )
+//        {
+//            for( unsigned int k = 0; k < 2; k++ )
+//            {
+//                std::map< double, Eigen::MatrixXd > fullMultiArcMatrixHistory = fullMultiArcVariationalSolution.at(
+//                            perBodyIndicesInFullPropagation.at( singleArcBodiesToPropagate.at( i ) ).at( j ) ).at( k );
+//                std::map< double, Eigen::MatrixXd > perBodyMultiMatrixHistory = perBodyMultiArcVariationalSolution.at( j ).at( k );
 
-                for( unsigned int i = 0; i < fullMultiArcMatrixHistory.size( ); i++ )
-                {
-                    BOOST_CHECK_CLOSE_FRACTION( fullIterator->first, perBodyIterator->first, std::numeric_limits< double >::epsilon( ) );
-                    TUDAT_CHECK_MATRIX_CLOSE_FRACTION( fullIterator->second, perBodyIterator->second, std::numeric_limits< double >::epsilon( ) );
+//                auto fullIterator = fullMultiArcMatrixHistory.begin( );
+//                auto perBodyIterator = perBodyMultiMatrixHistory.begin( );
 
-                    fullIterator++;
-                    perBodyIterator++;
-                }
-            }
-        }
+//                BOOST_CHECK_EQUAL( fullMultiArcMatrixHistory.size( ), perBodyMultiMatrixHistory.size( ) );
+
+//                for( unsigned int i = 0; i < fullMultiArcMatrixHistory.size( ); i++ )
+//                {
+//                    BOOST_CHECK_CLOSE_FRACTION( fullIterator->first, perBodyIterator->first, std::numeric_limits< double >::epsilon( ) );
+//                    TUDAT_CHECK_MATRIX_CLOSE_FRACTION( fullIterator->second, perBodyIterator->second, std::numeric_limits< double >::epsilon( ) );
+
+//                    fullIterator++;
+//                    perBodyIterator++;
+//                }
+//            }
+//        }
     }
 }
 

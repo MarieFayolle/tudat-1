@@ -64,6 +64,7 @@ public:
     void update( const std::vector< Eigen::Vector6d >& linkEndStates,
                  const std::vector< double >& times,
                  const observation_models::LinkEndType fixedLinkEnd,
+                 const observation_models::LinkEnds linkEnds,
                  const Eigen::VectorXd currentObservation );
 
     //! Function to get value by which to scale a constituent one-way ranges partial for it to be put into n-way range partial.

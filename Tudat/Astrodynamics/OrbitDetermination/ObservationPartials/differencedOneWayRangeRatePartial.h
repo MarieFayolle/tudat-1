@@ -57,14 +57,15 @@ public:
     void update( const std::vector< Eigen::Vector6d >& linkEndStates,
                  const std::vector< double >& times,
                  const observation_models::LinkEndType fixedLinkEnd,
+                 const observation_models::LinkEnds linkEnds,
                  const Eigen::VectorXd currentObservation )
     {
         oneWayRangeScalerArcStart_->update(
                     std::vector< Eigen::Vector6d >(
-                        linkEndStates.begin( ), linkEndStates.begin( ) + 2 ), times, fixedLinkEnd );
+                        linkEndStates.begin( ), linkEndStates.begin( ) + 2 ), times, fixedLinkEnd, linkEnds );
         oneWayRangeScalerArcEnd_->update(
                     std::vector< Eigen::Vector6d >(
-                        linkEndStates.begin( ) + 2, linkEndStates.begin( ) + 4 ), times, fixedLinkEnd );
+                        linkEndStates.begin( ) + 2, linkEndStates.begin( ) + 4 ), times, fixedLinkEnd, linkEnds );
     }
 
     //! Partial scaling for arc start range observation

@@ -16,6 +16,8 @@
 #include "Tudat/Astrodynamics/ObservationModels/observationModel.h"
 #include "Tudat/Astrodynamics/ObservationModels/observationViabilityCalculator.h"
 #include "Tudat/Astrodynamics/ObservationModels/linkTypeDefs.h"
+#include "Tudat/Astrodynamics/ObservationModels/mutualApproximationObservationModel.h"
+//#include "Tudat/SimulationSetup/EstimationSetup/createObservationModel.h"
 
 namespace tudat
 {
@@ -40,7 +42,7 @@ std::pair< Eigen::Matrix< ObservationScalarType, Eigen::Dynamic, 1 >, bool > sim
         const TimeType& observationTime,
         const std::shared_ptr< ObservationModel< ObservationSize, ObservationScalarType, TimeType > > observationModel,
         const LinkEndType linkEndAssociatedWithTime,
-        const std::vector< std::shared_ptr< ObservationViabilityCalculator > > linkViabilityCalculators =
+        std::vector< std::shared_ptr< ObservationViabilityCalculator > > linkViabilityCalculators =
         std::vector< std::shared_ptr< ObservationViabilityCalculator > >( ) )
 {
     // Initialize vector with reception times.
@@ -49,6 +51,75 @@ std::pair< Eigen::Matrix< ObservationScalarType, Eigen::Dynamic, 1 >, bool > sim
     std::vector< Eigen::Vector6d > vectorOfStates;
     std::vector< double > vectorOfTimes;
 
+    // Special case for mutual approximation observables.
+    if ( ( observationModel->getObservableType( ) == mutual_approximation ) ||
+         ( observationModel->getObservableType( ) == mutual_approximation_with_impact_parameter ) )
+    {
+        // Viability calculators must be taken into account when simulating the intermediate apparent distance observables.
+        std::vector< std::shared_ptr< ObservationViabilityCalculator > > viabilityCalculatorsApparentDistances;
+        for ( unsigned int i = 0 ; i < linkViabilityCalculators.size( ) ; i++ )
+        {
+            if ( std::dynamic_pointer_cast< MutualApproximationCalculator >( linkViabilityCalculators[ i ] ) == nullptr )
+            {
+                viabilityCalculatorsApparentDistances.push_back( linkViabilityCalculators[ i ] );
+            }
+        }
+
+        bool checkExistenceMutualApproximation;
+        bool checkObservableDuplicates;
+        if ( observationModel->getObservableType( ) == mutual_approximation )
+        {
+            if ( std::dynamic_pointer_cast< MutualApproximationObservationModel< ObservationScalarType, TimeType > >( observationModel ) != nullptr )
+            {
+                std::shared_ptr< MutualApproximationObservationModel< ObservationScalarType, TimeType > > mutualApproximationObservationModel =
+                        std::dynamic_pointer_cast< MutualApproximationObservationModel< ObservationScalarType, TimeType > >( observationModel );
+                mutualApproximationObservationModel->setViabilityCalculatorsApparentDistances( viabilityCalculatorsApparentDistances );
+
+                checkExistenceMutualApproximation = mutualApproximationObservationModel->isExistenceOfMutualApproximationChecked( );
+                checkObservableDuplicates = mutualApproximationObservationModel->areObservableDuplicatesRevoved( );
+            }
+            else if (  std::dynamic_pointer_cast< ModifiedMutualApproximationObservationModel< ObservationScalarType, TimeType > >( observationModel ) != nullptr )
+            {
+                std::shared_ptr< ModifiedMutualApproximationObservationModel< ObservationScalarType, TimeType > > mutualApproximationObservationModel =
+                        std::dynamic_pointer_cast< ModifiedMutualApproximationObservationModel< ObservationScalarType, TimeType > >( observationModel );
+                mutualApproximationObservationModel->setViabilityCalculatorsApparentDistances( viabilityCalculatorsApparentDistances );
+
+                checkExistenceMutualApproximation = mutualApproximationObservationModel->isExistenceOfMutualApproximationChecked( );
+                checkObservableDuplicates = mutualApproximationObservationModel->areObservableDuplicatesRevoved( );
+            }
+        }
+        if ( observationModel->getObservableType( ) == mutual_approximation_with_impact_parameter )
+        {
+            std::shared_ptr< MutualApproximationWithImpactParameterObservationModel< ObservationScalarType, TimeType > > mutualApproximationObservationModel =
+                    std::dynamic_pointer_cast< MutualApproximationWithImpactParameterObservationModel< ObservationScalarType, TimeType > >( observationModel );
+            mutualApproximationObservationModel->setViabilityCalculatorsApparentDistances( viabilityCalculatorsApparentDistances );
+
+            checkExistenceMutualApproximation = mutualApproximationObservationModel->isExistenceOfMutualApproximationChecked( );
+            checkObservableDuplicates = mutualApproximationObservationModel->areObservableDuplicatesRevoved( );
+        }
+
+
+        // For mutual approximation models, add appropriate viability calculator if required.
+        if ( ( checkExistenceMutualApproximation ) || ( checkObservableDuplicates ) )
+        {
+            bool isMutualApproximationCalculatorDetected = false;
+            for ( unsigned int i = 0 ; i < linkViabilityCalculators.size( ) ; i++ )
+            {
+                if ( std::dynamic_pointer_cast< MutualApproximationCalculator >( linkViabilityCalculators[ i ] ) != nullptr )
+                {
+                    isMutualApproximationCalculatorDetected = true;
+                }
+            }
+            if ( !isMutualApproximationCalculatorDetected )
+            {
+                std::vector< std::pair< int, int > > linkEndIndices = { std::make_pair( 2, 0 ), std::make_pair( 2, 1 ) };
+                std::shared_ptr< MutualApproximationCalculator > mutualApproximationCalculator = std::make_shared< MutualApproximationCalculator >( linkEndIndices );
+                linkViabilityCalculators.push_back( std::make_shared< MutualApproximationCalculator >( linkEndIndices ) );
+            }
+        }
+    }
+
+    // Compute observation.
     Eigen::Matrix< ObservationScalarType, ObservationSize, 1 > calculatedObservation =
             observationModel->computeObservationsWithLinkEndData(
                 observationTime, linkEndAssociatedWithTime, vectorOfTimes, vectorOfStates );

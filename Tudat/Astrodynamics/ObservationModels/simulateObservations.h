@@ -15,6 +15,7 @@
 #include <boost/bind.hpp>
 
 #include "Tudat/Astrodynamics/ObservationModels/observationSimulator.h"
+#include "Tudat/SimulationSetup/EstimationSetup/createObservationModel.h"
 
 namespace tudat
 {
@@ -246,6 +247,7 @@ simulateSingleObservationSet(
         const std::vector< std::shared_ptr< ObservationViabilityCalculator > > currentObservationViabilityCalculators =
         std::vector< std::shared_ptr< ObservationViabilityCalculator > >( ) )
 {
+
     if( observationSimulator == nullptr )
     {
         throw std::runtime_error( "Error when simulating single observation set, Observation simulator is nullptr" );

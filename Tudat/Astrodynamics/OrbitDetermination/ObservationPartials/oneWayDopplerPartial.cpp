@@ -48,6 +48,7 @@ double computePartialOfProjectedLinkEndVelocityWrtAssociatedTime(
 void OneWayDopplerDirectFirstOrderProperTimeComponentScaling::update( const std::vector< Eigen::Vector6d >& linkEndStates,
              const std::vector< double >& times,
              const observation_models::LinkEndType fixedLinkEnd,
+             const observation_models::LinkEnds linkEnds,
              const Eigen::VectorXd currentObservation )
 {
     // Get relative state
@@ -136,6 +137,7 @@ int OneWayDopplerDirectFirstOrderProperTimeComponentScaling::getParameterDepende
 void OneWayDopplerScaling::update( const std::vector< Eigen::Vector6d >& linkEndStates,
                                    const std::vector< double >& times,
                                    const observation_models::LinkEndType fixedLinkEnd,
+                                   const observation_models::LinkEnds linkEnds,
                                    const Eigen::VectorXd currentObservation )
 {
     // Compute geometry.
@@ -215,13 +217,13 @@ void OneWayDopplerScaling::update( const std::vector< Eigen::Vector6d >& linkEnd
     if( transmitterProperTimePartials_ != nullptr )
     {
         transmitterProperTimePartials_->update(
-                    linkEndStates, times, fixedLinkEnd, currentObservation );
+                    linkEndStates, times, fixedLinkEnd, linkEnds, currentObservation );
     }
 
     if( receiverProperTimePartials_ != nullptr )
     {
         receiverProperTimePartials_->update(
-                    linkEndStates, times, fixedLinkEnd, currentObservation );
+                    linkEndStates, times, fixedLinkEnd, linkEnds, currentObservation );
     }
 
 }

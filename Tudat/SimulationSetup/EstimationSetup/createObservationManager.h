@@ -22,6 +22,7 @@
 #include "Tudat/SimulationSetup/EstimationSetup/createObservationModel.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createObservationPartials.h"
 #include "Tudat/Astrodynamics/ObservationModels/oneWayRangeObservationModel.h"
+#include "Tudat/SimulationSetup/EstimationSetup/variationalEquationsSolver.h"
 
 namespace tudat
 {
@@ -297,7 +298,9 @@ std::shared_ptr< ObservationManagerBase< ObservationScalarType, TimeType > > cre
         const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< ObservationScalarType > >
         parametersToEstimate,
         const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface >
-        stateTransitionMatrixInterface )
+        stateTransitionMatrixInterface,
+        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface
+                = std::shared_ptr< propagators::DependentVariablesInterface >( ) )
 {
     using namespace observation_models;
     using namespace observation_partials;
@@ -320,7 +323,7 @@ std::shared_ptr< ObservationManagerBase< ObservationScalarType, TimeType > > cre
     {
         observationPartialsAndScaler =
                 observationPartialCreator->createObservationPartials(
-                    observableType, observationSimulator->getObservationModels( ), bodyMap, parametersToEstimate );
+                    observableType, observationSimulator->getObservationModels( ), bodyMap, parametersToEstimate, dependentVariablesInterface );
     }
 
     // Split position partial scaling and observation partial objects.
@@ -353,7 +356,9 @@ std::shared_ptr< ObservationManagerBase< ObservationScalarType, TimeType > > cre
         const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
         const simulation_setup::NamedBodyMap &bodyMap,
         const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< ObservationScalarType > > parametersToEstimate,
-        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface )
+        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface
+        = std::shared_ptr< propagators::DependentVariablesInterface >( ) )
 {
     std::shared_ptr< ObservationManagerBase< ObservationScalarType, TimeType > > observationManager;
     switch( observableType )
@@ -407,6 +412,27 @@ std::shared_ptr< ObservationManagerBase< ObservationScalarType, TimeType > > cre
         observationManager = createObservationManager< 1, ObservationScalarType, TimeType >(
                     observableType, settingsPerLinkEnds, bodyMap, parametersToEstimate,
                     stateTransitionMatrixInterface );
+        break;
+    case mutual_approximation:
+        if ( dependentVariablesInterface == nullptr )
+        {
+            throw std::runtime_error( "Error when creating observation manager for mutual approximation, no dependent variables interface"
+                                      " object found." );
+        }
+        observationManager = createObservationManager< 1, ObservationScalarType, TimeType >(
+                    observableType, settingsPerLinkEnds, bodyMap, parametersToEstimate,
+                    stateTransitionMatrixInterface, dependentVariablesInterface );
+        break;
+    case mutual_approximation_with_impact_parameter:
+        if ( dependentVariablesInterface == nullptr )
+        {
+            throw std::runtime_error( "Error when creating observation manager for mutual approximation with impact parameter, "
+                                      "no dependent variables interface object found." );
+        }
+        observationManager = createObservationManager< 2, ObservationScalarType, TimeType >(
+                    observableType, settingsPerLinkEnds, bodyMap, parametersToEstimate,
+                    stateTransitionMatrixInterface, dependentVariablesInterface );
+        break;
     default:
         throw std::runtime_error(
                     "Error when making observation manager, could not identify observable type " +
@@ -420,28 +446,32 @@ std::shared_ptr< ObservationManagerBase< ObservationScalarType, TimeType > > cre
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 
 //extern template std::shared_ptr< ObservationManagerBase< double, double > > createObservationManager< 1, double, double >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 
 //extern template std::shared_ptr< ObservationManagerBase< double, double > > createObservationManager< 2, double, double >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 
 //extern template std::shared_ptr< ObservationManagerBase< double, double > > createObservationManager< 3, double, double >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 
 //#if( BUILD_WITH_EXTENDED_PRECISION_PROPAGATION_TOOLS )
 
@@ -450,76 +480,88 @@ std::shared_ptr< ObservationManagerBase< ObservationScalarType, TimeType > > cre
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 //extern template std::shared_ptr< ObservationManagerBase< long double, double > > createObservationManager< 3, long double, double >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< long double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 //extern template std::shared_ptr< ObservationManagerBase< long double, Time > > createObservationManager< 3, long double, Time >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< long double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 
 //extern template std::shared_ptr< ObservationManagerBase< double, Time > > createObservationManager< 2, double, Time >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 //extern template std::shared_ptr< ObservationManagerBase< long double, double > > createObservationManager< 2, long double, double >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< long double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 //extern template std::shared_ptr< ObservationManagerBase< long double, Time > > createObservationManager< 2, long double, Time >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< long double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 
 //extern template std::shared_ptr< ObservationManagerBase< double, Time > > createObservationManager< 1, double, Time >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 //extern template std::shared_ptr< ObservationManagerBase< long double, double > > createObservationManager< 1, long double, double >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< long double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 //extern template std::shared_ptr< ObservationManagerBase< long double, Time > > createObservationManager< 1, long double, Time >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< long double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 
 //extern template std::shared_ptr< ObservationManagerBase< double, Time > > createObservationManagerBase< double, Time >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 //extern template std::shared_ptr< ObservationManagerBase< long double, double > > createObservationManagerBase< long double, double >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< long double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 //extern template std::shared_ptr< ObservationManagerBase< long double, Time > > createObservationManagerBase< long double, Time >(
 //        const ObservableType observableType,
 //        const std::map< LinkEnds, std::shared_ptr< ObservationSettings  > > settingsPerLinkEnds,
 //        const simulation_setup::NamedBodyMap &bodyMap,
 //        const std::shared_ptr< estimatable_parameters::EstimatableParameterSet< long double > > parametersToEstimate,
-//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface );
+//        const std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionMatrixInterface,
+//        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface );
 
 //#endif
 

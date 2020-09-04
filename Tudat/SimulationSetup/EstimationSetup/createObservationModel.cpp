@@ -246,7 +246,51 @@ std::vector< std::pair< int, int > > getLinkEndIndicesForObservationViability(
         }
         else
         {
-            throw std::runtime_error( "Error, parsed irrelevant apparent distance viability indices" );
+            throw std::runtime_error( "Error, parsed irrelevant apparent distance viability indices." );
+        }
+        break;
+    case mutual_approximation:
+        if( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+                                                                  ( linkEndToCheck.second == "" ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 0, 2 ) );
+        }
+        else if( linkEnds.at( transmitter2 ) == linkEndToCheck || ( ( linkEnds.at( transmitter2 ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 1, 2 ) );
+        }
+        else if( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 2, 0 ) );
+            linkEndIndices.push_back( std::make_pair( 2, 1 ) );
+        }
+        else
+        {
+            throw std::runtime_error( "Error, parsed irrelevant mutual approximation viability indices." );
+        }
+        break;
+    case mutual_approximation_with_impact_parameter:
+        if( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+                                                                  ( linkEndToCheck.second == "" ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 0, 2 ) );
+        }
+        else if( linkEnds.at( transmitter2 ) == linkEndToCheck || ( ( linkEnds.at( transmitter2 ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 1, 2 ) );
+        }
+        else if( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 2, 0 ) );
+            linkEndIndices.push_back( std::make_pair( 2, 1 ) );
+        }
+        else
+        {
+            throw std::runtime_error( "Error, parsed irrelevant viability indices for mutual approximation with impact parameter." );
         }
         break;
     default:
@@ -373,6 +417,50 @@ std::shared_ptr< OccultationCalculator > createOccultationCalculator(
                 stateOfOccultingBody, occultingBodyRadius );
 }
 
+
+//! Function to create an object to check if a mutual approximation condition is met for an observation
+std::shared_ptr< MutualApproximationCalculator > createMutualApproximationCalculator(
+        const simulation_setup::NamedBodyMap& bodyMap,
+        const LinkEnds linkEnds,
+        const ObservableType observationType,
+        const std::shared_ptr< ObservationViabilitySettings > observationViabilitySettings )
+{
+    if ( observationViabilitySettings->observationViabilityType_ != existence_central_instant )
+    {
+        throw std::runtime_error( "Error when making mutual approximation calculator, inconsistent input" );
+    }
+
+//    if( bodyMap.count( observationViabilitySettings->getStringParameter( ) ) == 0 )
+//    {
+//        throw std::runtime_error( "Error when making occultation calculator, body " +
+//                                  observationViabilitySettings->getStringParameter( ) + " not found." );
+//    }
+
+    if ( observationType != mutual_approximation )
+    {
+        throw std::runtime_error( "Error when making mutual approximation calculator, inconsistent input" );
+    }
+
+//    // Create state function of occulting body.
+//    std::function< Eigen::Vector6d( const double ) > stateOfOccultingBody =
+//            std::bind( &simulation_setup::Body::getStateInBaseFrameFromEphemeris< double, double >,
+//                         bodyMap.at( observationViabilitySettings->getStringParameter( ) ), std::placeholders::_1 );
+
+//    // Create check object
+//    if( bodyMap.at( observationViabilitySettings->getStringParameter( ) )->getShapeModel( ) == nullptr )
+//    {
+//        throw std::runtime_error( "Error when makig occultation calculator, no shape model found for " +
+//                                  observationViabilitySettings->getStringParameter( ) );
+//    }
+//    double occultingBodyRadius =
+//            bodyMap.at( observationViabilitySettings->getStringParameter( ) )->getShapeModel( )->getAverageRadius( );
+    return std::make_shared< MutualApproximationCalculator >(
+                getLinkEndIndicesForObservationViability(
+                    linkEnds, observationType, observationViabilitySettings->getAssociatedLinkEnd( ) )/*,
+                stateOfOccultingBody, occultingBodyRadius*/ );
+}
+
+
 //! Function to create an list of obervation viability conditions for a single set of link ends
 std::vector< std::shared_ptr< ObservationViabilityCalculator > > createObservationViabilityCalculators(
         const simulation_setup::NamedBodyMap& bodyMap,
@@ -426,6 +514,12 @@ std::vector< std::shared_ptr< ObservationViabilityCalculator > > createObservati
 
             linkViabilityCalculators.push_back(
                         createOccultationCalculator(
+                            bodyMap, linkEnds, observationType, relevantObservationViabilitySettings.at( i ) ) );
+            break;
+        case existence_central_instant:
+
+            linkViabilityCalculators.push_back(
+                        createMutualApproximationCalculator(
                             bodyMap, linkEnds, observationType, relevantObservationViabilitySettings.at( i ) ) );
             break;
         default:

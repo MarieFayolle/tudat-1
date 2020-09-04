@@ -21,6 +21,7 @@ namespace observation_partials
 void TwoWayDopplerScaling::update( const std::vector< Eigen::Vector6d >& linkEndStates,
                                    const std::vector< double >& times,
                                    const observation_models::LinkEndType fixedLinkEnd,
+                                   const observation_models::LinkEnds linkEnds,
                                    const Eigen::VectorXd currentObservation )
 {
     Eigen::Vector3d currentRangeVector;
@@ -62,8 +63,8 @@ void TwoWayDopplerScaling::update( const std::vector< Eigen::Vector6d >& linkEnd
         uplinkDoppler = uplinkDopplerModel_( observationTime, referenceLinkEnd );
 
         // Update current one-way range scaling
-        uplinkDopplerScaling_->update( singleLinkEndStates, singleLinkTimes, referenceLinkEnd );
-        uplinkRangeScaling_->update( singleLinkEndStates, singleLinkTimes, referenceLinkEnd );
+        uplinkDopplerScaling_->update( singleLinkEndStates, singleLinkTimes, referenceLinkEnd, linkEnds );
+        uplinkRangeScaling_->update( singleLinkEndStates, singleLinkTimes, referenceLinkEnd, linkEnds );
     }
 
     {
@@ -89,8 +90,8 @@ void TwoWayDopplerScaling::update( const std::vector< Eigen::Vector6d >& linkEnd
         downlinkDoppler = downlinkDopplerModel_( observationTime, referenceLinkEnd );
 
         // Update current one-way range scaling
-        downlinkDopplerScaling_->update( singleLinkEndStates, singleLinkTimes, referenceLinkEnd );
-        downlinkRangeScaling_->update( singleLinkEndStates, singleLinkTimes, referenceLinkEnd );
+        downlinkDopplerScaling_->update( singleLinkEndStates, singleLinkTimes, referenceLinkEnd, linkEnds );
+        downlinkRangeScaling_->update( singleLinkEndStates, singleLinkTimes, referenceLinkEnd, linkEnds );
     }
 
     projectedRelativeVelocityRatios_[ 0 ] = downlinkDoppler + 1.0;

@@ -277,6 +277,58 @@ private:
     double radiusOfOccultingBody_;
 };
 
+
+//! Function to check whether a central instant observation is possible, based on whether a mutual approximation is happenning at a given time.
+/*!
+ *  Function to check whether a central instant observation is possible, based on whether a mutual approximation is happenning at a given time.
+ *  NOTE: This class is only of use when modelling mutual approximation observations.
+ */
+class MutualApproximationCalculator: public ObservationViabilityCalculator
+{
+public:
+
+    MutualApproximationCalculator(
+            const std::vector< std::pair< int, int > > linkEndIndices/*,
+            const std::function< Eigen::Vector6d( const double ) > stateFunctionOfOccultingBody,
+            const double radiusOfOccultingBody*/ ):
+        linkEndIndices_( linkEndIndices )/*,
+        stateFunctionOfOccultingBody_( stateFunctionOfOccultingBody ),
+        radiusOfOccultingBody_( radiusOfOccultingBody )*/{ }
+
+    //! Function for determining whether there is a mutual approximation and thus whether the central instant is defined or not.
+    /*!
+     *  Function for determining whether there is a mutual approximation and thus whether the central instant is defined or not.
+     *  The input from which the viability of an observation is calculated are a vector of times and states of link ends involved
+     *  in the observation.
+     *  \param linkEndStates Vector of states of the link ends involved in the observation, in the order as provided by the
+     *  function computeObservationsAndLinkEndData of the associated ObservationModel.
+     *  \param linkEndTimes Vector of times of the link ends involved in the observation, in the order as provided by the
+     *  function computeObservationsAndLinkEndData of the associated ObservationModel.
+     *  \return True if observation is viable, false if not.
+     */
+    bool isObservationViable( const std::vector< Eigen::Vector6d >& linkEndStates,
+                              const std::vector< double >& linkEndTimes );
+
+private:
+
+    //! Vector of indices denoting which combinations of entries of vectors to isObservationViable are to be used.
+    /*!
+     *  Vector of indices denoting which combinations of entries from the linkEndIndices and linkEndTimes vectors to use for
+     *  occultation calculation when isObservationViable is called. The second entry of the pair is the index of the target that
+     *  is being observed from the ground station at which the signal is transmitted, the first entry is the index of the
+     *  ground station at which it is received. From each entry of this vector, a vector is created for which the
+     *  it if checked if it is occulted.
+     */
+    std::vector< std::pair< int, int > > linkEndIndices_;
+
+//    //! Function that returns the inertial state of the body that for which it is checked whether it occults the link.
+//    std::function< Eigen::Vector6d( const double ) > stateFunctionOfOccultingBody_;
+
+//    //! Radius of body causing occultation.
+//    double radiusOfOccultingBody_;
+};
+
+
 //! Enum defining possible checks which can be performed for observation viability,
 /*!
  *  Enum defining possible checks which can be performed for observation viability, the string and double parameter shown in the
@@ -286,7 +338,8 @@ enum ObservationViabilityType
 {
     minimum_elevation_angle,    //properties: no string, double = elevation angle
     body_avoidance_angle,       //properties: string = body to avoid, double = avoidance angle
-    body_occultation            //properties: string = occulting body, no double
+    body_occultation,           //properties: string = occulting body, no double
+    existence_central_instant   //properties: string = no string, double = limit acceptable impact parameter
 };
 
 //! Class to define settings for observation viability calculator creation

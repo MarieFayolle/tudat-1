@@ -17,6 +17,8 @@ set(OBSERVATION_PARTIALS_SOURCES
   "${SRCROOT}${OBSERVATIONPARTIALSDIR}/nWayRangePartial.cpp"
   "${SRCROOT}${OBSERVATIONPARTIALSDIR}/differencedOneWayRangeRatePartial.cpp"
   "${SRCROOT}${OBSERVATIONPARTIALSDIR}/oneWayDopplerPartial.cpp"
+  "${SRCROOT}${OBSERVATIONPARTIALSDIR}/apparentDistancePartial.cpp"
+  "${SRCROOT}${OBSERVATIONPARTIALSDIR}/mutualApproximationPartial.cpp"
   "${SRCROOT}${OBSERVATIONPARTIALSDIR}/observationPartial.cpp"
   "${SRCROOT}${LIGHTTIMECORRECTIONPARTIALSDIR}/lightTimeCorrectionPartial.cpp"
   "${SRCROOT}${LIGHTTIMECORRECTIONPARTIALSDIR}/firstOrderRelativisticPartial.cpp"
@@ -34,6 +36,8 @@ set(OBSERVATION_PARTIALS_HEADERS
   "${SRCROOT}${OBSERVATIONPARTIALSDIR}/twoWayDopplerPartial.h"
   "${SRCROOT}${OBSERVATIONPARTIALSDIR}/observationPartial.h"
   "${SRCROOT}${OBSERVATIONPARTIALSDIR}/eulerAngleObservablePartials.h"
+  "${SRCROOT}${OBSERVATIONPARTIALSDIR}/apparentDistancePartial.h"
+  "${SRCROOT}${OBSERVATIONPARTIALSDIR}/mutualApproximationPartial.h"
   "${SRCROOT}${LIGHTTIMECORRECTIONPARTIALSDIR}/lightTimeCorrectionPartial.h"
   "${SRCROOT}${LIGHTTIMECORRECTIONPARTIALSDIR}/firstOrderRelativisticPartial.h"
 )
@@ -87,6 +91,14 @@ target_link_libraries(test_PositionPartials tudat_observation_partials_test_func
 add_executable(test_EulerAngleObservationPartials "${SRCROOT}${OBSERVATIONPARTIALSDIR}/UnitTests/unitTestEulerAngleObservationPartials.cpp")
 setup_custom_test_program(test_EulerAngleObservationPartials "${SRCROOT}${OBSERVATIONPARTIALSDIR}")
 target_link_libraries(test_EulerAngleObservationPartials tudat_observation_partials_test_functions ${TUDAT_ESTIMATION_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(test_ApparentDistancePartials "${SRCROOT}${OBSERVATIONPARTIALSDIR}/UnitTests/unitTestApparentDistancePartials.cpp")
+setup_custom_test_program(test_ApparentDistancePartials "${SRCROOT}${OBSERVATIONPARTIALSDIR}")
+target_link_libraries(test_ApparentDistancePartials tudat_observation_partials_test_functions  ${TUDAT_ESTIMATION_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(test_MutualApproximationPartials "${SRCROOT}${OBSERVATIONPARTIALSDIR}/UnitTests/unitTestMutualApproximationPartials.cpp")
+setup_custom_test_program(test_MutualApproximationPartials "${SRCROOT}${OBSERVATIONPARTIALSDIR}")
+target_link_libraries(test_MutualApproximationPartials tudat_observation_partials_test_functions  ${TUDAT_ESTIMATION_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable(test_RotationMatrixPartials "${SRCROOT}${OBSERVATIONPARTIALSDIR}/UnitTests/unitTestRotationMatrixPartials.cpp")
 setup_custom_test_program(test_RotationMatrixPartials "${SRCROOT}${OBSERVATIONPARTIALSDIR}")

@@ -141,7 +141,10 @@ void testObservationPartials(
         const bool testPositionPartial = 1,
         const bool testParameterPartial = 1,
         const double positionPerturbationMultiplier = 1.0,
-        const Eigen::VectorXd parameterPerturbationMultipliers = Eigen::VectorXd::Constant( 4, 1.0 ) )
+        const Eigen::VectorXd parameterPerturbationMultipliers = Eigen::VectorXd::Constant( 4, 1.0 ),
+        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface
+        = std::shared_ptr< propagators::DependentVariablesInterface >( ),
+        const double estimateObservationTime = TUDAT_NAN )
 {
 
     // Retrieve double and vector parameters and estimate body states
@@ -174,7 +177,7 @@ void testObservationPartials(
     std::pair< std::map< std::pair< int, int >, std::shared_ptr< ObservationPartial< ObservableSize > > >,
             std::shared_ptr< PositionPartialScaling > > fullAnalyticalPartialSet =
             observationPartialCreator->createObservationPartials(
-                observableType, observationModelList, bodyMap, fullEstimatableParameterSet ).begin( )->second;
+                observableType, observationModelList, bodyMap, fullEstimatableParameterSet, dependentVariablesInterface ).begin( )->second;
     std::shared_ptr< PositionPartialScaling > positionPartialScaler = fullAnalyticalPartialSet.second;
 
 
@@ -182,18 +185,27 @@ void testObservationPartials(
     for( LinkEnds::const_iterator linkEndIterator = linkEnds.begin( ); linkEndIterator != linkEnds.end( );
          linkEndIterator++ )
     {
+
+        if ( ( ( observableType != apparent_distance ) && ( observableType != mutual_approximation ) )
+             || ( ( ( observableType == apparent_distance ) || ( observableType == mutual_approximation ) ) && ( linkEndIterator->first == receiver ) ) )
+        {
+
         std::cout << "============================ REFERENCE LINK END =============" << linkEndIterator->first << std::endl;
         // Evaluate nominal observation values
         std::vector< Eigen::Vector6d > vectorOfStates;
         std::vector< double > vectorOfTimes;
-        double observationTime = 1.1E7;
+        double observationTime = 1.1e7;
+        if ( observableType == mutual_approximation )
+        {
+            observationTime = estimateObservationTime;
+        }
         Eigen::VectorXd currentObservation = observationModel->computeObservationsWithLinkEndData(
                     observationTime, linkEndIterator->first, vectorOfTimes, vectorOfStates );
 
         // Calculate analytical observation partials.
         if( positionPartialScaler != NULL )
         {
-            positionPartialScaler->update( vectorOfStates, vectorOfTimes, static_cast< LinkEndType >( linkEndIterator->first ),
+            positionPartialScaler->update( vectorOfStates, vectorOfTimes, static_cast< LinkEndType >( linkEndIterator->first ), linkEnds,
                                            currentObservation );
         }
 
@@ -243,6 +255,7 @@ void testObservationPartials(
                 for( unsigned int j = 0; j < expectedPartialTimes[ i ].size( ); j++ )
                 {
                     BOOST_CHECK_EQUAL( analyticalObservationPartials[ i ][ j ].second, expectedPartialTimes[ i ][ j ] );
+                    std::cout << "expected partial times: " << expectedPartialTimes[ i ][ j ] << "\n\n";
                 }
             }
         }
@@ -281,6 +294,8 @@ void testObservationPartials(
                 if( observableType != angular_position )
                 {
                     TUDAT_CHECK_MATRIX_CLOSE_FRACTION( bodyPositionPartial, ( numericalPartialWrtBodyPosition ), tolerance );
+                    std::cout << "analytical partials: " << bodyPositionPartial << "\n\n";
+                    std::cout << "numerical partials; " << numericalPartialWrtBodyPosition << "\n\n";
                 }
                 else
                 {
@@ -290,7 +305,8 @@ void testObservationPartials(
                     numericalPartialWrtBodyPosition( 0, 2 ) = 0.0;
 
                     TUDAT_CHECK_MATRIX_CLOSE_FRACTION( bodyPositionPartial, ( numericalPartialWrtBodyPosition ), tolerance );
-
+                    std::cout << "analytical partials: " << bodyPositionPartial << "\n\n";
+                    std::cout << "numerical partials; " << numericalPartialWrtBodyPosition << "\n\n";
                 }
             }
         }
@@ -388,8 +404,11 @@ void testObservationPartials(
                         currentParameterPartial += analyticalObservationPartials[ i + numberOfEstimatedBodies ][ j ].first;
 
                     }
+                    std::cout << "TEST PARTIAL WRT DOUBLE PARAMETER" << "\n\n";
                     TUDAT_CHECK_MATRIX_CLOSE_FRACTION(
                                 currentParameterPartial, ( numericalPartialsWrtDoubleParameters[ i ] ), tolerance );
+                    std::cout << "analytical partials: " << currentParameterPartial << "\n\n";
+                    std::cout << "numerical partials; " << numericalPartialsWrtDoubleParameters[ i ] << "\n\n";
                 }
             }
 
@@ -428,11 +447,15 @@ void testObservationPartials(
                         currentParameterPartial += analyticalObservationPartials[ i + startIndex ][ j ].first;
 
                     }
+                    std::cout << "TEST PARTIAL WRT VECTOR PARAMETER" << "\n\n";
                     TUDAT_CHECK_MATRIX_CLOSE_FRACTION(
                                 ( currentParameterPartial ), ( numericalPartialsWrtVectorParameters[ i ] ), tolerance );
+                    std::cout << "analytical partials: " << currentParameterPartial << "\n\n";
+                    std::cout << "numerical partials; " << numericalPartialsWrtVectorParameters[ i ] << "\n\n";
                 }
             }
         }
+    }
     }
 }
 
@@ -445,7 +468,9 @@ const double tolerance,
 const bool testPositionPartial,
 const bool testParameterPartial,
 const double positionPerturbationMultiplier,
-const Eigen::VectorXd parameterPerturbationMultipliers );
+const Eigen::VectorXd parameterPerturbationMultipliers,
+const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface,
+const double estimateObservationTime );
 
 extern template void testObservationPartials< 2 >(
 const std::shared_ptr< ObservationModel< 2, double, double > > observationModel,
@@ -456,7 +481,9 @@ const double tolerance,
 const bool testPositionPartial,
 const bool testParameterPartial,
 const double positionPerturbationMultiplier,
-const Eigen::VectorXd parameterPerturbationMultipliers );
+const Eigen::VectorXd parameterPerturbationMultipliers,
+const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface,
+const double estimateObservationTime );
 
 
 }

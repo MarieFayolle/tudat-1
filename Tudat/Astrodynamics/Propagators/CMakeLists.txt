@@ -31,6 +31,7 @@ set(PROPAGATORS_SOURCES
   "${SRCROOT}${PROPAGATORSDIR}/integrateEquations.cpp"
   "${SRCROOT}${PROPAGATORSDIR}/dynamicsStateDerivativeModel.cpp"
   "${SRCROOT}${PROPAGATORSDIR}/propagateCovariance.cpp"
+  "${SRCROOT}${PROPAGATORSDIR}/dependentVariablesInterface.cpp"
 )
 
 # Add header files.
@@ -59,6 +60,7 @@ set(PROPAGATORS_HEADERS
   "${SRCROOT}${PROPAGATORSDIR}/stateDerivativeCircularRestrictedThreeBodyProblem.h"
   "${SRCROOT}${PROPAGATORSDIR}/getZeroProperModeRotationalInitialState.h"
   "${SRCROOT}${PROPAGATORSDIR}/propagateCovariance.h"
+  "${SRCROOT}${PROPAGATORSDIR}/dependentVariablesInterface.h"
 )
 
 # Add static libraries.
@@ -110,10 +112,13 @@ add_executable(test_HybridArcVariationalEquations "${SRCROOT}${PROPAGATORSDIR}/U
 setup_custom_test_program(test_HybridArcVariationalEquations "${SRCROOT}${PROPAGATORSDIR}")
 target_link_libraries(test_HybridArcVariationalEquations ${TUDAT_ESTIMATION_LIBRARIES} ${Boost_LIBRARIES})
 
-
 add_executable(test_DependentVariableOutput "${SRCROOT}${PROPAGATORSDIR}/UnitTests/unitTestDependentVariableOutput.cpp")
 setup_custom_test_program(test_DependentVariableOutput "${SRCROOT}${PROPAGATORSDIR}")
 target_link_libraries(test_DependentVariableOutput ${TUDAT_ESTIMATION_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(test_DependentVariablesInterface "${SRCROOT}${PROPAGATORSDIR}/UnitTests/unitTestDependentVariablesInterface.cpp")
+setup_custom_test_program(test_DependentVariablesInterface "${SRCROOT}${PROPAGATORSDIR}")
+target_link_libraries(test_DependentVariablesInterface ${TUDAT_ESTIMATION_LIBRARIES} ${Boost_LIBRARIES})
 
 endif( )
 
@@ -192,5 +197,3 @@ target_link_libraries(test_FullPropagationLambertTargeter tudat_trajectory_desig
 add_executable(test_FullPropagationPatchedConicsTrajectory "${SRCROOT}${PROPAGATORSDIR}/UnitTests/unitTestFullPropagationPatchedConicsTrajectory.cpp")
 setup_custom_test_program(test_FullPropagationPatchedConicsTrajectory "${SRCROOT}${PROPAGATORSDIR}")
 target_link_libraries(test_FullPropagationPatchedConicsTrajectory tudat_trajectory_design tudat_mission_segments tudat_ephemerides tudat_basic_astrodynamics tudat_basic_mathematics ${TUDAT_PROPAGATION_LIBRARIES} ${Boost_LIBRARIES})
-
-

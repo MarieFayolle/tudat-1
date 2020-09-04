@@ -82,6 +82,12 @@ std::string getObservableName( const ObservableType observableType, const int nu
     case apparent_distance:
         observableName = "ApparentDistance";
         break;
+    case mutual_approximation:
+        observableName = "MutualApproximation";
+        break;
+    case mutual_approximation_with_impact_parameter:
+        observableName = "MutualApproximationWithImpactParameter";
+        break;
     default:
         std::string errorMessage =
                 "Error, could not find observable type " + std::to_string( observableType ) +
@@ -129,6 +135,18 @@ ObservableType getObservableType( const std::string& observableName )
     {
         observableType = euler_angle_313_observable;
     }
+    else if ( observableName == "ApparentDistance" )
+    {
+        observableType = apparent_distance;
+    }
+    else if ( observableName == "MutualApproximation" )
+    {
+        observableType = mutual_approximation;
+    }
+    else if ( observableName == "MutualApproximationWithImpactParameter" )
+    {
+        observableType = mutual_approximation_with_impact_parameter;
+    }
     else
     {
         std::string errorMessage =
@@ -175,6 +193,12 @@ int getObservableSize( const ObservableType observableType )
         break;
     case apparent_distance:
         observableSize = 1;
+        break;
+    case mutual_approximation:
+        observableSize = 1;
+        break;
+    case mutual_approximation_with_impact_parameter:
+        observableSize = 2;
         break;
     default:
        std::string errorMessage = "Error, did not recognize observable " + std::to_string( observableType )
@@ -364,6 +388,46 @@ std::vector< int > getLinkEndIndicesForLinkEndTypeAtObservable(
             throw std::runtime_error( errorMessage );
         }
         break;
+     case mutual_approximation:
+        switch( linkEndType )
+        {
+        case transmitter:
+            linkEndIndices.push_back( 0 );
+            break;
+        case transmitter2:
+            linkEndIndices.push_back( 1 );
+            break;
+        case receiver:
+            linkEndIndices.push_back( 2 );
+            break;
+        default:
+            std::string errorMessage =
+                    "Error, could not find link end type index for link end " +
+                    std::to_string( linkEndType ) + " of observable " +
+                    std::to_string( observableType );
+            throw std::runtime_error( errorMessage );
+        }
+        break;
+    case mutual_approximation_with_impact_parameter:
+       switch( linkEndType )
+       {
+       case transmitter:
+           linkEndIndices.push_back( 0 );
+           break;
+       case transmitter2:
+           linkEndIndices.push_back( 1 );
+           break;
+       case receiver:
+           linkEndIndices.push_back( 2 );
+           break;
+       default:
+           std::string errorMessage =
+                   "Error, could not find link end type index for link end " +
+                   std::to_string( linkEndType ) + " of observable " +
+                   std::to_string( observableType );
+           throw std::runtime_error( errorMessage );
+       }
+       break;
 
     default:
         std::string errorMessage =

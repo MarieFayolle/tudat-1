@@ -24,6 +24,7 @@
 
 #include "Tudat/Astrodynamics/OrbitDetermination/EstimatableParameters/estimatableParameter.h"
 #include "Tudat/Astrodynamics/Propagators/stateTransitionMatrixInterface.h"
+#include "Tudat/Astrodynamics/Propagators/dependentVariablesInterface.h"
 #include "Tudat/SimulationSetup/PropagationSetup/dynamicsSimulator.h"
 #include "Tudat/Astrodynamics/Ephemerides/tabulatedEphemeris.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createStateDerivativePartials.h"
@@ -129,6 +130,16 @@ public:
         return stateTransitionInterface_;
     }
 
+    //! Function to get the dependent variable interface object.
+    /*!
+     *  Function to get the dependent variable interface object.
+     *  \return Dependent variable interface object.
+     */
+    std::shared_ptr< DependentVariablesInterface > getDependentVariablesInterface( )
+    {
+        return dependentVariablesInterface_;
+    }
+
     //! Pure virtual function to retrieve the dynamics simulator object (as base-class pointer)
     /*!
      * Pure virtual function to retrieve the dynamics simulator object (as base-class pointer)
@@ -209,6 +220,10 @@ protected:
 
     //! Object used for interpolating numerical results of state transition and sensitivity matrix.
     std::shared_ptr< CombinedStateTransitionAndSensitivityMatrixInterface > stateTransitionInterface_;
+
+    //! Object used for interpolating numerical results of dependent variables.
+    std::shared_ptr< DependentVariablesInterface > dependentVariablesInterface_;
+
 };
 
 //! Function to separate the time histories of the sensitivity and state transition matrices from a full numerical solution.
@@ -277,6 +292,97 @@ void createStateTransitionAndSensitivityMatrixInterpolator(
         sensitivityMatrixInterpolator,
         std::vector< std::map< double, Eigen::MatrixXd > >& variationalEquationsSolution,
         const bool clearRawSolution = 1 );
+
+//! Function to create interpolator for dependent variables from numerical results.
+/*!
+* Function to create interpolators for dependent variables from numerical results.
+* \param dependentVariablesInterpolator Interpolator object for dependent variables (returned by reference).
+* \param dependentVariablesHistory Dependent variables matrix history.
+* \param clearDependentVariableHistory Boolean denoting whether to clear entries of dependentVariablesHistory after creation
+* of interpolator.
+*/
+void createDependentVariablesInterpolator(
+        std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd > >&
+        dependentVariablesInterpolator,
+        std::map< double, Eigen::VectorXd >& dependentVariablesHistory,
+        const bool clearDependentVariablesHistory = 1 );
+
+
+//! Retrieve history of dependent variables needed for the dependent variable interface object.
+/*!
+ * Retrieve history of dependent variables needed for the dependent variable interface object, from
+ * the global dependent variables history.
+ * \param dependentVariablesHistory Dependent variables matrix history.
+ * \param dependentVariablesHistoryInterface Dependent variables matrix history for dependent variables interface (returned by reference).
+ * \param dependentVariablesSaveSettings Dependent variables settings object.
+ * \param dependentVariablesInterfaceSettings Dependent variables settings to create the dependent variables interface.
+ */
+void getDependentVariablesHistoryForInterface(
+        std::map< double, Eigen::VectorXd >& dependentVariablesHistory,
+        std::map< double, Eigen::VectorXd >& dependentVariablesHistoryInterface,
+        const std::shared_ptr< DependentVariableSaveSettings > dependentVariablesSaveSettings,
+        const std::shared_ptr< DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
+//{
+//    dependentVariablesHistoryInterface.clear( );
+
+//    std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > singleDependentVariablesSaveSettings = dependentVariablesSaveSettings->dependentVariables_;
+//    std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > singleDependentVariablesInterfaceSettings = dependentVariablesInterfaceSettings->dependentVariables_;
+
+////        std::map< PropagationDependentVariables, int > dependentVariableInterfaceIndices;
+//    std::map< PropagationDependentVariables, int > dependentVariablesSaveIndices;
+//    std::vector< std::pair< int, int > > dependentVariableInterfaceIndices;
+
+//    int totalDependentVariablesSize = 0;
+//    for ( unsigned int i = 0 ; i < singleDependentVariablesSaveSettings.size( ) ; i++ )
+//    {
+//        dependentVariablesSaveIndices[ singleDependentVariablesSaveSettings[ i ]->dependentVariableType_ ]
+//                = totalDependentVariablesSize;
+//        totalDependentVariablesSize += getDependentVariableSaveSize( singleDependentVariablesSaveSettings[ i ] );
+//    }
+
+//    int totalDependentVariablesInterfaceSize = 0;
+//    for ( unsigned int i = 0 ; i < singleDependentVariablesInterfaceSettings.size( ) ; i++ )
+//    {
+//        PropagationDependentVariables currentInterfaceDependentVariableType =
+//                singleDependentVariablesInterfaceSettings[ i ]->dependentVariableType_;
+//        if ( dependentVariablesSaveIndices.count( currentInterfaceDependentVariableType ) != 1 )
+//        {
+//            throw std::runtime_error( "Error when creating a dependent variables interface, required dependent variables settings"
+//                                      "incompatible with dependent variables to save." );
+//        }
+
+//        std::map< PropagationDependentVariables, int >::iterator itr = dependentVariablesSaveIndices.find( currentInterfaceDependentVariableType );
+////            dependentVariableInterfaceIndices[ currentInterfaceDependentVariableType ] = itr->second;
+//        dependentVariableInterfaceIndices.push_back(
+//                    std::make_pair( itr->second,
+//                                    getDependentVariableSaveSize( singleDependentVariablesInterfaceSettings[ i ] ) ) );
+//        totalDependentVariablesInterfaceSize += getDependentVariableSaveSize( singleDependentVariablesInterfaceSettings[ i ] );
+//    }
+
+////        for ( std::map< PropagationDependentVariables, int >::iterator itr =
+////              dependentVariableInterfaceIndices.begin( ) ; itr != dependentVariableInterfaceIndices.end( ) ; itr++ )
+////        {
+
+////        }
+//    for ( std::map< double, Eigen::VectorXd >::iterator itr = dependentVariablesHistory.begin( ) ;
+//          itr != dependentVariablesHistory.end( ) ; itr++ )
+//    {
+//        Eigen::VectorXd currentDependentVariableValues = Eigen::VectorXd::Zero( totalDependentVariablesInterfaceSize );
+
+//        int currentIndex = 0;
+//        for ( unsigned int i = 0 ; i < dependentVariableInterfaceIndices.size( ) ; i++ )
+//        {
+//            currentDependentVariableValues.segment( currentIndex, dependentVariableInterfaceIndices[ i ].second )
+//                    = itr->second.segment( dependentVariableInterfaceIndices[ i ].first,
+//                                           dependentVariableInterfaceIndices[ i ].second );
+//            currentIndex += dependentVariableInterfaceIndices[ i ].second;
+//        }
+
+//        dependentVariablesHistoryInterface[ itr->first ] = currentDependentVariableValues;
+//    }
+
+//}
+
 
 //! Function to check the consistency between propagation settings of equations of motion, and estimated parameters.
 /*!
@@ -576,6 +682,7 @@ public:
     using VariationalEquationsSolver< StateScalarType, TimeType >::stateTransitionMatrixSize_;
     using VariationalEquationsSolver< StateScalarType, TimeType >::parameterVectorSize_;
     using VariationalEquationsSolver< StateScalarType, TimeType >::stateTransitionInterface_;
+    using VariationalEquationsSolver< StateScalarType, TimeType >::dependentVariablesInterface_;
 
     //! Constructor
     /*!
@@ -608,12 +715,15 @@ public:
             = std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ),
             const bool clearNumericalSolution = true,
             const bool integrateEquationsOnCreation = true,
-            const bool setIntegratedResult = true ):
+            const bool setIntegratedResult = true,
+            const std::shared_ptr< DependentVariableSaveSettings > dependentVariablesInterfaceSettings =
+            std::shared_ptr< DependentVariableSaveSettings >( ) ):
         VariationalEquationsSolver< StateScalarType, TimeType >(
             bodyMap, parametersToEstimate, clearNumericalSolution ),
         integratorSettings_( integratorSettings ),
         propagatorSettings_( std::dynamic_pointer_cast< SingleArcPropagatorSettings< StateScalarType > >(propagatorSettings ) ),
-        variationalOnlyIntegratorSettings_( variationalOnlyIntegratorSettings )
+        variationalOnlyIntegratorSettings_( variationalOnlyIntegratorSettings ),
+        dependentVariablesInterfaceSettings_( dependentVariablesInterfaceSettings )
     {
         if( std::dynamic_pointer_cast< SingleArcPropagatorSettings< StateScalarType >  >( propagatorSettings ) == nullptr )
         {
@@ -684,6 +794,12 @@ public:
                             nullptr, nullptr,
                             propagatorSettings_->getConventionalStateSize( ), parameterVectorSize_,
                             variationalEquationsObject_->getStatePartialAdditionIndices( ) );
+
+                if ( dependentVariablesInterfaceSettings != nullptr )
+                {
+                    dependentVariablesInterface_ = std::make_shared< SingleArcDependentVariablesInterface >(
+                            std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd  > >( ), dependentVariablesInterfaceSettings );
+                }
             }
         }
     }
@@ -720,6 +836,9 @@ public:
     {
         variationalEquationsSolution_[ 0 ].clear( );
         variationalEquationsSolution_[ 1 ].clear( );
+
+        // Clear dependent variables history
+        dependentVariablesHistory_.clear( );
 
         if( integrateEquationsConcurrently )
         {
@@ -765,6 +884,9 @@ public:
                         rawNumericalSolution, variationalEquationsSolution_,
                         std::make_pair( 0, 0 ), std::make_pair( 0, stateTransitionMatrixSize_ ),
                         stateTransitionMatrixSize_, parameterVectorSize_ );
+
+            // Set dependent variables history.
+            dependentVariablesHistory_ = dependentVariableHistory;
         }
         else
         {
@@ -793,10 +915,20 @@ public:
                         std::make_pair( 0, stateTransitionMatrixSize_ ),
                         stateTransitionMatrixSize_, parameterVectorSize_ );
 
+            // Set dependent variables history.
+            dependentVariablesHistory_ = dynamicsSimulator_->getDependentVariableHistory( );
+
         }
 
         // Reset solution for state transition and sensitivity matrices.
         resetVariationalEquationsInterpolators( );
+
+        // Reset solution for dependent variables of interest.
+        if ( dependentVariablesInterfaceSettings_ != nullptr )
+        {
+            resetDependentVariablesInterpolator( );
+        }
+
     }
 
     //! Function to return the numerical solution history of numerically integrated variational equations.
@@ -905,7 +1037,69 @@ private:
                         stateTransitionMatrixInterpolator, sensitivityMatrixInterpolator,
                         variationalEquationsObject_->getStatePartialAdditionIndices( ) );
         }
+    }  
+
+
+    //! Reset dependent variables interpolator.
+    /*!
+     *  Reset dependent variables interpolator,
+     *  i.e. use numerical integration results to create new look-up tables
+     *  and interpolators of dependent variable through the createInterpolatorsForDependentVariable
+     *  function
+     */
+    void resetDependentVariablesInterpolator( )
+    {
+        using namespace interpolators;
+        using namespace utilities;
+
+        std::map< std::string, int > dependentVariablesIds;
+        std::map< int, std::string > dependentVariablesIdsFromDynamicsSimulator = dynamicsSimulator_->getDependentVariableIds( );
+        for ( std::map< int, std::string >::iterator itr = dependentVariablesIdsFromDynamicsSimulator.begin( ) ;
+              itr != dependentVariablesIdsFromDynamicsSimulator.end( ) ; itr++ )
+        {
+            dependentVariablesIds[ itr->second ] = itr->first;
+        }
+
+        for ( unsigned int i = 0 ; i < dependentVariablesInterfaceSettings_->dependentVariables_.size( ) ; i++ )
+        {
+            if (  dependentVariablesIds.count( getDependentVariableId( dependentVariablesInterfaceSettings_->dependentVariables_[ i ] ) ) != 1 )
+            {
+                throw std::runtime_error( "Error when making dependent variable interface, the following required dependent variable " +
+                                          getDependentVariableId( dependentVariablesInterfaceSettings_->dependentVariables_[ i ] ) +
+                                          " is not found in the propagtor settings." );
+            }
+        }
+
+        // Create interpolators.
+        std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd > >
+                dependentVariablesInterpolator;
+
+        std::map< double, Eigen::VectorXd > dependentVariablesHistoryInterface;
+        getDependentVariablesHistoryForInterface( dependentVariablesHistory_, dependentVariablesHistoryInterface,
+                                                  propagatorSettings_->getDependentVariablesToSave( ),
+                                                  dependentVariablesInterfaceSettings_ );
+
+        createDependentVariablesInterpolator( dependentVariablesInterpolator,
+                                              dependentVariablesHistoryInterface,
+                                              this->clearNumericalSolution_ );
+
+        // Create (if non-existent) or reset dependent variable interface
+        if( dependentVariablesInterface_ == nullptr )
+        {
+            dependentVariablesInterface_ = std::make_shared< SingleArcDependentVariablesInterface >(
+                        dependentVariablesInterpolator, dependentVariablesInterfaceSettings_ );// sensitivityMatrixInterpolator,
+//                        propagatorSettings_->getConventionalStateSize( ), parameterVectorSize_,
+//                        variationalEquationsObject_->getStatePartialAdditionIndices( ) );
+        }
+        else
+        {
+            std::dynamic_pointer_cast< SingleArcDependentVariablesInterface >(
+                        dependentVariablesInterface_ )->updateDependentVariablesInterpolators(
+                        dependentVariablesInterpolator ); /*, sensitivityMatrixInterpolator,
+                        variationalEquationsObject_->getStatePartialAdditionIndices( ) );*/
+        }
     }
+
 
     //! Object used for numerically propagating and managing the solution of the equations of motion.
     std::shared_ptr< SingleArcDynamicsSimulator< StateScalarType, TimeType > > dynamicsSimulator_;
@@ -919,6 +1113,9 @@ private:
      *  state transition matrix Phi (first vector entry) and sensitivity matrix S (second vector entry)
      */
     std::vector< std::map< double, Eigen::MatrixXd > > variationalEquationsSolution_;
+
+    //! Map of history of numerically computed dependent variables.
+    std::map< double, Eigen::VectorXd > dependentVariablesHistory_;
 
     std::function< void( Eigen::Matrix< StateScalarType, Eigen::Dynamic, Eigen::Dynamic >& ) > statePostProcessingFunction_;
 
@@ -939,6 +1136,10 @@ private:
      *  either full or separate propagation of equations.
      */
     std::shared_ptr< DynamicsStateDerivativeModel< TimeType, StateScalarType > > dynamicsStateDerivative_;
+
+    //! Settings object used to set up the dependent variable interface object if needed.
+    std::shared_ptr< DependentVariableSaveSettings > dependentVariablesInterfaceSettings_;
+
 };
 
 
@@ -1024,6 +1225,7 @@ public:
     using VariationalEquationsSolver< StateScalarType, TimeType >::stateTransitionMatrixSize_;
     using VariationalEquationsSolver< StateScalarType, TimeType >::parameterVectorSize_;
     using VariationalEquationsSolver< StateScalarType, TimeType >::stateTransitionInterface_;
+    using VariationalEquationsSolver< StateScalarType, TimeType >::dependentVariablesInterface_;
 
     //! Constructor
     /*!
@@ -1055,11 +1257,14 @@ public:
             std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ),
             const bool clearNumericalSolution = true,
             const bool integrateEquationsOnCreation = false,
-            const bool resetMultiArcDynamicsAfterPropagation = true ):
+            const bool resetMultiArcDynamicsAfterPropagation = true,
+            const std::shared_ptr< DependentVariableSaveSettings > dependentVariablesInterfaceSettings =
+            std::shared_ptr< DependentVariableSaveSettings >( ) ):
         VariationalEquationsSolver< StateScalarType, TimeType >(
             bodyMap, parametersToEstimate, clearNumericalSolution ),
         propagatorSettings_( std::dynamic_pointer_cast< MultiArcPropagatorSettings< StateScalarType > >( propagatorSettings ) ),
-        resetMultiArcDynamicsAfterPropagation_( resetMultiArcDynamicsAfterPropagation )
+        resetMultiArcDynamicsAfterPropagation_( resetMultiArcDynamicsAfterPropagation ),
+        dependentVariablesInterfaceSettings_( dependentVariablesInterfaceSettings )
     {
         if(  std::dynamic_pointer_cast< MultiArcPropagatorSettings< StateScalarType > >( propagatorSettings ) == nullptr )
         {
@@ -1073,17 +1278,38 @@ public:
         stateTransitionMatrixSize_ -= ( parametersToEstimate->getParameterSetSize( ) -
                                         estimatable_parameters::getSingleArcParameterSetSize( parametersToEstimate ) );
 
+        std::vector< std::shared_ptr< SingleArcPropagatorSettings< StateScalarType > > > singleArcPropagatorSettings = propagatorSettings_->getSingleArcSettings( );
+
+        for ( unsigned int i = 0 ; i < singleArcPropagatorSettings.size( ) ; i++ )
+        {
+            std::vector< std::shared_ptr< SingleStateTypeDerivative< StateScalarType, TimeType > > > stateDerivativeModels =
+                    createStateDerivativeModels( singleArcPropagatorSettings.at( i ), bodyMap, arcStartTimes[ i ] ); // integratorSettings->initialTime_ );
+
+            // Create state derivative partials
+            std::map< IntegratedStateType, orbit_determination::StateDerivativePartialsMap >
+                    stateDerivativePartials = simulation_setup::createStateDerivativePartials
+                    < StateScalarType, TimeType >( getStateDerivativeModelMapFromVector( stateDerivativeModels ), bodyMap, parametersToEstimate );
+
+            // Create simulation object for dynamics only.
+            if( propagatorSettings_->getSingleArcSettings( ).at( i )->getDependentVariablesToSave( ) != nullptr )
+            {
+                propagatorSettings_->getSingleArcSettings( ).at( i )->getDependentVariablesToSave( )->stateDerivativePartials_ = stateDerivativePartials;
+            }
+
+        }
+
         dynamicsSimulator_ =  std::make_shared< MultiArcDynamicsSimulator< StateScalarType, TimeType > >(
-                    bodyMap, integratorSettings, propagatorSettings, arcStartTimes,
+                    bodyMap, integratorSettings, propagatorSettings_, arcStartTimes,
                     false, clearNumericalSolution, resetMultiArcDynamicsAfterPropagation_ );
 
 
         std::vector< std::shared_ptr< SingleArcDynamicsSimulator< StateScalarType, TimeType > > > singleArcDynamicsSimulators =
                 dynamicsSimulator_->getSingleArcDynamicsSimulators( );
 
+
         if( arcStartTimes.size( ) != singleArcDynamicsSimulators.size( ) )
         {
-            throw std::runtime_error( "Error when making multi-arc variational equartions solver, input is inconsistent" );
+            throw std::runtime_error( "Error when making multi-arc variational equations solver, input is inconsistent" );
         }
 
         for( unsigned int i = 0; i < singleArcDynamicsSimulators.size( ); i++ )
@@ -1093,6 +1319,13 @@ public:
             std::map< IntegratedStateType, orbit_determination::StateDerivativePartialsMap > stateDerivativePartials =
                     simulation_setup::createStateDerivativePartials< StateScalarType, TimeType >(
                         dynamicsStateDerivatives_.at( i )->getStateDerivativeModels( ), bodyMap, parametersToEstimate );
+
+            // Create simulation object for dynamics only.
+            if( propagatorSettings_->getSingleArcSettings( ).at( i )->getDependentVariablesToSave( ) != nullptr )
+            {
+                propagatorSettings_->getSingleArcSettings( ).at( i )->getDependentVariablesToSave( )->stateDerivativePartials_ = stateDerivativePartials;
+            }
+
             std::shared_ptr< VariationalEquations > variationalEquationsObject_ =
                     std::make_shared< VariationalEquations >(
                         stateDerivativePartials, parametersToEstimate_, dynamicsStateDerivatives_.at( i )->getStateTypeStartIndices( ),
@@ -1113,12 +1346,15 @@ public:
             variationalEquationsSolution_[ i ].resize( 2 );
         }
 
+        // Resize dependent variables history vector
+        dependentVariablesHistory_.resize( numberOfArcs_ );
+
         // Integrate variational equations from initial state estimate.
         if( integrateEquationsOnCreation )
         {
             if( integrateDynamicalAndVariationalEquationsConcurrently )
             {
-                integrateVariationalAndDynamicalEquations( propagatorSettings_->getInitialStateList( ) , 1 );
+                integrateVariationalAndDynamicalEquations( propagatorSettings_->getInitialStateList( ), 1 );
             }
             else
             {
@@ -1229,6 +1465,12 @@ public:
             variationalEquationsSolution_[ i ][ 1 ].clear( );
         }
 
+        // Clear solution maps for dependent variables
+        for ( int i = 0 ; i < numberOfArcs_ ; i++ )
+        {
+            dependentVariablesHistory_[ i ].clear( );
+        }
+
         // Propagate variational equations and equations of motion concurrently
         if( integrateEquationsConcurrently )
         {
@@ -1249,7 +1491,7 @@ public:
             // Integrate equations for all arcs.
             for( int i = 0; i < numberOfArcs_; i++ )
             {
-                std::cout<<"Integrating arc "<<i<<" of "<<numberOfArcs_<<std::endl;
+                std::cout<< "Integrating arc " << i + 1 << " out of "<<numberOfArcs_ <<std::endl;
 
                 // Retrieve integrator settings, and ensure correct initial time.
                 std::shared_ptr< numerical_integrators::IntegratorSettings< TimeType > > integratorSettings =
@@ -1321,12 +1563,22 @@ public:
                             std::make_pair( 0, 0 ), std::make_pair( 0, stateTransitionMatrixSize_ ),
                             stateTransitionMatrixSize_, parameterVectorSize_ );
 
+
+                // Save dependent variables history.
+                dependentVariablesHistory_[ i ].clear( );
+                dependentVariablesHistory_[ i ] = dependentVariableHistorySolutions.at( i );
+
             }
 
             // Process numerical solution of equations of motion
             dynamicsSimulator_->manuallySetAndProcessRawNumericalEquationsOfMotionSolution(
                         equationsOfMotionNumericalSolutions, dependentVariableHistorySolutions,
                         resetMultiArcDynamicsAfterPropagation_ );
+
+            // Save dependent variables history.
+//            dependentVariablesHistory_ = dependentVariableHistorySolutions;
+//            std::cout << "size dependent variables history: " << dependentVariableHistorySolutions.at( 0 ).size( ) << "\n\n";
+
             equationsOfMotionNumericalSolutions.clear( );
 
             if( updateInitialStates )
@@ -1399,6 +1651,9 @@ public:
                 rawNumericalSolutions.clear( );
             }
 
+            // Save dependent variables history.
+            dependentVariablesHistory_ = dynamicsSimulator_->getDependentVariableHistory( );
+
         }
 
         if( updateInitialStates )
@@ -1410,6 +1665,12 @@ public:
 
         // Reset solution for state transition and sensitivity matrices.
         resetVariationalEquationsInterpolators( );
+
+        if ( dependentVariablesInterfaceSettings_ != nullptr )
+        {
+            // Reset solution for dependent variables.
+            resetDependentVariablesInterpolators( );
+        }
 
     }
 
@@ -1557,6 +1818,88 @@ private:
         }
     }
 
+
+
+    //! Reset solutions of dependent variables.
+    /*!
+     *  Reset solutions of dependent variables (dependentVariablesInterpolator_) for each arc,
+     *  i.e. use numerical integration results to create new look-up tables and interpolator
+     *  of dependent variables history.
+     */
+    void resetDependentVariablesInterpolators( )
+    {
+        using namespace interpolators;
+
+        // Allocate interpolator vectors
+        std::vector< std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd > > >
+                dependentVariablesInterpolator;
+        dependentVariablesInterpolator.resize( dependentVariablesHistory_.size( ) );
+
+        std::vector< std::map< double, Eigen::VectorXd > > dependentVariablesHistoryInterface;
+        dependentVariablesHistoryInterface.resize( dependentVariablesHistory_.size( ) );
+
+        // Create interpolators.
+        arcEndTimes_.resize( dependentVariablesHistory_.size( ) );
+        for( unsigned int i = 0 ; i < dependentVariablesHistory_.size( ); i++ )
+        {
+
+            std::map< std::string, int > dependentVariablesIds;
+            std::map< int, std::string > dependentVariablesIdsFromDynamicsSimulator = dynamicsSimulator_->getSingleArcDynamicsSimulators( ).at( i )->getDependentVariableIds( );
+            for ( std::map< int, std::string >::iterator itr = dependentVariablesIdsFromDynamicsSimulator.begin( ) ;
+                  itr != dependentVariablesIdsFromDynamicsSimulator.end( ) ; itr++ )
+            {
+                dependentVariablesIds[ itr->second ] = itr->first;
+            }
+
+            for ( unsigned int j = 0 ; j < dependentVariablesInterfaceSettings_->dependentVariables_.size( ) ; j++ )
+            {
+                if (  dependentVariablesIds.count( getDependentVariableId( dependentVariablesInterfaceSettings_->dependentVariables_[ j ] ) ) != 1 )
+                {
+                    throw std::runtime_error( "Error when making dependent variable interface, the following required dependent variable " +
+                                              getDependentVariableId( dependentVariablesInterfaceSettings_->dependentVariables_[ j ] ) +
+                                              " is not found in the propagtor settings." );
+                }
+            }
+
+            if( dynamicsSimulator_->getSingleArcDynamicsSimulators( ).at( i )->getIntegratorSettings( )->initialTimeStep_ > 0.0 )
+            {
+                arcEndTimes_[ i ] = dependentVariablesHistory_[ i ].rbegin( )->first;
+            }
+            else
+            {
+                arcEndTimes_[ i ] = dependentVariablesHistory_[ i ].begin( )->first;
+            }
+
+
+            getDependentVariablesHistoryForInterface(
+                        dependentVariablesHistory_[ i ], dependentVariablesHistoryInterface[ i ],
+                        propagatorSettings_->getSingleArcSettings( )[ i ]->getDependentVariablesToSave( ),
+                        dependentVariablesInterfaceSettings_ );
+
+            createDependentVariablesInterpolator( dependentVariablesInterpolator[ i ],
+                        dependentVariablesHistoryInterface[ i ],
+                        this->clearNumericalSolution_ );
+        }
+
+        // Create dependent variables matrix interface if needed, reset otherwise.
+        if( dependentVariablesInterface_ == nullptr )
+        {
+            dependentVariablesInterface_ = std::make_shared< MultiArcDependentVariablesInterface >(
+                        dependentVariablesInterpolator, dependentVariablesInterfaceSettings_,
+                        arcStartTimes_,
+                        arcEndTimes_ );
+//                        propagatorSettings_->getSingleArcSettings( ).at( 0 )->getConventionalStateSize( ),
+//                        parametersToEstimate_->getParameterSetSize( ), getArcWiseStatePartialAdditionIndices( ) );
+        }
+        else
+        {
+            std::dynamic_pointer_cast< MultiArcDependentVariablesInterface >(
+                        dependentVariablesInterface_ )->updateDependentVariablesInterpolators(
+                        dependentVariablesInterpolator, arcStartTimes_, arcEndTimes_ );
+        }
+    }
+
+
     std::vector< std::vector< std::pair< int, int > > > getArcWiseStatePartialAdditionIndices( )
     {
         std::vector< std::vector< std::pair< int, int > > > partialIndices;
@@ -1580,6 +1923,9 @@ private:
      */
     std::vector< std::vector< std::map< double, Eigen::MatrixXd > > > variationalEquationsSolution_;
 
+    //! Map of history of numerically computed dependent variables, per arc.
+    std::vector< std::map< double, Eigen::VectorXd > > dependentVariablesHistory_;
+
     //! List of start times of each arc. NOTE: This list is updated after every propagation.
     std::vector< double > arcStartTimes_;
 
@@ -1596,6 +1942,9 @@ private:
 
     //! Boolean denoting whether to reset the multi-arc dynamics after propagation.
     const bool resetMultiArcDynamicsAfterPropagation_;
+
+    //! Settings object used to set up the dependent variable interface object if needed.
+    std::shared_ptr< DependentVariableSaveSettings > dependentVariablesInterfaceSettings_;
 
 };
 
@@ -1619,6 +1968,7 @@ public:
     using VariationalEquationsSolver< StateScalarType, TimeType >::stateTransitionMatrixSize_;
     using VariationalEquationsSolver< StateScalarType, TimeType >::parameterVectorSize_;
     using VariationalEquationsSolver< StateScalarType, TimeType >::stateTransitionInterface_;
+    using VariationalEquationsSolver< StateScalarType, TimeType >::dependentVariablesInterface_;
 
     //! Constructor
     /*!
@@ -1643,12 +1993,15 @@ public:
             const std::vector< double > arcStartTimes,
             const bool integrateDynamicalAndVariationalEquationsConcurrently = true,
             const bool clearNumericalSolution = true,
-            const bool integrateEquationsOnCreation = false ):
+            const bool integrateEquationsOnCreation = false,
+            const std::shared_ptr< DependentVariableSaveSettings > dependentVariablesInterfaceSettings =
+            std::shared_ptr< DependentVariableSaveSettings >( ) ):
         VariationalEquationsSolver< StateScalarType, TimeType >(
             bodyMap, parametersToEstimate, clearNumericalSolution ),
         singleArcIntegratorSettings_( integratorSettings ),
         multiArcIntegratorSettings_( integratorSettings ),
-        arcStartTimes_( arcStartTimes )
+        arcStartTimes_( arcStartTimes ),
+        dependentVariablesInterfaceSettings_( dependentVariablesInterfaceSettings )
     {
         initializeHybridArcVariationalEquationsSolver(
                     bodyMap, propagatorSettings, integrateDynamicalAndVariationalEquationsConcurrently, integrateEquationsOnCreation );
@@ -1663,12 +2016,15 @@ public:
             const std::vector< double > arcStartTimes,
             const bool integrateDynamicalAndVariationalEquationsConcurrently = true,
             const bool clearNumericalSolution = true,
-            const bool integrateEquationsOnCreation = false ):
+            const bool integrateEquationsOnCreation = false,
+            const std::shared_ptr< DependentVariableSaveSettings > dependentVariablesInterfaceSettings =
+            std::shared_ptr< DependentVariableSaveSettings >( ) ):
         VariationalEquationsSolver< StateScalarType, TimeType >(
             bodyMap, parametersToEstimate, clearNumericalSolution ),
         singleArcIntegratorSettings_( singleArcIntegratorSettings ),
         multiArcIntegratorSettings_( multiArcIntegratorSettings ),
-        arcStartTimes_( arcStartTimes )
+        arcStartTimes_( arcStartTimes ),
+        dependentVariablesInterfaceSettings_( dependentVariablesInterfaceSettings )
     {
         initializeHybridArcVariationalEquationsSolver(
                     bodyMap, propagatorSettings, integrateDynamicalAndVariationalEquationsConcurrently, integrateEquationsOnCreation );
@@ -1683,39 +2039,146 @@ public:
         singleArcInitialTime_ = singleArcIntegratorSettings_->initialTime_;
 
         // Cast propagator settings to correct type and check validity
-        originalPopagatorSettings_ =
+        originalPropagatorSettings_ =
                 std::dynamic_pointer_cast< HybridArcPropagatorSettings< StateScalarType > >( propagatorSettings );
-        if( originalPopagatorSettings_ == nullptr )
+        if( originalPropagatorSettings_ == nullptr )
         {
             throw std::runtime_error( "Error when making HybridArcVariationalEquationsSolver, input propagation settings are not hybrid arc" );
         }
 
         // Get input size of single-arc and input multi-arc
-        singleArcDynamicsSize_ = originalPopagatorSettings_->getSingleArcPropagatorSettings( )->getConventionalStateSize( );
-        originalMultiArcDynamicsSize_ = originalPopagatorSettings_->getMultiArcPropagatorSettings( )->getConventionalStateSize( );
-        originalMultiArcDynamicsSingleArcSize_ = originalPopagatorSettings_->getMultiArcPropagatorSettings( )->getConventionalStateSize( ) /
+        singleArcDynamicsSize_ = originalPropagatorSettings_->getSingleArcPropagatorSettings( )->getConventionalStateSize( );
+        originalMultiArcDynamicsSize_ = originalPropagatorSettings_->getMultiArcPropagatorSettings( )->getConventionalStateSize( );
+        originalMultiArcDynamicsSingleArcSize_ = originalPropagatorSettings_->getMultiArcPropagatorSettings( )->getConventionalStateSize( ) /
                 arcStartTimes_.size( );
 
         // Create propagator settings with the single arc settings included (at the beginning) in each arc
         std::shared_ptr< MultiArcPropagatorSettings< StateScalarType > > extendedMultiArcSettings =
                 getExtendedMultiPropagatorSettings(
-                    originalPopagatorSettings_->getSingleArcPropagatorSettings( ),
-                    originalPopagatorSettings_->getMultiArcPropagatorSettings( ),
+                    originalPropagatorSettings_->getSingleArcPropagatorSettings( ),
+                    originalPropagatorSettings_->getMultiArcPropagatorSettings( ),
                     arcStartTimes_.size( ) );
         multiArcDynamicsSize_ = extendedMultiArcSettings->getConventionalStateSize( );
         multiArcDynamicsSingleArcSize_ = extendedMultiArcSettings->getConventionalStateSize( ) / arcStartTimes_.size( );
         propagatorSettings_ = std::make_shared< HybridArcPropagatorSettings< StateScalarType> >(
-                    originalPopagatorSettings_->getSingleArcPropagatorSettings( ), extendedMultiArcSettings );
+                    originalPropagatorSettings_->getSingleArcPropagatorSettings( ), extendedMultiArcSettings );
 
         // Update estimated parameter vector to extended multi-arc settings
         setExtendedMultiArcParameters( arcStartTimes_ );
 
+
+        ////////////////////////////
+        // Divide the interface dependent variables into single-arc and multi-arc interface dependent variables.
+        std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > singleArcDependentVariablesInterfaceSettingsVector;
+        std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > multiArcDependentVariablesInterfaceSettingsVector;
+
+        if ( dependentVariablesInterfaceSettings_ != nullptr )
+        {
+            std::vector< std::string > singleArcDependentVariables;
+            if ( originalPropagatorSettings_->getSingleArcPropagatorSettings( )->getDependentVariablesToSave( ) != nullptr )
+            {
+                std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > singleArcDependentVariablesSettings =
+                        originalPropagatorSettings_->getSingleArcPropagatorSettings( )->getDependentVariablesToSave( )->dependentVariables_;
+                for ( unsigned int i = 0 ; i < singleArcDependentVariablesSettings.size( ) ; i++ )
+                {
+                    singleArcDependentVariables.push_back( getDependentVariableId( singleArcDependentVariablesSettings[ i ] ) );
+                }
+            }
+
+            std::vector< std::shared_ptr< SingleArcPropagatorSettings< StateScalarType > > > multiArcPropagators = originalPropagatorSettings_->getMultiArcPropagatorSettings( )->getSingleArcSettings( );
+    //        std::vector< std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > > multiArcDependentVariablesSettings;
+            std::vector< std::vector< std::string > > multiArcDependentVariables;
+            for ( unsigned int currentArc = 0 ; currentArc < multiArcPropagators.size( ) ; currentArc++ )
+            {
+                if ( multiArcPropagators[ currentArc ]->getDependentVariablesToSave( ) != nullptr )
+                {
+                    std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > multiArcDependentVariablesSettings =
+                            multiArcPropagators[ currentArc ]->getDependentVariablesToSave( )->dependentVariables_;
+                    std::vector< std::string > dependentVariablesPerArc;
+                    for ( unsigned int i = 0 ; i < multiArcDependentVariablesSettings.size( ) ; i++ )
+                    {
+                        dependentVariablesPerArc.push_back( getDependentVariableId( multiArcDependentVariablesSettings[ i ] ) );
+                    }
+                    multiArcDependentVariables.push_back( dependentVariablesPerArc );
+                }
+            }
+
+
+            for ( unsigned int i = 0 ; i < dependentVariablesInterfaceSettings_->dependentVariables_.size( ) ; i++ )
+            {
+                std::string currentDependentVariableId = getDependentVariableId( dependentVariablesInterfaceSettings_->dependentVariables_[ i ] );
+                bool isDependentVariableIncludedInSingleArc = false;
+                bool isDependentVariableIncludedInMultiArc = true;
+
+                if ( ( singleArcDependentVariables.size( ) != 0 )
+                     && ( std::count( singleArcDependentVariables.begin( ), singleArcDependentVariables.end( ), currentDependentVariableId ) == 1 ) )
+                {
+//                    singleArcDependentVariablesInterfaceSettings_.push_back( dependentVariablesInterfaceSettings_->dependentVariables_[ i ] );
+                    isDependentVariableIncludedInSingleArc = true;
+                }
+                if ( multiArcDependentVariables.size( ) == 0 )
+                {
+                    isDependentVariableIncludedInMultiArc = false;
+                }
+                for ( unsigned int currentArc = 0 ; currentArc < multiArcDependentVariables.size( ) ; currentArc++ )
+                {
+                    if ( std::count( multiArcDependentVariables[ currentArc ].begin( ), multiArcDependentVariables[ currentArc ].end( ), currentDependentVariableId ) != 1 )
+                    {
+                        isDependentVariableIncludedInMultiArc = false;
+                    }
+                }
+
+                if ( ( isDependentVariableIncludedInSingleArc ) && ( isDependentVariableIncludedInMultiArc ) )
+                {
+                    throw std::runtime_error( "Error when making hybrid arc variational equations solver, identical dependent variables in both single-arc and multi-arc solvers." );
+                }
+                else if ( ( !isDependentVariableIncludedInSingleArc ) && ( !isDependentVariableIncludedInMultiArc ) )
+                {
+                    throw std::runtime_error( "Error when making hybrid arc variational equations solver, dependent variable required by interface not provided in propagator settings." );
+                }
+                else if ( isDependentVariableIncludedInSingleArc )
+                {
+                    singleArcDependentVariablesInterfaceSettingsVector.push_back( dependentVariablesInterfaceSettings_->dependentVariables_[ i ] );
+                    std::cout << "single arc " << currentDependentVariableId << "\n\n";
+                }
+                else if ( isDependentVariableIncludedInMultiArc )
+                {
+                    multiArcDependentVariablesInterfaceSettingsVector.push_back( dependentVariablesInterfaceSettings_->dependentVariables_[ i ] );
+                    std::cout << "multi arc " << currentDependentVariableId << "\n\n";
+                }
+
+            }
+
+        }
+
+        if ( singleArcDependentVariablesInterfaceSettingsVector.size( ) != 0 )
+        {
+            singleArcDependentVariablesInterfaceSettings_ = std::make_shared< DependentVariableSaveSettings >( singleArcDependentVariablesInterfaceSettingsVector, false );
+        }
+        else
+        {
+            std::cout << "empty pointer for single arc dependent variables interface settings" << "\n\n";
+            singleArcDependentVariablesInterfaceSettings_ = std::shared_ptr< DependentVariableSaveSettings >( );
+        }
+
+        if ( multiArcDependentVariablesInterfaceSettingsVector.size( ) != 0 )
+        {
+            multiArcDependentVariablesInterfaceSettings_ = std::make_shared< DependentVariableSaveSettings >( multiArcDependentVariablesInterfaceSettingsVector, false );
+        }
+        else
+        {
+            std::cout << "empty pointer for multi arc dependent variables interface settings" << "\n\n";
+            multiArcDependentVariablesInterfaceSettings_ = std::shared_ptr< DependentVariableSaveSettings >( );
+        }
+
+        //////////////////////////////////////////////
+
         // Create multi-arc solver with original parameter set
         originalMultiArcSolver_ = std::make_shared< MultiArcVariationalEquationsSolver< StateScalarType, TimeType > >(
-                    bodyMap, multiArcIntegratorSettings_, originalPopagatorSettings_->getMultiArcPropagatorSettings( ),
+                    bodyMap, multiArcIntegratorSettings_, originalPropagatorSettings_->getMultiArcPropagatorSettings( ),
                     originalMultiArcParametersToEstimate_, arcStartTimes_, integrateDynamicalAndVariationalEquationsConcurrently,
                     std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ),
-                    false, false, false );
+                    false, false, false, multiArcDependentVariablesInterfaceSettings_ );
 
         // Create variational equations solvers for single- and multi-arc
         singleArcIntegratorSettings_->initialTime_ = singleArcInitialTime_;
@@ -1723,12 +2186,35 @@ public:
                     bodyMap, singleArcIntegratorSettings_, propagatorSettings_->getSingleArcPropagatorSettings( ),
                     singleArcParametersToEstimate_, integrateDynamicalAndVariationalEquationsConcurrently,
                     std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ),
-                    false, false );
+                    false, false, true, singleArcDependentVariablesInterfaceSettings_ );
         multiArcSolver_ = std::make_shared< MultiArcVariationalEquationsSolver< StateScalarType, TimeType > >(
                     bodyMap, multiArcIntegratorSettings_, extendedMultiArcSettings,
                     multiArcParametersToEstimate_, arcStartTimes_, integrateDynamicalAndVariationalEquationsConcurrently,
                     std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ),
-                    false, false, false );
+                    false, false, false, dependentVariablesInterfaceSettings_ );
+
+//        for ( unsigned int j = 0 ; j < extendedMultiArcSettings->getSingleArcSettings( ).size( ) ; j++ )
+//        {
+//            if ( extendedMultiArcSettings->getSingleArcSettings( )[ j ]->getDependentVariablesToSave( ) != nullptr )
+//            {
+//                for ( unsigned int i = 0 ; i < extendedMultiArcSettings->getSingleArcSettings( )[ j ]->getDependentVariablesToSave( )->dependentVariables_.size( ) ; i++ )
+//                {
+//                    std::cout << "arc" << j << ": dependent variables extended multi-arc settings: " << getDependentVariableId(
+//                                     extendedMultiArcSettings->getSingleArcSettings( )[ j ]->getDependentVariablesToSave( )->dependentVariables_[ i ] ) << "\n\n";
+//                }
+//            }
+//        }
+
+//        for ( unsigned int i = 0 ; i < propagatorSettings_->getSingleArcPropagatorSettings( )->getDependentVariablesToSave( )->dependentVariables_.size( ) ; i++ )
+//        {
+//            std::cout << "single arc propagator settings dependent variables: " <<
+//                         getDependentVariableId( propagatorSettings_->getSingleArcPropagatorSettings( )->getDependentVariablesToSave( )->dependentVariables_[ i ] ) << "\n\n";
+//        }
+//        for ( unsigned int i = 0 ; i < singleArcDependentVariablesInterfaceSettings_->dependentVariables_.size( ) ; i++ )
+//        {
+//            std::cout << "single arc interface dependent variables: " <<
+//                         getDependentVariableId( singleArcDependentVariablesInterfaceSettings_->dependentVariables_[ i ] ) << "\n\n";
+//        }
 
         for( unsigned int i = 0; i < multiArcSolver_->getDynamicsStateDerivatives( ).size( ); i++ )
         {
@@ -1839,6 +2325,62 @@ public:
                         std::dynamic_pointer_cast< MultiArcCombinedStateTransitionAndSensitivityMatrixInterface >(
                             multiArcSolver_->getStateTransitionMatrixInterface( ) ) );
         }
+
+
+        // Create dependent variables interface if not yet created.
+        if ( dependentVariablesInterfaceSettings_ != nullptr )
+        {
+            if( dependentVariablesInterface_ == nullptr )
+            {
+                std::shared_ptr< SingleArcDependentVariablesInterface > singleArcDependentVariablesInterface;
+                if( std::dynamic_pointer_cast< SingleArcDependentVariablesInterface >(
+                            singleArcSolver_->getDependentVariablesInterface( ) ) == nullptr )
+                {
+                    singleArcDependentVariablesInterface = std::shared_ptr< SingleArcDependentVariablesInterface >( );
+                    throw std::runtime_error( "Error when making hybrid dependent variables interface, single-arc input is nullptr" );
+                }
+                else
+                {
+                    singleArcDependentVariablesInterface = std::dynamic_pointer_cast< SingleArcDependentVariablesInterface >(
+                                singleArcSolver_->getDependentVariablesInterface( ) );
+                }
+
+                std::shared_ptr< MultiArcDependentVariablesInterface > multiArcDependentVariablesInterface;
+                if( std::dynamic_pointer_cast< MultiArcDependentVariablesInterface >(
+                            multiArcSolver_->getDependentVariablesInterface( ) ) == nullptr )
+                {
+                    multiArcDependentVariablesInterface = std::shared_ptr< MultiArcDependentVariablesInterface >( );
+                    throw std::runtime_error( "Error when making hybrid dependent variables interface, multi-arc input is nullptr" );
+                }
+                else
+                {
+                    multiArcDependentVariablesInterface = std::dynamic_pointer_cast< MultiArcDependentVariablesInterface >(
+                                multiArcSolver_->getDependentVariablesInterface( ) );
+                }
+
+                std::shared_ptr< MultiArcDependentVariablesInterface > originalMultiArcDependentVariablesInterface;
+                if ( originalMultiArcSolver_/*multiArcSolver_*/->getDependentVariablesInterface( ) == nullptr )
+                {
+//                    throw std::runtime_error( "ARGH NO ORIGINAL MULTI-ARC DEPENDENT VARIABLES INTERFACE" );
+                    originalMultiArcDependentVariablesInterface = std::shared_ptr< MultiArcDependentVariablesInterface >( );
+                }
+                else
+                {
+                    originalMultiArcDependentVariablesInterface = std::dynamic_pointer_cast< MultiArcDependentVariablesInterface >(
+                                originalMultiArcSolver_/*multiArcSolver_*/->getDependentVariablesInterface( ) );
+
+                }
+
+                dependentVariablesInterface_ = std::make_shared< HybridArcDependentVariablesInterface >(
+                            singleArcDependentVariablesInterface,
+                            /*std::dynamic_pointer_cast< SingleArcDependentVariablesInterface >(
+                                singleArcSolver_->getDependentVariablesInterface( ) )*/
+                            multiArcDependentVariablesInterface );
+//                            std::dynamic_pointer_cast< MultiArcDependentVariablesInterface >(
+//                                originalMultiArcSolver_/*multiArcSolver_*/->getDependentVariablesInterface( ) ) );
+            }
+        }
+
     }
 
     //! Function to integrate equations of motion only.
@@ -1896,7 +2438,7 @@ public:
     {
         // Reset values of parameters.
         parametersToEstimate_->template resetParameterValues< StateScalarType >( newParameterEstimate );
-        originalPopagatorSettings_->resetInitialStates(
+        originalPropagatorSettings_->resetInitialStates(
                     estimatable_parameters::getInitialStateVectorOfBodiesToEstimate( parametersToEstimate_ ) );
 
         propagatorSettings_->getSingleArcPropagatorSettings( )->resetInitialStates(
@@ -2060,15 +2602,15 @@ protected:
         std::vector< VectorType > extendedMultiArcInitialStates =
                 propagatorSettings_->getMultiArcPropagatorSettings( )->getInitialStateList( );
         std::vector< VectorType > originalMultiArcInitialStates =
-                originalPopagatorSettings_->getMultiArcPropagatorSettings( )->getInitialStateList( );
+                originalPropagatorSettings_->getMultiArcPropagatorSettings( )->getInitialStateList( );
         for( unsigned int i = 0; i < extendedMultiArcInitialStates.size( ); i++ )
         {
             originalMultiArcInitialStates[ i ] = extendedMultiArcInitialStates.at( i ).segment(
                         singleArcDynamicsSize_, originalMultiArcDynamicsSingleArcSize_ );
         }
 
-        originalPopagatorSettings_->getMultiArcPropagatorSettings( )->resetInitialStatesList( originalMultiArcInitialStates );
-        originalPopagatorSettings_->setInitialStatesFromConstituents( );
+        originalPropagatorSettings_->getMultiArcPropagatorSettings( )->resetInitialStatesList( originalMultiArcInitialStates );
+        originalPropagatorSettings_->setInitialStatesFromConstituents( );
     }
 
     //! Object to solve multi-arc variational equations (multi-arc bodies only).
@@ -2081,7 +2623,7 @@ protected:
     std::shared_ptr< MultiArcVariationalEquationsSolver< StateScalarType, TimeType > > multiArcSolver_;
 
     //! Propagator settings, with single- and multi-arc separately
-    std::shared_ptr< HybridArcPropagatorSettings< StateScalarType > > originalPopagatorSettings_;
+    std::shared_ptr< HybridArcPropagatorSettings< StateScalarType > > originalPropagatorSettings_;
 
     //! Propagator settings, with single-arc bodies added to multi-arc list
     std::shared_ptr< HybridArcPropagatorSettings< StateScalarType > > propagatorSettings_;
@@ -2126,6 +2668,15 @@ protected:
     std::function< Eigen::Matrix< StateScalarType, Eigen::Dynamic, 1 >( const double ) >initialStatesFromSingleArcPropagation_;
 
     double singleArcInitialTime_;
+
+    //! Settings object used to set up the dependent variable interface object if needed.
+    std::shared_ptr< DependentVariableSaveSettings > dependentVariablesInterfaceSettings_;
+
+    //! Settings object used to set up the dependent variable interface object for the single-arc variational equations solver if needed.
+    std::shared_ptr< DependentVariableSaveSettings > singleArcDependentVariablesInterfaceSettings_;
+
+    //! Settings object used to set up the dependent variable interface objec for the multi-arc variational equations solver if needed.
+    std::shared_ptr< DependentVariableSaveSettings > multiArcDependentVariablesInterfaceSettings_;
 
 };
 

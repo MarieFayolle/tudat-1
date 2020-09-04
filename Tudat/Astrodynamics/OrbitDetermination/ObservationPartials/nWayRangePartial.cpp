@@ -21,6 +21,7 @@ namespace observation_partials
 void NWayRangeScaling::update( const std::vector< Eigen::Vector6d >& linkEndStates,
                                const std::vector< double >& times,
                                const observation_models::LinkEndType fixedLinkEnd,
+                               const observation_models::LinkEnds linkEnds,
                                const Eigen::VectorXd currentObservation )
 {
     Eigen::Vector3d currentRangeVector;
@@ -59,7 +60,7 @@ void NWayRangeScaling::update( const std::vector< Eigen::Vector6d >& linkEndStat
 
         // Update current one-way range scaling
         constituentRangeScalingIterator_->second->update(
-                    singleLinkEndStates, singleLinkTimes, referenceLinkEnd );
+                    singleLinkEndStates, singleLinkTimes, referenceLinkEnd, linkEnds );
     }
 
     // Compute scaling factors by which one-way range partias are to be multiplied before being included in the n-way range

@@ -44,7 +44,7 @@ set(OBSERVATION_MODELS_HEADERS
   "${SRCROOT}${OBSERVATIONMODELSDIR}/eulerAngleObservationModel.h"
   "${SRCROOT}${OBSERVATIONMODELSDIR}/UnitTests/testLightTimeCorrections.h"
   "${SRCROOT}${OBSERVATIONMODELSDIR}/observationViabilityCalculator.h"
-#  "${SRCROOT}${OBSERVATIONMODELSDIR}/mutualApproximationObservationModel.h"
+  "${SRCROOT}${OBSERVATIONMODELSDIR}/mutualApproximationObservationModel.h"
   "${SRCROOT}${OBSERVATIONMODELSDIR}/apparentDistanceObservationModel.h"
   "${SRCROOT}${OBSERVABLECORRECTIONSDIR}/lightTimeCorrection.h"
   "${SRCROOT}${OBSERVABLECORRECTIONSDIR}/firstOrderRelativisticCorrection.h"
@@ -100,6 +100,10 @@ if(USE_CSPICE)
     add_executable(test_ApparentDistanceModel "${SRCROOT}${OBSERVATIONMODELSDIR}/UnitTests/unitTestApparentDistanceModel.cpp")
     setup_custom_test_program(test_ApparentDistanceModel "${SRCROOT}${OBSERVATIONMODELSDIR}")
     target_link_libraries(test_ApparentDistanceModel ${TUDAT_ESTIMATION_LIBRARIES} ${Boost_LIBRARIES})
+
+    add_executable(test_MutualApproximationModel "${SRCROOT}${OBSERVATIONMODELSDIR}/UnitTests/unitTestMutualApproximationModel.cpp")
+    setup_custom_test_program(test_MutualApproximationModel "${SRCROOT}${OBSERVATIONMODELSDIR}")
+    target_link_libraries(test_MutualApproximationModel ${TUDAT_ESTIMATION_LIBRARIES} ${Boost_LIBRARIES})
 
     add_executable(test_ObservationViabilityCalculators "${SRCROOT}${OBSERVATIONMODELSDIR}/UnitTests/unitTestObservationViabilityCalculators.cpp")
     setup_custom_test_program(test_ObservationViabilityCalculators "${SRCROOT}${OBSERVATIONMODELSDIR}")

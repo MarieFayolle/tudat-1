@@ -30,10 +30,12 @@
 #include "Tudat/Astrodynamics/ObservationModels/eulerAngleObservationModel.h"
 #include "Tudat/Astrodynamics/ObservationModels/velocityObservationModel.h"
 #include "Tudat/Astrodynamics/ObservationModels/apparentDistanceObservationModel.h"
+#include "Tudat/Astrodynamics/ObservationModels/mutualApproximationObservationModel.h"
 #include "Tudat/Astrodynamics/ObservationModels/observationSimulator.h"
 #include "Tudat/Astrodynamics/ObservationModels/observationViabilityCalculator.h"
 #include "Tudat/SimulationSetup/EnvironmentSetup/body.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createLightTimeCalculator.h"
+#include "Tudat/Mathematics/RootFinders/createRootFinder.h"
 
 
 namespace tudat
@@ -474,6 +476,104 @@ public:
     std::function< std::vector< double >( const double ) > retransmissionTimesFunction_;
 
 };
+
+
+//! Class to define the settings for mutual approximation observable.
+class MutualApproximationObservationSettings: public ObservationSettings
+{
+public:
+
+    //! Constructor.
+    /*!
+     * Constructor.
+     * \param lightTimeCorrections List of light-time correction settings to create the required light-time calculators.
+     * \param toleranceWrtCentralInstant Tolerance w.r.t. to the estimated central instant (time interval over which the central instant is looked for).
+     * \param frequencyApparentDistanceMeasurements Time interval between two successive apparent distance measurements.
+     * \param upperLimitImpactParameter Upper limit value for the impact parameter, beyond which there is no close encounter.
+     * \param orderPolynomialFitting Order of the fitting polynomial to derive the central instant.
+     * \param checkExistenceMutualApproximation Boolean denoting whether the existence of a mutual approximation at the given time must be verified.
+     * \param checkObservableDuplicates Boolean denoting whether the duplicated central instant observables should be removed.
+     * \param rootFinderSettings Root finder settings used to derive the central instant from the apparent distance observations.
+     * \param mutualApproximationBiasSettings Settings for the bias model to be used for the central instant observable.
+     * \param apparentDistancesBiasSettings Settings for the bias model to be used for the intermediate apparent distance measurements.
+     * \param centralInstantAsObservable Boolean denoting whether the central instants are directly used as mutual approximation observables.
+     */
+    MutualApproximationObservationSettings(
+            const std::vector< std::shared_ptr< LightTimeCorrectionSettings > > lightTimeCorrections,
+            const double toleranceWrtCentralInstant,
+            const double frequencyApparentDistanceMeasurements,
+            const double upperLimitImpactParameter,
+            const int orderPolynomialFitting = 4,
+            const bool checkExistenceMutualApproximation = true,
+            const bool checkObservableDuplicates = true,
+            const std::shared_ptr< root_finders::RootFinderSettings > rootFinderSettings = std::make_shared< root_finders::RootFinderSettings >(
+                root_finders::bisection_root_finder, 1.0e-12, 60 ),
+            const std::shared_ptr< ObservationBiasSettings > mutualApproximationBiasSettings = nullptr,
+            const std::shared_ptr< ObservationBiasSettings > apparentDistancesBiasSettings = nullptr,
+            const bool centralInstantAsObservable = true,
+            const ObservableType observableType = mutual_approximation ):
+        ObservationSettings( observableType, lightTimeCorrections, mutualApproximationBiasSettings ),
+        toleranceWrtCentralInstant_( toleranceWrtCentralInstant ),
+        frequencyApparentDistanceMeasurements_( frequencyApparentDistanceMeasurements ),
+        upperLimitImpactParameter_( upperLimitImpactParameter ),
+        orderPolynomialFitting_( orderPolynomialFitting ),
+        checkExistenceMutualApproximation_( checkExistenceMutualApproximation ),
+        checkObservableDuplicates_( checkObservableDuplicates ),
+        rootFinderSettings_( rootFinderSettings ),
+        apparentDistancesBiasSettings_( apparentDistancesBiasSettings ),
+        centralInstantAsObservable_( centralInstantAsObservable ),
+        observableType_( observableType )
+    {
+        if ( ( observableType_ != mutual_approximation ) && ( observableType_ != mutual_approximation_with_impact_parameter )  )
+        {
+            throw std::runtime_error( "Error when making mutual approximation settings, observable type should be either"
+                                      " mutual_approximation or mutual_approximation_with_impact_parameter" );
+        }
+    }
+
+    //! Destructor
+    ~MutualApproximationObservationSettings( ){ }
+
+    //! Tolerance w.r.t. to the estimated central instant
+    //! (time interval over which the central instant is looked for).
+    double toleranceWrtCentralInstant_;
+
+    //! Time interval between two successive apparent distance measurements.
+    double frequencyApparentDistanceMeasurements_;
+
+    //! Upper limit value for the impact parameter, beyond which there is no close encounter.
+    double upperLimitImpactParameter_;
+
+    //! Order of the fitting polynomial to derive the central instant.
+    int orderPolynomialFitting_;
+
+    //! Boolean denoting whether the existence of a mutual approximation at the given time must be verified
+    //! or not while computing the central instant observable (default value is true).
+    bool checkExistenceMutualApproximation_;
+
+    //! Boolean denoting whether the current central instant observable should be compared with former observables already computed with
+    //! the mutual approximation observation model, in order to remove duplicates (default value is true).
+    bool checkObservableDuplicates_;
+
+    //! Root finder settings used to derive the central instant from the apparent distance observations.
+    std::shared_ptr< root_finders::RootFinderSettings > rootFinderSettings_;
+
+    //! Minimum number of apparent distance observations to compute the mutual approximation observable.
+    int minimumNumberOfObservations_;
+
+    //! Settings for the observation bias model that is to be used for the intermediate apparent distance measurements (default none: nullptr).
+    std::shared_ptr< ObservationBiasSettings > apparentDistancesBiasSettings_;
+
+    //! BBoolean denoting whether the central instants are directly used as mutual approximation observables or if a modified observable
+    //! should be preferred to simplify the variational equations (default value is true).
+    bool centralInstantAsObservable_;
+
+    //! Observable type for the mutual approximation settings. Can be either mutual_approximation or
+    //! mutual_approximation_with_impact_parameter (default is mutual_approximation).
+    ObservableType observableType_;
+
+};
+
 
 //! Function to create the proper time rate calculator for use in one-way Doppler
 /*!
@@ -1175,6 +1275,82 @@ public:
 
             break;
         }
+        case mutual_approximation:
+        {
+            // Check consistency input.
+            if( linkEnds.size( ) != 3 )
+            {
+                std::string errorMessage =
+                        "Error when making mutual approximation model, " +
+                        std::to_string( linkEnds.size( ) ) + " link ends found";
+                throw std::runtime_error( errorMessage );
+            }
+            if( linkEnds.count( receiver ) == 0 )
+            {
+                throw std::runtime_error( "Error when making mutual approximation model, no receiver found" );
+            }
+            if( linkEnds.count( transmitter ) == 0 )
+            {
+                throw std::runtime_error( "Error when making mutual approximation model, no transmitter found" );
+            }
+            if( linkEnds.count( transmitter2 ) == 0 )
+            {
+                throw std::runtime_error( "Error when making mutual approximation model, no second transmitter found" );
+            }
+
+
+            std::shared_ptr< MutualApproximationObservationSettings > mutualApproximationSettings =
+                    std::dynamic_pointer_cast< MutualApproximationObservationSettings >( observationSettings );
+            if ( mutualApproximationSettings == nullptr )
+            {
+                throw std::runtime_error( "Error when making mutual approximation model, inconsistent observation settings provided as input." );
+            }
+
+            std::shared_ptr< ObservationBias< 1 > > mutualApproximationObservationBias;
+            if( observationSettings->biasSettings_ != nullptr )
+            {
+                mutualApproximationObservationBias =
+                        createObservationBiasCalculator(
+                            linkEnds, observationSettings->observableType_, observationSettings->biasSettings_, bodyMap );
+            }
+
+            std::shared_ptr< ObservationBias< 1 > > apparentDistancesObservationBias;
+            if( mutualApproximationSettings->apparentDistancesBiasSettings_ != nullptr )
+            {
+                apparentDistancesObservationBias = createObservationBiasCalculator(
+                            linkEnds, apparent_distance, mutualApproximationSettings->apparentDistancesBiasSettings_, bodyMap );
+            }
+
+            // Create observation model.
+            if ( mutualApproximationSettings->centralInstantAsObservable_ )
+            {
+                observationModel = std::make_shared< MutualApproximationObservationModel<
+                        ObservationScalarType, TimeType > >(
+                            createLightTimeCalculator< ObservationScalarType, TimeType >(
+                                linkEnds.at( transmitter ), linkEnds.at( receiver ), bodyMap, observationSettings->lightTimeCorrectionsList_ ),
+                            createLightTimeCalculator< ObservationScalarType, TimeType >(
+                                linkEnds.at( transmitter2 ), linkEnds.at( receiver ), bodyMap, observationSettings->lightTimeCorrectionsList_ ),
+                            mutualApproximationSettings->frequencyApparentDistanceMeasurements_, mutualApproximationSettings->toleranceWrtCentralInstant_,
+                            mutualApproximationSettings->upperLimitImpactParameter_, mutualApproximationSettings->orderPolynomialFitting_,
+                            mutualApproximationSettings->checkExistenceMutualApproximation_, mutualApproximationSettings->checkObservableDuplicates_,
+                            mutualApproximationSettings->rootFinderSettings_, mutualApproximationObservationBias, apparentDistancesObservationBias );
+            }
+            else
+            {
+                observationModel = std::make_shared< ModifiedMutualApproximationObservationModel<
+                        ObservationScalarType, TimeType > >(
+                            createLightTimeCalculator< ObservationScalarType, TimeType >(
+                                linkEnds.at( transmitter ), linkEnds.at( receiver ), bodyMap, observationSettings->lightTimeCorrectionsList_ ),
+                            createLightTimeCalculator< ObservationScalarType, TimeType >(
+                                linkEnds.at( transmitter2 ), linkEnds.at( receiver ), bodyMap, observationSettings->lightTimeCorrectionsList_ ),
+                            mutualApproximationSettings->frequencyApparentDistanceMeasurements_, mutualApproximationSettings->toleranceWrtCentralInstant_,
+                            mutualApproximationSettings->upperLimitImpactParameter_, mutualApproximationSettings->orderPolynomialFitting_,
+                            mutualApproximationSettings->checkExistenceMutualApproximation_, mutualApproximationSettings->checkObservableDuplicates_,
+                            mutualApproximationSettings->rootFinderSettings_, mutualApproximationObservationBias, apparentDistancesObservationBias );
+            }
+
+            break;
+        }
 
         default:
             std::string errorMessage = "Error, observable " + std::to_string(
@@ -1249,6 +1425,72 @@ public:
                             linkEnds.at( transmitter ), linkEnds.at( receiver ),
                             bodyMap, observationSettings->lightTimeCorrectionsList_ ),
                         observationBias );
+
+            break;
+        }
+        case mutual_approximation_with_impact_parameter:
+        {
+            // Check consistency input.
+            if( linkEnds.size( ) != 3 )
+            {
+                std::string errorMessage = "Error when making mutual approximation with impact parameter model, " +
+                        std::to_string( linkEnds.size( ) ) + " link ends found";
+                throw std::runtime_error( errorMessage );
+            }
+            if( linkEnds.count( receiver ) == 0 )
+            {
+                throw std::runtime_error( "Error when making mutual approximation with impact parameter model, no receiver found" );
+            }
+            if( linkEnds.count( transmitter ) == 0 )
+            {
+                throw std::runtime_error( "Error when making mutual approximation with impact parameter model, no transmitter found" );
+            }
+            if( linkEnds.count( transmitter2 ) == 0 )
+            {
+                throw std::runtime_error( "Error when making mutual approximation with impact parameter model, no second transmitter found" );
+            }
+
+
+            std::shared_ptr< MutualApproximationObservationSettings > mutualApproximationSettings =
+                    std::dynamic_pointer_cast< MutualApproximationObservationSettings >( observationSettings );
+            if ( mutualApproximationSettings == nullptr )
+            {
+                throw std::runtime_error( "Error when making mutual approximation with impact parameter model, "
+                                          " inconsistent observation settings provided as input." );
+            }
+
+            if ( !mutualApproximationSettings->centralInstantAsObservable_ )
+            {
+                throw std::runtime_error( "Error when making mutual approximation with impact parameter model, "
+                                          " the central instant has to be directly used over the modified mutual approximation observable." );
+            }
+
+            std::shared_ptr< ObservationBias< 2 > > mutualApproximationObservationBias;
+            if( observationSettings->biasSettings_ != nullptr )
+            {
+                mutualApproximationObservationBias =
+                        createObservationBiasCalculator< 2 >(
+                            linkEnds, observationSettings->observableType_, observationSettings->biasSettings_, bodyMap );
+            }
+
+            std::shared_ptr< ObservationBias< 1 > > apparentDistancesObservationBias;
+            if( mutualApproximationSettings->apparentDistancesBiasSettings_ != nullptr )
+            {
+                apparentDistancesObservationBias = createObservationBiasCalculator(
+                            linkEnds, apparent_distance, mutualApproximationSettings->apparentDistancesBiasSettings_, bodyMap );
+            }
+
+            // Create observation model
+            observationModel = std::make_shared< MutualApproximationWithImpactParameterObservationModel<
+                    ObservationScalarType, TimeType > >(
+                        createLightTimeCalculator< ObservationScalarType, TimeType >(
+                            linkEnds.at( transmitter ), linkEnds.at( receiver ), bodyMap, observationSettings->lightTimeCorrectionsList_ ),
+                        createLightTimeCalculator< ObservationScalarType, TimeType >(
+                            linkEnds.at( transmitter2 ), linkEnds.at( receiver ), bodyMap, observationSettings->lightTimeCorrectionsList_ ),
+                        mutualApproximationSettings->frequencyApparentDistanceMeasurements_, mutualApproximationSettings->toleranceWrtCentralInstant_,
+                        mutualApproximationSettings->upperLimitImpactParameter_, mutualApproximationSettings->orderPolynomialFitting_,
+                        mutualApproximationSettings->checkExistenceMutualApproximation_, mutualApproximationSettings->checkObservableDuplicates_,
+                        mutualApproximationSettings->rootFinderSettings_, mutualApproximationObservationBias, apparentDistancesObservationBias );
 
             break;
         }
@@ -1630,6 +1872,23 @@ std::shared_ptr< OccultationCalculator > createOccultationCalculator(
         const LinkEnds linkEnds,
         const ObservableType observationType,
         const std::shared_ptr< ObservationViabilitySettings > observationViabilitySettings );
+
+
+//! Function to create an object to check if a mutual approximation condition is met for an observation.
+/*!
+ * Function to create an object to check if a mutual approximation condition is met for an observation.
+ * \param bodyMap Map of body objects that constitutes the environment
+ * \param linkEnds Link ends for which viability check object is to be made
+ * \param observationType Type of observable for which viability check object is to be made
+ * \param observationViabilitySettings Object that defines the settings for the creation of the viability check creation
+ * \return Object to check if a mutual approximation condition is met for an observation
+ */
+std::shared_ptr< MutualApproximationCalculator > createMutualApproximationCalculator(
+        const simulation_setup::NamedBodyMap& bodyMap,
+        const LinkEnds linkEnds,
+        const ObservableType observationType,
+        const std::shared_ptr< ObservationViabilitySettings > observationViabilitySettings );
+
 
 //! Function to create an list of obervation viability conditions for a single set of link ends
 /*!

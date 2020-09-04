@@ -136,6 +136,41 @@ bool OccultationCalculator::isObservationViable( const std::vector< Eigen::Vecto
 }
 
 
+//! Function for determining whether there is a mutual approximation and thus whether the central instant is defined or not.
+bool MutualApproximationCalculator::isObservationViable( const std::vector< Eigen::Vector6d >& linkEndStates,
+                                                         const std::vector< double >& linkEndTimes )
+{
+    bool isObservationPossible = false;
+//    Eigen::Vector3d positionOfOccultingBody;
+
+
+    // Iterate over all sets of entries of input vector for which occultation is to be checked.
+    for( unsigned int i = 0; i < linkEndIndices_.size( ); i++ )
+    {
+        if ( !isnan( linkEndTimes.at( linkEndIndices_.at( i ).first ) )
+             || !isnan( linkEndTimes.at( linkEndIndices_.at( i ).second ) ) )
+        {
+//        // Get position of occulting body
+//        positionOfOccultingBody = stateFunctionOfOccultingBody_(
+//                    ( linkEndTimes.at( linkEndIndices_.at( i ).first ) +
+//                      linkEndTimes.at( linkEndIndices_.at( i ).second ) ) / 2.0 ).segment( 0, 3 );
+
+//        // Check if observing link end is occulted by body.
+//        if( mission_geometry::computeShadowFunction(
+//                    linkEndStates.at( linkEndIndices_.at( i ).first ).segment( 0, 3 ), 0.0,
+//                    positionOfOccultingBody,
+//                    radiusOfOccultingBody_,
+//                    linkEndStates.at( linkEndIndices_.at( i ).second ).segment( 0, 3 ) ) < 1.0E-10 )
+//        {
+            isObservationPossible = true;
+            break;
+        }
+    }//
+
+    return isObservationPossible;
+}
+
+
 
 }
 

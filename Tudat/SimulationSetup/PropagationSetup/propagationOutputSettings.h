@@ -114,7 +114,8 @@ enum PropagationDependentVariables
     local_aerodynamic_heat_rate_dependent_variable = 43,
     euler_angles_to_body_fixed_313 = 44,
     current_body_mass_dependent_variable = 45,
-    radiation_pressure_coefficient_dependent_variable = 46
+    radiation_pressure_coefficient_dependent_variable = 46,
+    total_acceleration_partial_wrt_body_translational_state = 47
 };
 
 //! Functional base class for defining settings for dependent variables that are to be saved during propagation
@@ -446,7 +447,7 @@ public:
 
 };
 
-//! Class to define .
+//! Class to define single acceleration partial w.r.t. translational state.
 class AccelerationPartialWrtStateSaveSettings: public SingleDependentVariableSaveSettings
 {
 public:
@@ -482,6 +483,45 @@ public:
     std::string thirdBody_;
 
 };
+
+
+//! Class to define partial of the total acceleration of a given body w.r.t. translational state.
+class TotalAccelerationPartialWrtStateSaveSettings: public SingleDependentVariableSaveSettings
+{
+public:
+
+    //! Constructor.
+    /*!
+     *  Constructor.
+     *  \param bodyUndergoingAcceleration Body undergoing acceleration.
+     *  \param bodyExertingAcceleration Body exerting acceleration.
+     *  \param accelerationModelType Type of acceleration that is to be saved.
+     *  \param derivativeWrtBody String denoting w.r.t. which body the partial needs to be taken.
+     *  \param thirdBody String denoting the third body w.r.t. which the partial needs to be taken (in case
+     *      of third body acceleration).
+     */
+    TotalAccelerationPartialWrtStateSaveSettings(
+            const std::string& bodyUndergoingAcceleration,
+//            const std::string& bodyExertingAcceleration,
+//            const basic_astrodynamics::AvailableAcceleration accelerationModelType,
+            const std::string derivativeWrtBody,
+            const std::string centralBody = "" ):
+        SingleDependentVariableSaveSettings(
+            total_acceleration_partial_wrt_body_translational_state, bodyUndergoingAcceleration ), //, bodyExertingAcceleration ),
+        /*accelerationModelType_( accelerationModelType ), */derivativeWrtBody_( derivativeWrtBody ),
+        centralBody_( centralBody ){ }
+
+//    //! Type of acceleration that is to be saved.
+//    basic_astrodynamics::AvailableAcceleration accelerationModelType_;
+
+    //! String denoting w.r.t. which body the derivative needs to be taken.
+    std::string derivativeWrtBody_;
+
+    //! String denoting the central body w.r.t. which the partial needs to be taken (in case of third body acceleration).
+    std::string centralBody_;
+
+};
+
 
 //! Container class for settings of all dependent variables that are to be saved.
 class DependentVariableSaveSettings

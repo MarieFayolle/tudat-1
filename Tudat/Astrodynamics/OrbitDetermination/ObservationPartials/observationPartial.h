@@ -58,6 +58,7 @@ public:
     virtual void update( const std::vector< Eigen::Vector6d >& linkEndStates,
                          const std::vector< double >& times,
                          const observation_models::LinkEndType fixedLinkEnd,
+                         const observation_models::LinkEnds linkEnds,
                          const Eigen::VectorXd currentObservation ) = 0;
 };
 

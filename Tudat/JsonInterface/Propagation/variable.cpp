@@ -216,6 +216,15 @@ void to_json( nlohmann::json& jsonObject,
         jsonObject[ K::thirdBody ] = accelerationPartialSettings->thirdBody_;
         return;
     }
+    case total_acceleration_partial_wrt_body_translational_state:
+    {
+        std::shared_ptr< TotalAccelerationPartialWrtStateSaveSettings > totalAccelerationPartialSettings =
+                std::dynamic_pointer_cast< TotalAccelerationPartialWrtStateSaveSettings >( dependentVariableSettings );
+        assertNonnullptrPointer( totalAccelerationPartialSettings );
+        jsonObject[ K::derivativeWrtBody ] = totalAccelerationPartialSettings->derivativeWrtBody_;
+        jsonObject[ K::thirdBody ] = totalAccelerationPartialSettings->centralBody_;
+        return;
+    }
     default:
     {
         assignIfNotEmpty( jsonObject, K::relativeToBody, dependentVariableSettings->secondaryBody_ );
@@ -315,6 +324,14 @@ void from_json( const nlohmann::json& jsonObject,
                     getValue< std::string >( jsonObject, K::body ),
                     getValue< std::string >( jsonObject, K::bodyExertingAcceleration ),
                     getValue< basic_astrodynamics::AvailableAcceleration >( jsonObject, K::accelerationType ),
+                    getValue< std::string >( jsonObject, K::derivativeWrtBody ),
+                    getValue< std::string >( jsonObject, K::thirdBody, "" ) );
+        return;
+    }
+    case total_acceleration_partial_wrt_body_translational_state:
+    {
+        dependentVariableSettings = std::make_shared< TotalAccelerationPartialWrtStateSaveSettings >(
+                    getValue< std::string >( jsonObject, K::body ),
                     getValue< std::string >( jsonObject, K::derivativeWrtBody ),
                     getValue< std::string >( jsonObject, K::thirdBody, "" ) );
         return;

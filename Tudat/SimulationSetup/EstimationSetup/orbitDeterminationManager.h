@@ -23,6 +23,7 @@
 #include "Tudat/SimulationSetup/EstimationSetup/variationalEquationsSolver.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createObservationManager.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createNumericalSimulator.h"
+#include "Tudat/Astrodynamics/Propagators/dependentVariablesInterface.h"
 
 namespace tudat
 {
@@ -807,11 +808,13 @@ protected:
         if( integrateAndEstimateOrbit_ )
         {
             stateTransitionAndSensitivityMatrixInterface_ = variationalEquationsSolver_->getStateTransitionMatrixInterface( );
+            dependentVariablesInterface_ = variationalEquationsSolver_->getDependentVariablesInterface( );
         }
         else if( propagatorSettings == nullptr )
         {
             stateTransitionAndSensitivityMatrixInterface_ = createStateTransitionAndSensitivityMatrixInterface(
                         propagatorSettings, 0, parametersToEstimate_->getParameterSetSize( ) );
+//            dependentVariablesInterface_ =
         }
         else
         {
@@ -826,7 +829,7 @@ protected:
             observationManagers_[ observablesIterator->first ] =
                     createObservationManagerBase< ObservationScalarType, TimeType >(
                         observablesIterator->first, observablesIterator->second, bodyMap, parametersToEstimate_,
-                        stateTransitionAndSensitivityMatrixInterface_ );
+                        stateTransitionAndSensitivityMatrixInterface_, dependentVariablesInterface_ );
         }
 
         // Set current parameter estimate from body initial states and parameter set.
@@ -883,6 +886,9 @@ protected:
     //! Object used to interpolate the numerically integrated result of the state transition/sensitivity matrices.
     std::shared_ptr< propagators::CombinedStateTransitionAndSensitivityMatrixInterface >
     stateTransitionAndSensitivityMatrixInterface_;
+
+    //! Object used to interpolate the numerically integrated result of the dependent variables.
+    std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface_;
 
 };
 

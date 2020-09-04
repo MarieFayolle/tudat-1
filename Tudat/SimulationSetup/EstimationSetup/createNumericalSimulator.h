@@ -81,12 +81,14 @@ createSingleArcVariationalEquationsSolver(
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings
         = std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ),
         const bool clearNumericalSolution = 1,
-        const bool integrateEquationsOnCreation = 1 )
+        const bool integrateEquationsOnCreation = 1,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings =
+        std::shared_ptr< propagators::DependentVariableSaveSettings >( ) )
 {
     return std::make_shared< propagators::SingleArcVariationalEquationsSolver< StateScalarType, TimeType > >(
                 bodyMap, integratorSettings, propagatorSettings, parametersToEstimate,
                 integrateDynamicalAndVariationalEquationsConcurrently, variationalOnlyIntegratorSettings,
-                clearNumericalSolution, integrateEquationsOnCreation );
+                clearNumericalSolution, integrateEquationsOnCreation, true, dependentVariablesInterfaceSettings );
 }
 
 //! Function to create multi-arc variational equations solver object
@@ -117,14 +119,16 @@ createMultiArcVariationalEquationsSolver(
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings
         = std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ),
         const bool clearNumericalSolution = 1,
-        const bool integrateEquationsOnCreation = 1 )
+        const bool integrateEquationsOnCreation = 1,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings =
+        std::shared_ptr< propagators::DependentVariableSaveSettings >( ) )
 {
     std::vector< double > arcStartTimes = estimatable_parameters::getMultiArcStateEstimationArcStartTimes(
                 parametersToEstimate, true );
     return std::make_shared< propagators::MultiArcVariationalEquationsSolver< StateScalarType, TimeType > >(
                 bodyMap, integratorSettings, propagatorSettings, parametersToEstimate, arcStartTimes,
                 integrateDynamicalAndVariationalEquationsConcurrently, variationalOnlyIntegratorSettings,
-                clearNumericalSolution, integrateEquationsOnCreation );
+                clearNumericalSolution, integrateEquationsOnCreation, true, dependentVariablesInterfaceSettings );
 }
 
 
@@ -156,7 +160,9 @@ createHybridArcVariationalEquationsSolver(
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings
         = std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ),
         const bool clearNumericalSolution = 1,
-        const bool integrateEquationsOnCreation = 1 )
+        const bool integrateEquationsOnCreation = 1,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings =
+        std::shared_ptr< propagators::DependentVariableSaveSettings >( ) )
 {
     std::vector< double > arcStartTimes = estimatable_parameters::getMultiArcStateEstimationArcStartTimes(
                 parametersToEstimate, false );
@@ -165,14 +171,14 @@ createHybridArcVariationalEquationsSolver(
         return std::make_shared< propagators::HybridArcVariationalEquationsSolver< StateScalarType, TimeType > >(
                     bodyMap, integratorSettings.at( 0 ), propagatorSettings, parametersToEstimate, arcStartTimes,
                     integrateDynamicalAndVariationalEquationsConcurrently,
-                    clearNumericalSolution, integrateEquationsOnCreation );
+                    clearNumericalSolution, integrateEquationsOnCreation, dependentVariablesInterfaceSettings );
     }
     else
     {
         return std::make_shared< propagators::HybridArcVariationalEquationsSolver< StateScalarType, TimeType > >(
                     bodyMap, integratorSettings.at( 0 ), integratorSettings.at( 1 ), propagatorSettings, parametersToEstimate, arcStartTimes,
                     integrateDynamicalAndVariationalEquationsConcurrently,
-                    clearNumericalSolution, integrateEquationsOnCreation );
+                    clearNumericalSolution, integrateEquationsOnCreation, dependentVariablesInterfaceSettings );
     }
 }
 
@@ -204,7 +210,9 @@ createVariationalEquationsSolver(
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings
         = std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ),
         const bool clearNumericalSolution = 1,
-        const bool integrateEquationsOnCreation = 1 )
+        const bool integrateEquationsOnCreation = 1,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings =
+        std::shared_ptr< propagators::DependentVariableSaveSettings >( ) )
 {
     if( std::dynamic_pointer_cast< propagators::SingleArcPropagatorSettings< StateScalarType > >( propagatorSettings ) != nullptr )
     {
@@ -214,7 +222,7 @@ createVariationalEquationsSolver(
         }
         return createSingleArcVariationalEquationsSolver(
                     bodyMap, integratorSettings.at( 0 ), propagatorSettings, parametersToEstimate, integrateDynamicalAndVariationalEquationsConcurrently,
-                    variationalOnlyIntegratorSettings, clearNumericalSolution, integrateEquationsOnCreation );
+                    variationalOnlyIntegratorSettings, clearNumericalSolution, integrateEquationsOnCreation, dependentVariablesInterfaceSettings );
     }
     else if( std::dynamic_pointer_cast< propagators::MultiArcPropagatorSettings< StateScalarType > >( propagatorSettings ) != nullptr )
     {
@@ -224,13 +232,13 @@ createVariationalEquationsSolver(
         }
         return createMultiArcVariationalEquationsSolver(
                     bodyMap, integratorSettings.at( 0 ), propagatorSettings, parametersToEstimate, integrateDynamicalAndVariationalEquationsConcurrently,
-                    variationalOnlyIntegratorSettings, clearNumericalSolution, integrateEquationsOnCreation );
+                    variationalOnlyIntegratorSettings, clearNumericalSolution, integrateEquationsOnCreation, dependentVariablesInterfaceSettings );
     }
     else if( std::dynamic_pointer_cast< propagators::HybridArcPropagatorSettings< StateScalarType > >( propagatorSettings ) != nullptr )
     {
         return createHybridArcVariationalEquationsSolver(
                     bodyMap, integratorSettings, propagatorSettings, parametersToEstimate, integrateDynamicalAndVariationalEquationsConcurrently,
-                    variationalOnlyIntegratorSettings, clearNumericalSolution, integrateEquationsOnCreation );
+                    variationalOnlyIntegratorSettings, clearNumericalSolution, integrateEquationsOnCreation, dependentVariablesInterfaceSettings );
     }
     else
     {
@@ -292,7 +300,8 @@ createSingleArcVariationalEquationsSolver< double, double >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 extern template std::shared_ptr< propagators::SingleArcDynamicsSimulator< double, double > >
 createSingleArcDynamicsSimulator< double, double >(
@@ -312,7 +321,8 @@ createMultiArcVariationalEquationsSolver< double, double >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 extern template std::shared_ptr< propagators::HybridArcVariationalEquationsSolver< double, double > >
 createHybridArcVariationalEquationsSolver< double, double >(
@@ -323,7 +333,8 @@ createHybridArcVariationalEquationsSolver< double, double >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 
 extern template std::shared_ptr< propagators::VariationalEquationsSolver< double, double > >
@@ -335,7 +346,8 @@ createVariationalEquationsSolver< double, double >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 #if( BUILD_WITH_EXTENDED_PRECISION_PROPAGATION_TOOLS )
 
@@ -376,7 +388,8 @@ createSingleArcVariationalEquationsSolver< double, Time >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 extern template std::shared_ptr< propagators::SingleArcVariationalEquationsSolver< long double, Time > >
 createSingleArcVariationalEquationsSolver< long double, Time >(
@@ -387,7 +400,8 @@ createSingleArcVariationalEquationsSolver< long double, Time >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 extern template std::shared_ptr< propagators::SingleArcVariationalEquationsSolver< long double, double > >
 createSingleArcVariationalEquationsSolver< long double, double >(
@@ -398,7 +412,8 @@ createSingleArcVariationalEquationsSolver< long double, double >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 
 
@@ -411,7 +426,8 @@ createHybridArcVariationalEquationsSolver< double, Time >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 extern template std::shared_ptr< propagators::HybridArcVariationalEquationsSolver< long double, Time > >
 createHybridArcVariationalEquationsSolver< long double, Time >(
@@ -422,7 +438,8 @@ createHybridArcVariationalEquationsSolver< long double, Time >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 extern template std::shared_ptr< propagators::HybridArcVariationalEquationsSolver< long double, double > >
 createHybridArcVariationalEquationsSolver< long double, double >(
@@ -433,7 +450,8 @@ createHybridArcVariationalEquationsSolver< long double, double >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 
 
@@ -446,7 +464,8 @@ createMultiArcVariationalEquationsSolver< double, Time >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 extern template std::shared_ptr< propagators::MultiArcVariationalEquationsSolver< long double, Time > >
 createMultiArcVariationalEquationsSolver< long double, Time >(
@@ -457,7 +476,8 @@ createMultiArcVariationalEquationsSolver< long double, Time >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 extern template std::shared_ptr< propagators::MultiArcVariationalEquationsSolver< long double, double > >
 createMultiArcVariationalEquationsSolver< long double, double >(
@@ -468,7 +488,8 @@ createMultiArcVariationalEquationsSolver< long double, double >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 
 
@@ -482,7 +503,8 @@ createVariationalEquationsSolver< double, Time >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 extern template std::shared_ptr< propagators::VariationalEquationsSolver< long double, Time > >
 createVariationalEquationsSolver< long double, Time >(
@@ -493,7 +515,8 @@ createVariationalEquationsSolver< long double, Time >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 extern template std::shared_ptr< propagators::VariationalEquationsSolver< long double, double > >
 createVariationalEquationsSolver< long double, double >(
@@ -504,7 +527,8 @@ createVariationalEquationsSolver< long double, double >(
         const bool integrateDynamicalAndVariationalEquationsConcurrently,
         const std::shared_ptr< numerical_integrators::IntegratorSettings< double > > variationalOnlyIntegratorSettings,
         const bool clearNumericalSolution,
-        const bool integrateEquationsOnCreation );
+        const bool integrateEquationsOnCreation,
+        const std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesInterfaceSettings );
 
 #endif
 

@@ -312,7 +312,7 @@ protected:
     {
         if( observationPartialScalers_.at( linkEnds ) != nullptr )
         {
-            observationPartialScalers_.at( linkEnds )->update( states, times, linkEndAssociatedWithTime,
+            observationPartialScalers_.at( linkEnds )->update( states, times, linkEndAssociatedWithTime, linkEnds,
                                                                currentObservation.template cast< double >( ) );
         }
     }

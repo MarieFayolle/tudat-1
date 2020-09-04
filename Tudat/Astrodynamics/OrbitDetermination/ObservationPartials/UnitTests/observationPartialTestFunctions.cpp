@@ -566,7 +566,9 @@ template void testObservationPartials< 1 >(
         const bool testPositionPartial,
         const bool testParameterPartial,
         const double positionPerturbationMultiplier,
-        const Eigen::VectorXd parameterPerturbationMultipliers );
+        const Eigen::VectorXd parameterPerturbationMultipliers,
+        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface,
+        const double estimateObservationTime );
 
 template void testObservationPartials< 2 >(
         const std::shared_ptr< ObservationModel< 2, double, double > > observationModel,
@@ -577,7 +579,9 @@ template void testObservationPartials< 2 >(
         const bool testPositionPartial,
         const bool testParameterPartial,
         const double positionPerturbationMultiplier,
-        const Eigen::VectorXd parameterPerturbationMultipliers );
+        const Eigen::VectorXd parameterPerturbationMultipliers,
+        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface,
+        const double estimateObservationTime );
 
 
 }

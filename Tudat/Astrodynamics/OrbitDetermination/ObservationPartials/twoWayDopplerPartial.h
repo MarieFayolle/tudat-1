@@ -84,6 +84,7 @@ public:
     void update( const std::vector< Eigen::Vector6d >& linkEndStates,
                  const std::vector< double >& times,
                  const observation_models::LinkEndType fixedLinkEnd,
+                 const observation_models::LinkEnds linkEnds,
                  const Eigen::VectorXd currentObservation );
 
     //! Funtion to get the relevant derivative of one-way Doppler observation, when setting up tow-way Doppler mode
