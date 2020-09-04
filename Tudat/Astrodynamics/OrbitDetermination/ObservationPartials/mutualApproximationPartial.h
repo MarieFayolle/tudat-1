@@ -83,52 +83,6 @@ Eigen::Matrix< double, 1, 3 > computePartialOfSecondTimeDerivativeDeclinationWrt
 double computeAngleThetaRealSolutionsCubicEquation( double intermediateQ,
                                                     double intermediateR );
 
-////! Function to compute the right ascension and declination of the observed body as seen from the observer.
-///*!
-// * Function to compute the right ascension and declination of the observed body as seen from the observer.
-// * \param relativePosition Vector from observer to observed object
-// * \return pair object containing the right ascension and declination of the observed body as seen from the observer.
-// */
-//std::pair< double, double > computeRightAscensionAndDeclination( Eigen::Vector3d relativePosition );
-
-
-////! Function to compute the derivative of (direct geometric) right ascension w.r.t. position of observer or observed object.
-///*!
-// * Function to compute the derivative of (direct geometric) right ascension w.r.t. position of observer or observed object.
-// * \param relativeRangeVector Vector from observer to observed object
-// * \param isLinkEndReceiver True if the partial is to be computed w.r.t. position of observer, false if it is the observed
-// * object
-// * \return derivative of (direct geometric) right ascension w.r.t. position of observer or observed object.
-// */
-//Eigen::Matrix< double, 1, 3 > computePartialOfRightAscensionWrtLinkEndPosition(
-//        const Eigen::Vector3d& relativeRangeVector,
-//        const bool isLinkEndReceiver );
-
-////! Function to compute the derivative of (direct geometric) declination w.r.t. position of observer or observed object.
-///*!
-// * Function to compute the derivative of (direct geometric) declination w.r.t. position of observer or observed object.
-// * \param relativeRangeVector Vector from observer to observed object
-// * \param isLinkEndReceiver True if the partial is to be computed w.r.t. position of observer, false if it is the observed
-// * object
-// * \return derivative of (direct geometric) declination w.r.t. position of observer or observed object.
-// */
-//Eigen::Matrix< double, 1, 3 > computePartialOfDeclinationWrtLinkEndPosition(
-//        Eigen::Vector3d relativeRangeVector,
-//        const bool isLinkEndReceiver );
-
-////! Function to compute the derivative of (direct geometric) right ascension and declination w.r.t. position of observer or
-////! observed object.
-///*!
-// * Function to compute the derivative of (direct geometric) right ascension and declination w.r.t. position of observer or
-// * observed object.
-// * \param relativeRangeVector Vector from observer to observed object
-// * \param isLinkEndReceiver True if the partial is to be computed w.r.t. position of observer, false if it is the observed
-// * object
-// * \return Derivative of (direct geometric) right ascension and declination w.r.t. position of observer or observed object.
-// */
-//Eigen::Matrix< double, 1, 3 > computePartialOfApparentDistanceWrtLinkEndPosition(
-//        Eigen::Vector3d relativeRangeVector,
-//        const bool isLinkEndReceiver );
 
 //! Derived class for scaling three-dimensional position partial to mutual approximation observable partial
 class MutualApproximationScaling: public PositionPartialScaling
@@ -311,9 +265,7 @@ protected:
 
     Eigen::Vector2d computeRelativeVelocityInInstrumentalFrame( );
 
-    Eigen::Vector2d computeRelativeAccelerationInInstrumentalFrame(
-            Eigen::Vector3d cartesianAccelerationFirstTransmitterWrtReceiver,
-            Eigen::Vector3d cartesianAccelerationSecondTransmitterWrtReceiver );
+    Eigen::Vector2d computeRelativeAccelerationInInstrumentalFrame( );
 
     void computePartialOfRelativePositionInInstrumentalFrameWrtLinkEndPosition( );
 
@@ -332,7 +284,6 @@ protected:
             Eigen::Matrix< double, 2, 3 >& partialsOfInstrumentalFrameRelativeAccelerationWrtSecondTransmitterPosition,
             Eigen::Matrix< double, 2, 3 >& partialsOfInstrumentalFrameRelativeAccelerationWrtReceiverPosition );
 
-//    std::pair< Eigen::Matrix< double, 4, 3 >, Eigen::Matrix< double, 4, 3 > > computePartialOfCubicPolynomialCoefficientsWrtCartesianPosition( );
 
     Eigen::Vector4d computeCubicPolynomialCoefficients( );
 
@@ -343,20 +294,13 @@ protected:
 
     Eigen::Vector3d computeDepressedCubicPolynomialCoefficients( );
 
-//    std::pair< Eigen::Matrix< double, 3, 3 >, Eigen::Matrix< double, 3, 3 > > computePartialOfDepressedCubicPolynomialCoefficientsWrtCartesianPosition( );
     void computePartialOfDepressedCubicPolynomialCoefficientsWrtCartesianPosition(
             Eigen::Matrix< double, 3, 3 >& partialOfDepressedCubicPolynomialCoefficientsWrtFirstTransmitterPosition,
             Eigen::Matrix< double, 3, 3 >& partialOfDepressedCubicPolynomialCoefficientsWrtSecondTransmitterPosition,
             Eigen::Matrix< double, 3, 3 >& partialOfDepressedCubicPolynomialCoefficientsWrtReceiverPosition );
 
+
     void computePartialsOfCentralInstantWrtLinkEndPosition( const std::vector< double > times );
-
-//    std::pair< Eigen::Matrix< double, 2, 3 >, Eigen::Matrix< double, 2, 3 > > computePartialOfRelativeAccelerationInInstrumentalFrameWrtLinkEndPosition(
-//            Eigen::Vector3d cartesianAccelerationTransmitterWrtReceiver,
-//            Eigen::Vector3d cartesianAccelerationSecondTransmitterWrtReceiver,
-//            Eigen::Matrix3d partialAccelerationFirstTransmitterWrtLinkEndPosition,
-//            Eigen::Matrix3d partialAccelerationSecondTransmitterWrtLinkEndPosition );
-
 
 
 private:
@@ -394,25 +338,6 @@ private:
     //! Computed light time correction scaling factor for second transmitter downlink.
     Eigen::Vector2d angularPositionLightTimeCorrectionScalingSecondTransmitter_;
 
-//    //! Predeclared common scaling factor
-//    Eigen::Matrix< double, 1, 3 > scalingFactor_;
-
-
-
-//    //! Computed scaling factor (at receiver)
-//    Eigen::Matrix< double, 1, 3 > referenceScalingFactor_;
-
-//    //! Computed light time correction scaling factor
-//    Eigen::Vector1d referenceLightTimeCorrectionScaling_;
-
-
-
-//    std::pair< double, double > XlightTimeCorrectionScalingFactors_;
-//    std::pair< double, double > YlightTimeCorrectionScalingFactors_;
-
-
-
-
 
 
     //! Relative acceleration of first transmitter w.r.t. receiver in cartesian coordinates.
@@ -435,8 +360,6 @@ private:
     //! (retrieved from dependent variables interface)
     Eigen::Matrix3d partialAccelerationFirstTransmitterWrtOtherTransmitterPosition_;
 
-    //    Eigen::Matrix3d partialAccelerationFirstTransmitterWrtLinkEndPosition_;
-
     //! Partial w.r.t. link end position of relative acceleration of second transmitter w.r.t. receiver (in cartesian coordinates).
     //! (retrieved from dependent variables interface)
     Eigen::Matrix3d partialAccelerationSecondTransmitterWrtReceiverPosition_;
@@ -448,8 +371,6 @@ private:
     //! Partial w.r.t. link end position of relative acceleration of second transmitter w.r.t. first transmitter (in cartesian coordinates).
     //! (retrieved from dependent variables interface)
     Eigen::Matrix3d partialAccelerationSecondTransmitterWrtOtherTransmitterPosition_;
-
-//    Eigen::Matrix3d partialAccelerationSecondTransmitterWrtLinkEndPosition_;
 
 
     //! Computed right ascension of first transmitter as seen from receiver.
