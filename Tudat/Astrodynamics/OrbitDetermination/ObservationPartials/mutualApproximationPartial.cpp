@@ -951,7 +951,7 @@ void computePartialOfIntermediateVariableSWrtLinkEndPosition(
 }
 
 
-Eigen::Vector2d MutualApproximationScaling::computeRelativePositionInInstrumentalFrame( )
+Eigen::Vector2d MutualApproximationScalingBase::computeRelativePositionInInstrumentalFrame( )
 {
     Eigen::Vector2d relativePositionInInstrumentalFrame = Eigen::Vector2d::Zero( );
 
@@ -963,7 +963,7 @@ Eigen::Vector2d MutualApproximationScaling::computeRelativePositionInInstrumenta
 }
 
 
-Eigen::Vector2d MutualApproximationScaling::computeRelativeVelocityInInstrumentalFrame( )
+Eigen::Vector2d MutualApproximationScalingBase::computeRelativeVelocityInInstrumentalFrame( )
 {
     Eigen::Vector2d relativeVelocityInInstrumentalFrame = Eigen::Vector2d::Zero( );
 
@@ -978,7 +978,7 @@ Eigen::Vector2d MutualApproximationScaling::computeRelativeVelocityInInstrumenta
 }
 
 
-Eigen::Vector2d MutualApproximationScaling::computeRelativeAccelerationInInstrumentalFrame( )
+Eigen::Vector2d MutualApproximationScalingBase::computeRelativeAccelerationInInstrumentalFrame( )
 {
 
     Eigen::Vector2d relativeAccelerationInInstrumentalFrame = Eigen::Vector2d::Zero( );
@@ -1001,7 +1001,7 @@ Eigen::Vector2d MutualApproximationScaling::computeRelativeAccelerationInInstrum
 
 
 
-void MutualApproximationScaling::computePartialOfRelativePositionInInstrumentalFrameWrtLinkEndPosition( )
+void MutualApproximationScalingBase::computePartialOfRelativePositionInInstrumentalFrameWrtLinkEndPosition( )
 {
 
     Eigen::Vector3d relativePositionFirstTransmitterWrtReceiver = ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 );
@@ -1056,7 +1056,7 @@ void MutualApproximationScaling::computePartialOfRelativePositionInInstrumentalF
 }
 
 
-void MutualApproximationScaling::computePartialOfRelativeVelocityInInstrumentalFrameWrtLinkEndPosition( )
+void MutualApproximationScalingBase::computePartialOfRelativeVelocityInInstrumentalFrameWrtLinkEndPosition( )
 {
 
     Eigen::Vector3d relativePositionFirstTransmitterWrtReceiver = ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 );
@@ -1156,7 +1156,7 @@ void MutualApproximationScaling::computePartialOfRelativeVelocityInInstrumentalF
 }
 
 
-void MutualApproximationScaling::computePartialOfRelativeAccelerationInInstrumentalFrameWrtLinkEndPosition(
+void MutualApproximationScalingBase::computePartialOfRelativeAccelerationInInstrumentalFrameWrtLinkEndPosition(
         Eigen::Vector3d relativeAccelerationFirstTransmitterWrtReceiver,
         Eigen::Vector3d relativeAccelerationSecondTransmitterWrtReceiver,
         Eigen::Matrix3d partialAccelerationFirstTransmitterWrtReceiverPosition,
@@ -1459,7 +1459,7 @@ void MutualApproximationScaling::computePartialOfRelativeAccelerationInInstrumen
 
 
 
-Eigen::Vector4d MutualApproximationScaling::computeCubicPolynomialCoefficients( )
+Eigen::Vector4d MutualApproximationScalingBase::computeCubicPolynomialCoefficients( )
 {
     return ( Eigen::Vector4d( ) <<
 
@@ -1479,7 +1479,7 @@ Eigen::Vector4d MutualApproximationScaling::computeCubicPolynomialCoefficients( 
 }
 
 
-void MutualApproximationScaling::computePartialOfCubicPolynomialCoefficientsWrtCartesianPosition(
+void MutualApproximationScalingBase::computePartialOfCubicPolynomialCoefficientsWrtCartesianPosition(
         Eigen::Matrix< double, 4, 3 >& partialOfCubicPolynomialCoefficientsWrtFirstTransmitterPosition,
         Eigen::Matrix< double, 4, 3 >& partialOfCubicPolynomialCoefficientsWrtSecondTransmitterPosition,
         Eigen::Matrix< double, 4, 3 >& partialOfCubicPolynomialCoefficientsWrtReceiverPosition )
@@ -1617,7 +1617,7 @@ void MutualApproximationScaling::computePartialOfCubicPolynomialCoefficientsWrtC
 }
 
 
-Eigen::Vector3d MutualApproximationScaling::computeDepressedCubicPolynomialCoefficients(  )
+Eigen::Vector3d MutualApproximationScalingBase::computeDepressedCubicPolynomialCoefficients(  )
 {
     return ( Eigen::Vector3d( ) <<
              cubicPolynomialCoefficients_[ 1 ] / cubicPolynomialCoefficients_[ 0 ],
@@ -1626,7 +1626,7 @@ Eigen::Vector3d MutualApproximationScaling::computeDepressedCubicPolynomialCoeff
 }
 
 
-void MutualApproximationScaling::computePartialOfDepressedCubicPolynomialCoefficientsWrtCartesianPosition(
+void MutualApproximationScalingBase::computePartialOfDepressedCubicPolynomialCoefficientsWrtCartesianPosition(
         Eigen::Matrix< double, 3, 3 >& partialOfDepressedCubicPolynomialCoefficientsWrtFirstTransmitterPosition,
         Eigen::Matrix< double, 3, 3 >& partialOfDepressedCubicPolynomialCoefficientsWrtSecondTransmitterPosition,
         Eigen::Matrix< double, 3, 3 >& partialOfDepressedCubicPolynomialCoefficientsWrtReceiverPosition )
@@ -1696,7 +1696,7 @@ void MutualApproximationScaling::computePartialOfDepressedCubicPolynomialCoeffic
 }
 
 
-void MutualApproximationScaling::computePartialsOfCentralInstantWrtLinkEndPosition(
+void MutualApproximationScalingBase::computePartialsOfCentralInstantWrtLinkEndPosition(
         const std::vector< double > times )
 {
 
@@ -1909,7 +1909,7 @@ void MutualApproximationScaling::computePartialsOfCentralInstantWrtLinkEndPositi
 
 
 //! Function to check whether all the required dependent variables are included in the interface.
-void MutualApproximationScaling::checkRequiredDependentVariablesFromInterface( const observation_models::LinkEnds linkEnds )
+void MutualApproximationScalingBase::checkRequiredDependentVariablesFromInterface( const observation_models::LinkEnds linkEnds )
 {
     if ( dependentVariablesInterfaceIdsAndIndices_.count(  "Total acceleration in inertial frame of " + linkEnds.at( observation_models::receiver ).first ) == 0 )
     {
@@ -1966,7 +1966,7 @@ void MutualApproximationScaling::checkRequiredDependentVariablesFromInterface( c
 
 //! Function to retrieve the relative accelerations of the two transmitters, and the associated acceleration partials
 //!  from the dependent variables interface.
-void MutualApproximationScaling::retrieveRelativeAccelerationsAndAssociatedPartialsFromDependentVariables(
+void MutualApproximationScalingBase::retrieveRelativeAccelerationsAndAssociatedPartialsFromDependentVariables(
         const std::vector< double >& times, const observation_models::LinkEnds linkEnds )
 {
     // Compute relative accelerations of the two transmitters w.r.t the common receiver.
@@ -2180,6 +2180,458 @@ void MutualApproximationScaling::update( const std::vector< Eigen::Vector6d >& l
     currentLinkEndType_ = fixedLinkEnd;
 
 }
+
+
+
+void MutualApproximationWithImpactParameterScaling::computePartialsOfApparentDistanceWrtLinkEndPosition( )
+{
+    double apparentDistance = std::sqrt( instrumentalFrameRelativePosition_[ 0 ] * instrumentalFrameRelativePosition_[ 0 ]
+            + instrumentalFrameRelativePosition_[ 1 ] * instrumentalFrameRelativePosition_[ 1 ] );
+
+
+    // Successively compute partials w.r.t. state of first transmitter, second transmitter and receiver.
+    for ( unsigned int currentLinkEndIndex = 0 ; currentLinkEndIndex < 3 ; currentLinkEndIndex++ )
+    {
+
+        Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativePositionWrtLinkEndPosition;
+        if ( currentLinkEndIndex == 0 ) // If partials w.r.t. first transmitter position
+        {
+            partialsOfInstrumentalFrameRelativePositionWrtLinkEndPosition = partialsOfInstrumentalFrameRelativePositionWrtFirstTransmitterPosition_;
+        }
+        else if ( currentLinkEndIndex == 1 ) // If partials w.r.t. second transmitter position
+        {
+            partialsOfInstrumentalFrameRelativePositionWrtLinkEndPosition = partialsOfInstrumentalFrameRelativePositionWrtSecondTransmitterPosition_;
+        }
+        else if ( currentLinkEndIndex == 2 ) // If partials w.r.t. receiver position
+        {
+            partialsOfInstrumentalFrameRelativePositionWrtLinkEndPosition = partialsOfInstrumentalFrameRelativePositionWrtReceiverPosition_;
+        }
+
+
+        // Compute partials of apparent distance w.r.t. position of current link end .
+        Eigen::Matrix< double, 1, 3 > partials =  ( 1.0 / apparentDistance ) *
+                ( instrumentalFrameRelativePosition_[ 0 ] * partialsOfInstrumentalFrameRelativePositionWrtLinkEndPosition.block( 0, 0, 1, 3 )
+                + instrumentalFrameRelativePosition_[ 1 ] * partialsOfInstrumentalFrameRelativePositionWrtLinkEndPosition.block( 1, 0, 1, 3 ) );
+
+
+        // Assign partials to the right link leg.
+
+        if ( currentLinkEndIndex == 0 ) // If partials w.r.t. first transmitter position
+        {
+            partialsOfApparentDistanceWrtFirstTransmitterPosition_ = partials;
+        }
+        else if ( currentLinkEndIndex == 1 ) // If partials w.r.t. second transmitter position
+        {
+            partialsOfApparentDistanceWrtSecondTransmitterPosition_ = partials;
+        }
+        else if ( currentLinkEndIndex == 2 )  // If partials w.r.t. receiver position
+        {
+            partialsOfApparentDistanceWrtReceiverPosition_ = partials;
+        }
+
+    }
+}
+
+
+void MutualApproximationWithImpactParameterScaling::computePartialsOfImpactParameterWrtLinkEndPosition( )
+{
+    double apparentDistance = std::sqrt( instrumentalFrameRelativePosition_[ 0 ] * instrumentalFrameRelativePosition_[ 0 ]
+            + instrumentalFrameRelativePosition_[ 1 ] * instrumentalFrameRelativePosition_[ 1 ] );
+
+    double timeDerivativeOfApparentDistance = ( 1.0 / apparentDistance )
+            * ( instrumentalFrameRelativePosition_[ 0 ] * instrumentalFrameRelativeVelocity_[ 0 ]
+            + instrumentalFrameRelativePosition_[ 1 ] * instrumentalFrameRelativeVelocity_[ 1 ] );
+
+
+    // Successively compute partials w.r.t. state of first transmitter, second transmitter and receiver.
+    for ( unsigned int currentLinkEndIndex = 0 ; currentLinkEndIndex < 3 ; currentLinkEndIndex++ )
+    {
+
+        Eigen::Matrix< double, 1, 3 > partialsOfApparentDistanceWrtLinkEndPosition;
+        Eigen::Matrix< double, 1, 3 > partialsOfCentralInstantWrtLinkEndPosition;
+        if ( currentLinkEndIndex == 0 ) // If partials w.r.t. first transmitter position
+        {
+            partialsOfApparentDistanceWrtLinkEndPosition = partialsOfApparentDistanceWrtFirstTransmitterPosition_;
+            partialsOfCentralInstantWrtLinkEndPosition = partialsOfCentralInstantWrtFirstTransmitterPosition_;
+        }
+        else if ( currentLinkEndIndex == 1 ) // If partials w.r.t. second transmitter position
+        {
+            partialsOfApparentDistanceWrtLinkEndPosition = partialsOfApparentDistanceWrtSecondTransmitterPosition_;
+            partialsOfCentralInstantWrtLinkEndPosition = partialsOfCentralInstantWrtSecondTransmitterPosition_;
+        }
+        else if ( currentLinkEndIndex == 2 ) // If partials w.r.t. receiver position
+        {
+            partialsOfApparentDistanceWrtLinkEndPosition = partialsOfApparentDistanceWrtReceiverPosition_;
+            partialsOfCentralInstantWrtLinkEndPosition = partialsOfCentralInstantWrtReceiverPosition_;
+        }
+
+
+        // Compute partials of impact parameter w.r.t. position of current link end .
+        Eigen::Matrix< double, 1, 3 > partials =  partialsOfApparentDistanceWrtLinkEndPosition
+                + timeDerivativeOfApparentDistance * partialsOfCentralInstantWrtLinkEndPosition;
+
+
+        // Assign partials to the right link leg.
+
+        if ( currentLinkEndIndex == 0 ) // If partials w.r.t. first transmitter position
+        {
+            partialsOfImpactParameterWrtFirstTransmitterPosition_ = partials;
+        }
+        else if ( currentLinkEndIndex == 1 ) // If partials w.r.t. second transmitter position
+        {
+            partialsOfImpactParameterWrtSecondTransmitterPosition_ = partials;
+        }
+        else if ( currentLinkEndIndex == 2 )  // If partials w.r.t. receiver position
+        {
+            partialsOfImpactParameterWrtReceiverPosition_ = partials;
+        }
+
+    }
+}
+
+
+
+//! Update the scaling object to the current times and states
+void MutualApproximationWithImpactParameterScaling::update( const std::vector< Eigen::Vector6d >& linkEndStates,
+                                                            const std::vector< double >& times,
+                                                            const observation_models::LinkEndType fixedLinkEnd,
+                                                            const observation_models::LinkEnds linkEnds,
+                                                            const Eigen::VectorXd currentObservation )
+{
+    std::cout << "BEGINNING UPDATE FUNCTION IN MUTUAL APPROXIMATION WITH IMPACT PARAMETER SCALING" << "\n\n";
+
+    if ( fixedLinkEnd != observation_models::receiver )
+    {
+        throw std::runtime_error( "Error when updating the mutual approximation scaling object, "
+                                  "fixed link end time different from receiver." );
+    }
+
+    if( ( linkEnds.count( observation_models::receiver ) == 0 ) ||
+            ( linkEnds.count( observation_models::transmitter ) == 0 ) ||
+            ( linkEnds.count( observation_models::transmitter2 ) == 0 ) )
+    {
+        throw std::runtime_error( "Error when updating mutual approximation partials scaling, did not find transmitter, transmitter2 or receiver in link ends" );
+    }
+
+    // Check that the required dependent variables are provided by the dependent variables interface.
+    checkRequiredDependentVariablesFromInterface( linkEnds );
+
+    // Retrieve the relative accelerations of the two transmitters, and the associated acceleration partials.
+    retrieveRelativeAccelerationsAndAssociatedPartialsFromDependentVariables( times, linkEnds );
+
+    // Retrieve states of the two transmitters and the receiver.
+    firstTransmitterState_ = linkEndStates[ 0 ];
+    secondTransmitterState_ = linkEndStates[ 1 ];
+    receiverState_ = linkEndStates[ 2 ];
+
+    Eigen::Vector3d relativeRangeVectorFirstTransmitter = ( receiverState_ - firstTransmitterState_ ).segment( 0, 3 );
+    Eigen::Vector3d relativeRangeVectorSecondTransmitter = ( receiverState_ - secondTransmitterState_ ).segment( 0, 3 );
+
+
+    // Compute right ascension and declination of the first and second transmitters as seen from the receiver.
+    std::pair< double, double > rightAscensionAndDeclinationFirstTransmitter =
+            computeRightAscensionAndDeclination( relativeRangeVectorFirstTransmitter );
+    std::pair< double, double > rightAscensionAndDeclinationSecondTransmitter =
+            computeRightAscensionAndDeclination( relativeRangeVectorSecondTransmitter );
+
+    rightAscensionFirstTransmitter_ = rightAscensionAndDeclinationFirstTransmitter.first;
+    declinationFirstTransmitter_ = rightAscensionAndDeclinationFirstTransmitter.second;
+    rightAscensionSecondTransmitter_ = rightAscensionAndDeclinationSecondTransmitter.first;
+    declinationSecondTransmitter_ = rightAscensionAndDeclinationSecondTransmitter.second;
+
+    averageDeclination_ = ( declinationFirstTransmitter_ + declinationSecondTransmitter_ ) / 2.0;
+
+
+    // Compute first partials of right ascension and declination of the two transmitters wrt time.
+    partialOfRightAscensionFirstTransmitterWrtTime_ = computePartialOfRightAscensionWrtTime(
+                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ) );
+
+    partialOfRightAscensionSecondTransmitterWrtTime_ = computePartialOfRightAscensionWrtTime(
+                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ) );
+
+    partialOfDeclinationFirstTransmitterWrtTime_ = computePartialOfDeclinationWrtTime(
+                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ) );
+
+    partialOfDeclinationSecondTransmitterWrtTime_ = computePartialOfDeclinationWrtTime(
+                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ) );
+
+//    std::cout << "first partial right ascension w.r.t. time: " << partialOfRightAscensionSecondTransmitterWrtTime_ << "\n\n";
+//    std::cout << "first partial declination w.r.t. time: " << partialOfDeclinationSecondTransmitterWrtTime_ << "\n\n";
+
+
+    // Compute second partials of right ascension and declination of the two transmitters wrt time.
+    secondPartialOfRightAscensionFirstTransmitterWrtTime_ = computeSecondPartialRightAscensionWrtTime(
+                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+                cartesianAccelerationFirstTransmitterWrtReceiver_ );
+
+    secondPartialOfRightAscensionSecondTransmitterWrtTime_ = computeSecondPartialRightAscensionWrtTime(
+                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+                cartesianAccelerationSecondTransmitterWrtReceiver_ );
+
+    secondPartialOfDeclinationFirstTransmitterWrtTime_ = computeSecondPartialDeclinationWrtTime(
+                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+                cartesianAccelerationFirstTransmitterWrtReceiver_ );
+
+    secondPartialOfDeclinationSecondTransmitterWrtTime_ = computeSecondPartialDeclinationWrtTime(
+                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+                cartesianAccelerationSecondTransmitterWrtReceiver_ );
+
+
+    // Compute relative position, velocity and acceleration between two transmitters in the instrumental frame of
+    // the receiver.
+    instrumentalFrameRelativePosition_ = computeRelativePositionInInstrumentalFrame( );
+//    std::cout << "instrumental frame relative position: " << instrumentalFrameRelativePosition_.transpose( ) << "\n\n";
+
+    instrumentalFrameRelativeVelocity_ = computeRelativeVelocityInInstrumentalFrame( );
+//    std::cout << "instrumental frame relative velocity: " << instrumentalFrameRelativeVelocity_.transpose( ) << "\n\n";
+
+    instrumentalFrameRelativeAcceleration_ = computeRelativeAccelerationInInstrumentalFrame( );
+//    std::cout << "instrumental frame relative acceleration: " << instrumentalFrameRelativeAcceleration_.transpose( ) << "\n\n";
+
+
+
+    // Compute partials of relative position and velocity between two transmitters in the instrumental frame wrt link end cartesian position.
+    computePartialOfRelativePositionInInstrumentalFrameWrtLinkEndPosition( );
+    computePartialOfRelativeVelocityInInstrumentalFrameWrtLinkEndPosition( );
+
+    // Compute partials of relative acceleration between two transmitters in the instrumental frame wrt link end cartesian positions.
+    computePartialOfRelativeAccelerationInInstrumentalFrameWrtLinkEndPosition(
+                cartesianAccelerationFirstTransmitterWrtReceiver_, cartesianAccelerationSecondTransmitterWrtReceiver_, partialAccelerationFirstTransmitterWrtReceiverPosition_,
+                partialAccelerationFirstTransmitterWrtTransmitterPosition_, partialAccelerationSecondTransmitterWrtReceiverPosition_, partialAccelerationSecondTransmitterWrtTransmitterPosition_,
+                partialAccelerationFirstTransmitterWrtOtherTransmitterPosition_, partialAccelerationSecondTransmitterWrtOtherTransmitterPosition_,
+                partialsOfInstrumentalFrameRelativeAccelerationWrtFirstTransmitterPosition_, partialsOfInstrumentalFrameRelativeAccelerationWrtSecondTransmitterPosition_,
+                partialsOfInstrumentalFrameRelativeAccelerationWrtReceiverPosition_ );
+
+    // Compute coefficients of the cubic polynomial for the central instant t0.
+    cubicPolynomialCoefficients_ = computeCubicPolynomialCoefficients( );
+
+    // Compute coefficients of the depressed cubic polynomial for the central instant t0.
+    depressedCubicPolynomialCoefficients_ = computeDepressedCubicPolynomialCoefficients( );
+
+    // Compute partials of central instant w.r.t. link ends positions.
+    computePartialsOfCentralInstantWrtLinkEndPosition( times );
+
+
+    // Compute partials of apparent distance w.r.t. link ends positions.
+    computePartialsOfApparentDistanceWrtLinkEndPosition( );
+
+    // Compute partials of impact parameter w.r.t. link ends position.
+    computePartialsOfImpactParameterWrtLinkEndPosition( );
+
+
+    currentLinkEndType_ = fixedLinkEnd;
+
+}
+
+
+
+void ModifiedMutualApproximationScaling::computePartialsOfModifiedObservableWrtLinkEndPosition( )
+{
+    double apparentDistance = std::sqrt( instrumentalFrameRelativePosition_[ 0 ] * instrumentalFrameRelativePosition_[ 0 ]
+            + instrumentalFrameRelativePosition_[ 1 ] * instrumentalFrameRelativePosition_[ 1 ] );
+
+    // Successively compute partials w.r.t. state of first transmitter, second transmitter and receiver.
+    for ( unsigned int currentLinkEndIndex = 0 ; currentLinkEndIndex < 3 ; currentLinkEndIndex++ )
+    {
+
+        Eigen::Matrix< double, 2, 3 > partialsOfRelativePositionWrtLinkEndPosition;
+        Eigen::Matrix< double, 2, 3 > partialsOfRelativeVelocityWrtLinkEndPosition;
+        if ( currentLinkEndIndex == 0 ) // If partials w.r.t. first transmitter position
+        {
+            partialsOfRelativePositionWrtLinkEndPosition = partialsOfInstrumentalFrameRelativePositionWrtFirstTransmitterPosition_;
+            partialsOfRelativeVelocityWrtLinkEndPosition = partialsOfInstrumentalFrameRelativeVelocityWrtFirstTransmitterPosition_;
+        }
+        else if ( currentLinkEndIndex == 1 ) // If partials w.r.t. second transmitter position
+        {
+            partialsOfRelativePositionWrtLinkEndPosition = partialsOfInstrumentalFrameRelativePositionWrtSecondTransmitterPosition_;
+            partialsOfRelativeVelocityWrtLinkEndPosition = partialsOfInstrumentalFrameRelativeVelocityWrtSecondTransmitterPosition_;
+        }
+        else if ( currentLinkEndIndex == 2 ) // If partials w.r.t. receiver position
+        {
+            partialsOfRelativePositionWrtLinkEndPosition = partialsOfInstrumentalFrameRelativePositionWrtReceiverPosition_;
+            partialsOfRelativeVelocityWrtLinkEndPosition = partialsOfInstrumentalFrameRelativeVelocityWrtReceiverPosition_;
+        }
+
+
+        // Compute partials of impact parameter w.r.t. position of current link end .
+        Eigen::Matrix< double, 1, 3 > partials =  ( 1.0 / apparentDistance )
+                * ( instrumentalFrameRelativeVelocity_[ 0 ] * partialsOfRelativePositionWrtLinkEndPosition.block( 0, 0, 1, 3 )
+                + instrumentalFrameRelativePosition_[ 0 ] * partialsOfRelativeVelocityWrtLinkEndPosition.block( 0, 0, 1, 3 )
+                + instrumentalFrameRelativeVelocity_[ 1 ] * partialsOfRelativePositionWrtLinkEndPosition.block( 1, 0, 1, 3 )
+                + instrumentalFrameRelativePosition_[ 1 ] * partialsOfRelativeVelocityWrtLinkEndPosition.block( 1, 0, 1, 3 ) )
+                - ( 1.0 / ( apparentDistance * apparentDistance * apparentDistance ) )
+                * ( instrumentalFrameRelativePosition_[ 0 ] * instrumentalFrameRelativeVelocity_[ 0 ]
+                + instrumentalFrameRelativePosition_[ 1 ] * instrumentalFrameRelativeVelocity_[ 1 ] )
+                * ( instrumentalFrameRelativePosition_[ 0 ] * partialsOfRelativePositionWrtLinkEndPosition.block( 0, 0, 1, 3 )
+                + instrumentalFrameRelativePosition_[ 1 ] * partialsOfRelativePositionWrtLinkEndPosition.block( 1, 0, 1, 3 ) );
+
+
+        // Assign partials to the right link leg.
+
+        if ( currentLinkEndIndex == 0 ) // If partials w.r.t. first transmitter position
+        {
+            partialsOfModifiedObservableWrtFirstTransmitterPosition_ = partials;
+        }
+        else if ( currentLinkEndIndex == 1 ) // If partials w.r.t. second transmitter position
+        {
+            partialsOfModifiedObservableWrtSecondTransmitterPosition_ = partials;
+        }
+        else if ( currentLinkEndIndex == 2 )  // If partials w.r.t. receiver position
+        {
+            partialsOfModifiedObservableWrtReceiverPosition_ = partials;
+        }
+
+    }
+}
+
+
+//! Update the scaling object to the current times and states
+void ModifiedMutualApproximationScaling::update( const std::vector< Eigen::Vector6d >& linkEndStates,
+                                                 const std::vector< double >& times,
+                                                 const observation_models::LinkEndType fixedLinkEnd,
+                                                 const observation_models::LinkEnds linkEnds,
+                                                 const Eigen::VectorXd currentObservation )
+{
+    std::cout << "BEGINNING UPDATE FUNCTION IN MODIFIED MUTUAL APPROXIMATION SCALING" << "\n\n";
+
+    if ( fixedLinkEnd != observation_models::receiver )
+    {
+        throw std::runtime_error( "Error when updating the mutual approximation scaling object, "
+                                  "fixed link end time different from receiver." );
+    }
+
+    if( ( linkEnds.count( observation_models::receiver ) == 0 ) ||
+            ( linkEnds.count( observation_models::transmitter ) == 0 ) ||
+            ( linkEnds.count( observation_models::transmitter2 ) == 0 ) )
+    {
+        throw std::runtime_error( "Error when updating mutual approximation partials scaling, did not find transmitter, transmitter2 or receiver in link ends" );
+    }
+
+    // Check that the required dependent variables are provided by the dependent variables interface.
+    checkRequiredDependentVariablesFromInterface( linkEnds );
+
+    // Retrieve the relative accelerations of the two transmitters, and the associated acceleration partials.
+    retrieveRelativeAccelerationsAndAssociatedPartialsFromDependentVariables( times, linkEnds );
+
+    // Retrieve states of the two transmitters and the receiver.
+    firstTransmitterState_ = linkEndStates[ 0 ];
+    secondTransmitterState_ = linkEndStates[ 1 ];
+    receiverState_ = linkEndStates[ 2 ];
+
+    Eigen::Vector3d relativeRangeVectorFirstTransmitter = ( receiverState_ - firstTransmitterState_ ).segment( 0, 3 );
+    Eigen::Vector3d relativeRangeVectorSecondTransmitter = ( receiverState_ - secondTransmitterState_ ).segment( 0, 3 );
+
+
+    // Compute right ascension and declination of the first and second transmitters as seen from the receiver.
+    std::pair< double, double > rightAscensionAndDeclinationFirstTransmitter =
+            computeRightAscensionAndDeclination( relativeRangeVectorFirstTransmitter );
+    std::pair< double, double > rightAscensionAndDeclinationSecondTransmitter =
+            computeRightAscensionAndDeclination( relativeRangeVectorSecondTransmitter );
+
+    rightAscensionFirstTransmitter_ = rightAscensionAndDeclinationFirstTransmitter.first;
+    declinationFirstTransmitter_ = rightAscensionAndDeclinationFirstTransmitter.second;
+    rightAscensionSecondTransmitter_ = rightAscensionAndDeclinationSecondTransmitter.first;
+    declinationSecondTransmitter_ = rightAscensionAndDeclinationSecondTransmitter.second;
+
+    averageDeclination_ = ( declinationFirstTransmitter_ + declinationSecondTransmitter_ ) / 2.0;
+
+
+    // Compute first partials of right ascension and declination of the two transmitters wrt time.
+    partialOfRightAscensionFirstTransmitterWrtTime_ = computePartialOfRightAscensionWrtTime(
+                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ) );
+
+    partialOfRightAscensionSecondTransmitterWrtTime_ = computePartialOfRightAscensionWrtTime(
+                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ) );
+
+    partialOfDeclinationFirstTransmitterWrtTime_ = computePartialOfDeclinationWrtTime(
+                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ) );
+
+    partialOfDeclinationSecondTransmitterWrtTime_ = computePartialOfDeclinationWrtTime(
+                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ) );
+
+//    std::cout << "first partial right ascension w.r.t. time: " << partialOfRightAscensionSecondTransmitterWrtTime_ << "\n\n";
+//    std::cout << "first partial declination w.r.t. time: " << partialOfDeclinationSecondTransmitterWrtTime_ << "\n\n";
+
+
+    // Compute second partials of right ascension and declination of the two transmitters wrt time.
+    secondPartialOfRightAscensionFirstTransmitterWrtTime_ = computeSecondPartialRightAscensionWrtTime(
+                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+                cartesianAccelerationFirstTransmitterWrtReceiver_ );
+
+    secondPartialOfRightAscensionSecondTransmitterWrtTime_ = computeSecondPartialRightAscensionWrtTime(
+                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+                cartesianAccelerationSecondTransmitterWrtReceiver_ );
+
+    secondPartialOfDeclinationFirstTransmitterWrtTime_ = computeSecondPartialDeclinationWrtTime(
+                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+                cartesianAccelerationFirstTransmitterWrtReceiver_ );
+
+    secondPartialOfDeclinationSecondTransmitterWrtTime_ = computeSecondPartialDeclinationWrtTime(
+                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+                cartesianAccelerationSecondTransmitterWrtReceiver_ );
+
+
+    // Compute relative position, velocity and acceleration between two transmitters in the instrumental frame of
+    // the receiver.
+    instrumentalFrameRelativePosition_ = computeRelativePositionInInstrumentalFrame( );
+//    std::cout << "instrumental frame relative position: " << instrumentalFrameRelativePosition_.transpose( ) << "\n\n";
+
+    instrumentalFrameRelativeVelocity_ = computeRelativeVelocityInInstrumentalFrame( );
+//    std::cout << "instrumental frame relative velocity: " << instrumentalFrameRelativeVelocity_.transpose( ) << "\n\n";
+
+    instrumentalFrameRelativeAcceleration_ = computeRelativeAccelerationInInstrumentalFrame( );
+//    std::cout << "instrumental frame relative acceleration: " << instrumentalFrameRelativeAcceleration_.transpose( ) << "\n\n";
+
+
+    // Compute apparent distance.
+    double apparentDistance = std::sqrt( instrumentalFrameRelativePosition_[ 0 ] * instrumentalFrameRelativePosition_[ 0 ]
+            + instrumentalFrameRelativePosition_[ 1 ] * instrumentalFrameRelativePosition_[ 1 ] );
+
+
+
+    // Compute partials of relative position and velocity between two transmitters in the instrumental frame wrt link end cartesian position.
+    computePartialOfRelativePositionInInstrumentalFrameWrtLinkEndPosition( );
+    computePartialOfRelativeVelocityInInstrumentalFrameWrtLinkEndPosition( );
+
+    // Compute partials of relative acceleration between two transmitters in the instrumental frame wrt link end cartesian positions.
+    computePartialOfRelativeAccelerationInInstrumentalFrameWrtLinkEndPosition(
+                cartesianAccelerationFirstTransmitterWrtReceiver_, cartesianAccelerationSecondTransmitterWrtReceiver_, partialAccelerationFirstTransmitterWrtReceiverPosition_,
+                partialAccelerationFirstTransmitterWrtTransmitterPosition_, partialAccelerationSecondTransmitterWrtReceiverPosition_, partialAccelerationSecondTransmitterWrtTransmitterPosition_,
+                partialAccelerationFirstTransmitterWrtOtherTransmitterPosition_, partialAccelerationSecondTransmitterWrtOtherTransmitterPosition_,
+                partialsOfInstrumentalFrameRelativeAccelerationWrtFirstTransmitterPosition_, partialsOfInstrumentalFrameRelativeAccelerationWrtSecondTransmitterPosition_,
+                partialsOfInstrumentalFrameRelativeAccelerationWrtReceiverPosition_ );
+
+    // Compute coefficients of the cubic polynomial for the central instant t0.
+    cubicPolynomialCoefficients_ = computeCubicPolynomialCoefficients( );
+
+    // Compute coefficients of the depressed cubic polynomial for the central instant t0.
+    depressedCubicPolynomialCoefficients_ = computeDepressedCubicPolynomialCoefficients( );
+
+    // Compute partials of central instant w.r.t. link ends positions.
+    computePartialsOfCentralInstantWrtLinkEndPosition( times );
+
+
+    currentLinkEndType_ = fixedLinkEnd;
+
+}
+
+
 
 //! Function to calculate the observation partial(s) at required time and state
 MutualApproximationPartial::MutualApproximationPartialReturnType MutualApproximationPartial::calculatePartial(

@@ -85,12 +85,12 @@ double computeAngleThetaRealSolutionsCubicEquation( double intermediateQ,
 
 
 //! Derived class for scaling three-dimensional position partial to mutual approximation observable partial
-class MutualApproximationScaling: public PositionPartialScaling
+class MutualApproximationScalingBase: public PositionPartialScaling
 {
 public:
 
     //! Constructor
-    MutualApproximationScaling(
+    MutualApproximationScalingBase(
             const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface ) :
     dependentVariablesInterface_( dependentVariablesInterface )
     {
@@ -105,68 +105,67 @@ public:
     }
 
     //! Destructor
-    ~MutualApproximationScaling( ){ }
+    ~MutualApproximationScalingBase( ){ }
 
-    //! Update the scaling object to the current times and states
-    /*!
-     *  Update the scaling object to the current times and states
-     *  \param linkEndStates List of states at each link end during observation Index of vector maps to link end for a
-     *  given ObsevableType through getLinkEndIndex function.
-     *  \param times List of times at each link end during observation.
-     *  \param fixedLinkEnd Link end at which observation time is defined, i.e. link end for which associated time
-     *  is kept constant when computing observable.
-     *  \param currentObservation Value of observation for which partial scaling is to be computed
-     */
-    void update( const std::vector< Eigen::Vector6d >& linkEndStates,
-                 const std::vector< double >& times,
-                 const observation_models::LinkEndType fixedLinkEnd,
-                 const observation_models::LinkEnds linkEnds,
-                 const Eigen::VectorXd currentObservation );
+    //! Update the scaling object to the current times and states (pure virtual).
+        /*!
+         *  Update the scaling object to the current times and states (pure virtual).
+         *  \param linkEndStates List of states at each link end during observation.
+         *  \param times List of times at each link end during observation.
+         *  \param fixedLinkEnd Link end at which observation time is defined, i.e. link end for which associated time
+         *  is kept constant when computing observable.
+         *  \param currentObservation Value of observation for which partial scaling is to be computed
+         */
+    virtual void update( const std::vector< Eigen::Vector6d >& linkEndStates,
+                             const std::vector< double >& times,
+                             const observation_models::LinkEndType fixedLinkEnd,
+                             const observation_models::LinkEnds linkEnds,
+                             const Eigen::VectorXd currentObservation ) = 0;
 
-    //! Function to retrieve the scaling factor for specific link end
-    /*!
-     * Function to retrieve the scaling factor for specific link end
-     * \param linkEndType Link end for which scaling factor is to be returned
-     * \return Position partial scaling factor at current link end
-     */
-    Eigen::Matrix< double, 1, 3 > getScalingFactor(
-            const observation_models::LinkEndType linkEndType )
-    {
-        if ( linkEndType == observation_models::transmitter )
-        {
-            return partialsOfCentralInstantWrtFirstTransmitterPosition_;
-        }
-        else if ( linkEndType == observation_models::transmitter2 )
-        {
-            return partialsOfCentralInstantWrtSecondTransmitterPosition_;
-        }
-        else if ( linkEndType == observation_models::receiver )
-        {
-            return partialsOfCentralInstantWrtReceiverPosition_;
-        }
-        else
-        {
-            throw std::runtime_error( "Error when retrieving the apparent distance scaling factor, the link end type"
-                                      "is different from transmitter, transmitter2 or receiver" );
-        }
-    }
+//    //! Function to retrieve the scaling factor for specific link end
+//    /*!
+//     * Function to retrieve the scaling factor for specific link end
+//     * \param linkEndType Link end for which scaling factor is to be returned
+//     * \return Position partial scaling factor at current link end
+//     */
+//    Eigen::Matrix< double, 1, 3 > getScalingFactor(
+//            const observation_models::LinkEndType linkEndType )
+//    {
+//        if ( linkEndType == observation_models::transmitter )
+//        {
+//            return partialsOfCentralInstantWrtFirstTransmitterPosition_;
+//        }
+//        else if ( linkEndType == observation_models::transmitter2 )
+//        {
+//            return partialsOfCentralInstantWrtSecondTransmitterPosition_;
+//        }
+//        else if ( linkEndType == observation_models::receiver )
+//        {
+//            return partialsOfCentralInstantWrtReceiverPosition_;
+//        }
+//        else
+//        {
+//            throw std::runtime_error( "Error when retrieving the apparent distance scaling factor, the link end type"
+//                                      "is different from transmitter, transmitter2 or receiver" );
+//        }
+//    }
 
-    //! Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
-    /*!
-     * Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
-     * \return Factor by which the light-time partials should be scaled in one-way observation partial.
-     */
-    double getLightTimePartialScalingFactor( )
-    {
-//        XlightTimeCorrectionScalingFactor_ = XlightTimeCorrectionScalingFactors_.first
-//                + XlightTimeCorrectionScalingFactors_.second;
-//        YlightTimeCorrectionScalingFactor_ = YlightTimeCorrectionScalingFactors_.first
-//                + YlightTimeCorrectionScalingFactors_.second;
+//    //! Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
+//    /*!
+//     * Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
+//     * \return Factor by which the light-time partials should be scaled in one-way observation partial.
+//     */
+//    double getLightTimePartialScalingFactor( )
+//    {
+////        XlightTimeCorrectionScalingFactor_ = XlightTimeCorrectionScalingFactors_.first
+////                + XlightTimeCorrectionScalingFactors_.second;
+////        YlightTimeCorrectionScalingFactor_ = YlightTimeCorrectionScalingFactors_.first
+////                + YlightTimeCorrectionScalingFactors_.second;
 
-        return 0.0; //1.0 / std::sqrt( XcoordinateReceiverFrame_ * XcoordinateReceiverFrame_ + YcoordinateReceiverFrame_ * YcoordinateReceiverFrame_ )
-//                * ( XcoordinateReceiverFrame_ * XlightTimeCorrectionScalingFactor_
-//                    + YcoordinateReceiverFrame_ * YlightTimeCorrectionScalingFactor_ );
-    }
+//        return 0.0; //1.0 / std::sqrt( XcoordinateReceiverFrame_ * XcoordinateReceiverFrame_ + YcoordinateReceiverFrame_ * YcoordinateReceiverFrame_ )
+////                * ( XcoordinateReceiverFrame_ * XlightTimeCorrectionScalingFactor_
+////                    + YcoordinateReceiverFrame_ * YlightTimeCorrectionScalingFactor_ );
+//    }
 
     //! Function to get the fixed link end for last computation of update() function.
     /*!
@@ -303,7 +302,7 @@ protected:
     void computePartialsOfCentralInstantWrtLinkEndPosition( const std::vector< double > times );
 
 
-private:
+//private:
 
     //! Dependent variable interface object, to be used to retrieve total acceleration and total acceleration
     //! partial w.r.t. link end position
@@ -478,6 +477,298 @@ private:
     Eigen::Matrix< double, 1, 3 > partialsOfCentralInstantWrtReceiverPosition_;
 
 };
+
+
+
+//! Derived class for scaling three-dimensional position partial to mutual approximation observable partial
+class MutualApproximationScaling: public MutualApproximationScalingBase /*PositionPartialScaling*/
+{
+public:
+
+    //! Constructor
+    MutualApproximationScaling(
+            const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface ) :
+    MutualApproximationScalingBase( dependentVariablesInterface )
+    {  }
+
+    //! Destructor
+    ~MutualApproximationScaling( ){ }
+
+    //! Update the scaling object to the current times and states
+    /*!
+     *  Update the scaling object to the current times and states
+     *  \param linkEndStates List of states at each link end during observation Index of vector maps to link end for a
+     *  given ObsevableType through getLinkEndIndex function.
+     *  \param times List of times at each link end during observation.
+     *  \param fixedLinkEnd Link end at which observation time is defined, i.e. link end for which associated time
+     *  is kept constant when computing observable.
+     *  \param currentObservation Value of observation for which partial scaling is to be computed
+     */
+    void update( const std::vector< Eigen::Vector6d >& linkEndStates,
+                 const std::vector< double >& times,
+                 const observation_models::LinkEndType fixedLinkEnd,
+                 const observation_models::LinkEnds linkEnds,
+                 const Eigen::VectorXd currentObservation );
+
+    //! Function to retrieve the scaling factor for specific link end
+    /*!
+     * Function to retrieve the scaling factor for specific link end
+     * \param linkEndType Link end for which scaling factor is to be returned
+     * \return Position partial scaling factor at current link end
+     */
+    Eigen::Matrix< double, 1, 3 > getScalingFactor(
+            const observation_models::LinkEndType linkEndType )
+    {
+        if ( linkEndType == observation_models::transmitter )
+        {
+            return partialsOfCentralInstantWrtFirstTransmitterPosition_;
+        }
+        else if ( linkEndType == observation_models::transmitter2 )
+        {
+            return partialsOfCentralInstantWrtSecondTransmitterPosition_;
+        }
+        else if ( linkEndType == observation_models::receiver )
+        {
+            return partialsOfCentralInstantWrtReceiverPosition_;
+        }
+        else
+        {
+            throw std::runtime_error( "Error when retrieving the mutual approximation scaling factor, the link end type"
+                                      "is different from transmitter, transmitter2 or receiver" );
+        }
+    }
+
+    //! Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
+    /*!
+     * Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
+     * \return Factor by which the light-time partials should be scaled in one-way observation partial.
+     */
+    double getLightTimePartialScalingFactor( )
+    {
+//        XlightTimeCorrectionScalingFactor_ = XlightTimeCorrectionScalingFactors_.first
+//                + XlightTimeCorrectionScalingFactors_.second;
+//        YlightTimeCorrectionScalingFactor_ = YlightTimeCorrectionScalingFactors_.first
+//                + YlightTimeCorrectionScalingFactors_.second;
+
+        return 0.0; //1.0 / std::sqrt( XcoordinateReceiverFrame_ * XcoordinateReceiverFrame_ + YcoordinateReceiverFrame_ * YcoordinateReceiverFrame_ )
+//                * ( XcoordinateReceiverFrame_ * XlightTimeCorrectionScalingFactor_
+//                    + YcoordinateReceiverFrame_ * YlightTimeCorrectionScalingFactor_ );
+    }
+
+
+protected:
+
+
+};
+
+
+//! Derived class for scaling three-dimensional position partial to mutual approximation observable partial
+class MutualApproximationWithImpactParameterScaling: public MutualApproximationScalingBase
+{
+public:
+
+    //! Constructor
+    MutualApproximationWithImpactParameterScaling(
+            const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface ) :
+    MutualApproximationScalingBase( dependentVariablesInterface )
+    {  }
+
+    //! Destructor
+    ~MutualApproximationWithImpactParameterScaling( ){ }
+
+    //! Update the scaling object to the current times and states
+    /*!
+     *  Update the scaling object to the current times and states
+     *  \param linkEndStates List of states at each link end during observation Index of vector maps to link end for a
+     *  given ObsevableType through getLinkEndIndex function.
+     *  \param times List of times at each link end during observation.
+     *  \param fixedLinkEnd Link end at which observation time is defined, i.e. link end for which associated time
+     *  is kept constant when computing observable.
+     *  \param currentObservation Value of observation for which partial scaling is to be computed
+     */
+    void update( const std::vector< Eigen::Vector6d >& linkEndStates,
+                 const std::vector< double >& times,
+                 const observation_models::LinkEndType fixedLinkEnd,
+                 const observation_models::LinkEnds linkEnds,
+                 const Eigen::VectorXd currentObservation );
+
+    //! Function to retrieve the scaling factor for specific link end
+    /*!
+     * Function to retrieve the scaling factor for specific link end
+     * \param linkEndType Link end for which scaling factor is to be returned
+     * \return Position partial scaling factor at current link end
+     */
+    Eigen::Matrix< double, 2, 3 > getScalingFactor(
+            const observation_models::LinkEndType linkEndType )
+    {
+
+        Eigen::Matrix< double, 2, 3 > scalingFactor = Eigen::Matrix< double, 2, 3 >::Zero( );
+
+        if ( linkEndType == observation_models::transmitter )
+        {
+            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtFirstTransmitterPosition_;
+            scalingFactor.block( 1, 0, 1, 3 ) = partialsOfImpactParameterWrtFirstTransmitterPosition_;
+        }
+        else if ( linkEndType == observation_models::transmitter2 )
+        {
+            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtSecondTransmitterPosition_;
+            scalingFactor.block( 1, 0, 1, 3 ) = partialsOfImpactParameterWrtSecondTransmitterPosition_;
+        }
+        else if ( linkEndType == observation_models::receiver )
+        {
+            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtReceiverPosition_;
+            scalingFactor.block( 1, 0, 1, 3 ) = partialsOfImpactParameterWrtReceiverPosition_;
+        }
+        else
+        {
+            throw std::runtime_error( "Error when retrieving the mutual approximation scaling factor, the link end type"
+                                      "is different from transmitter, transmitter2 or receiver" );
+        }
+
+        return scalingFactor;
+    }
+
+    //! Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
+    /*!
+     * Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
+     * \return Factor by which the light-time partials should be scaled in one-way observation partial.
+     */
+    double getLightTimePartialScalingFactor( )
+    {
+//        XlightTimeCorrectionScalingFactor_ = XlightTimeCorrectionScalingFactors_.first
+//                + XlightTimeCorrectionScalingFactors_.second;
+//        YlightTimeCorrectionScalingFactor_ = YlightTimeCorrectionScalingFactors_.first
+//                + YlightTimeCorrectionScalingFactors_.second;
+
+        return 0.0; //1.0 / std::sqrt( XcoordinateReceiverFrame_ * XcoordinateReceiverFrame_ + YcoordinateReceiverFrame_ * YcoordinateReceiverFrame_ )
+//                * ( XcoordinateReceiverFrame_ * XlightTimeCorrectionScalingFactor_
+//                    + YcoordinateReceiverFrame_ * YlightTimeCorrectionScalingFactor_ );
+    }
+
+
+protected:
+
+    void computePartialsOfApparentDistanceWrtLinkEndPosition( );
+
+    void computePartialsOfImpactParameterWrtLinkEndPosition( );
+
+private:
+
+    //! Partials of apparent distance w.r.t. first transmitter position.
+    Eigen::Matrix< double, 1, 3 > partialsOfApparentDistanceWrtFirstTransmitterPosition_;
+
+    //! Partials of apparent distance w.r.t. second transmitter position.
+    Eigen::Matrix< double, 1, 3 > partialsOfApparentDistanceWrtSecondTransmitterPosition_;
+
+    //! Partials of apparent distance w.r.t. receiver position.
+    Eigen::Matrix< double, 1, 3 > partialsOfApparentDistanceWrtReceiverPosition_;
+
+    //! Partials of impact parameter w.r.t. first transmitter position.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtFirstTransmitterPosition_;
+
+    //! Partials of impact parameter w.r.t. second transmitter position.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtSecondTransmitterPosition_;
+
+    //! Partials of impact parameter w.r.t. receiver position.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtReceiverPosition_;
+
+
+};
+
+
+//! Derived class for scaling three-dimensional position partial to mutual approximation observable partial
+class ModifiedMutualApproximationScaling: public MutualApproximationScalingBase
+{
+public:
+
+    //! Constructor
+    ModifiedMutualApproximationScaling(
+            const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface ) :
+    MutualApproximationScalingBase( dependentVariablesInterface )
+    {  }
+
+    //! Destructor
+    ~ModifiedMutualApproximationScaling( ){ }
+
+    //! Update the scaling object to the current times and states
+    /*!
+     *  Update the scaling object to the current times and states
+     *  \param linkEndStates List of states at each link end during observation Index of vector maps to link end for a
+     *  given ObsevableType through getLinkEndIndex function.
+     *  \param times List of times at each link end during observation.
+     *  \param fixedLinkEnd Link end at which observation time is defined, i.e. link end for which associated time
+     *  is kept constant when computing observable.
+     *  \param currentObservation Value of observation for which partial scaling is to be computed
+     */
+    void update( const std::vector< Eigen::Vector6d >& linkEndStates,
+                 const std::vector< double >& times,
+                 const observation_models::LinkEndType fixedLinkEnd,
+                 const observation_models::LinkEnds linkEnds,
+                 const Eigen::VectorXd currentObservation );
+
+    //! Function to retrieve the scaling factor for specific link end
+    /*!
+     * Function to retrieve the scaling factor for specific link end
+     * \param linkEndType Link end for which scaling factor is to be returned
+     * \return Position partial scaling factor at current link end
+     */
+    Eigen::Matrix< double, 1, 3 > getScalingFactor(
+            const observation_models::LinkEndType linkEndType )
+    {
+        if ( linkEndType == observation_models::transmitter )
+        {
+            return partialsOfCentralInstantWrtFirstTransmitterPosition_;
+        }
+        else if ( linkEndType == observation_models::transmitter2 )
+        {
+            return partialsOfCentralInstantWrtSecondTransmitterPosition_;
+        }
+        else if ( linkEndType == observation_models::receiver )
+        {
+            return partialsOfCentralInstantWrtReceiverPosition_;
+        }
+        else
+        {
+            throw std::runtime_error( "Error when retrieving the mutual approximation scaling factor, the link end type"
+                                      "is different from transmitter, transmitter2 or receiver" );
+        }
+    }
+
+    //! Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
+    /*!
+     * Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
+     * \return Factor by which the light-time partials should be scaled in one-way observation partial.
+     */
+    double getLightTimePartialScalingFactor( )
+    {
+//        XlightTimeCorrectionScalingFactor_ = XlightTimeCorrectionScalingFactors_.first
+//                + XlightTimeCorrectionScalingFactors_.second;
+//        YlightTimeCorrectionScalingFactor_ = YlightTimeCorrectionScalingFactors_.first
+//                + YlightTimeCorrectionScalingFactors_.second;
+
+        return 0.0; //1.0 / std::sqrt( XcoordinateReceiverFrame_ * XcoordinateReceiverFrame_ + YcoordinateReceiverFrame_ * YcoordinateReceiverFrame_ )
+//                * ( XcoordinateReceiverFrame_ * XlightTimeCorrectionScalingFactor_
+//                    + YcoordinateReceiverFrame_ * YlightTimeCorrectionScalingFactor_ );
+    }
+
+
+protected:
+
+    void computePartialsOfModifiedObservableWrtLinkEndPosition( );
+
+private:
+
+    //! Partials of modified mutual approximation observable w.r.t. first transmitter position.
+    Eigen::Matrix< double, 1, 3 > partialsOfModifiedObservableWrtFirstTransmitterPosition_;
+
+    //! Partials of modified mutual approximation observable w.r.t. second transmitter position.
+    Eigen::Matrix< double, 1, 3 > partialsOfModifiedObservableWrtSecondTransmitterPosition_;
+
+    //! Partials of modified mutual approximation observable w.r.t. receiver position.
+    Eigen::Matrix< double, 1, 3 > partialsOfModifiedObservableWrtReceiverPosition_;
+
+};
+
 
 //! Class to compute the partial derivatives of a mutual approximation observation partial.
 class MutualApproximationPartial: public ObservationPartial< 1 >
