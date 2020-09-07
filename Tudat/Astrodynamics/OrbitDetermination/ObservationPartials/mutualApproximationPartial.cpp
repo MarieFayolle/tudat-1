@@ -2565,26 +2565,26 @@ void ModifiedMutualApproximationScaling::update( const std::vector< Eigen::Vecto
 //    std::cout << "first partial declination w.r.t. time: " << partialOfDeclinationSecondTransmitterWrtTime_ << "\n\n";
 
 
-    // Compute second partials of right ascension and declination of the two transmitters wrt time.
-    secondPartialOfRightAscensionFirstTransmitterWrtTime_ = computeSecondPartialRightAscensionWrtTime(
-                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
-                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ),
-                cartesianAccelerationFirstTransmitterWrtReceiver_ );
+//    // Compute second partials of right ascension and declination of the two transmitters wrt time.
+//    secondPartialOfRightAscensionFirstTransmitterWrtTime_ = computeSecondPartialRightAscensionWrtTime(
+//                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+//                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+//                cartesianAccelerationFirstTransmitterWrtReceiver_ );
 
-    secondPartialOfRightAscensionSecondTransmitterWrtTime_ = computeSecondPartialRightAscensionWrtTime(
-                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
-                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ),
-                cartesianAccelerationSecondTransmitterWrtReceiver_ );
+//    secondPartialOfRightAscensionSecondTransmitterWrtTime_ = computeSecondPartialRightAscensionWrtTime(
+//                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+//                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+//                cartesianAccelerationSecondTransmitterWrtReceiver_ );
 
-    secondPartialOfDeclinationFirstTransmitterWrtTime_ = computeSecondPartialDeclinationWrtTime(
-                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
-                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ),
-                cartesianAccelerationFirstTransmitterWrtReceiver_ );
+//    secondPartialOfDeclinationFirstTransmitterWrtTime_ = computeSecondPartialDeclinationWrtTime(
+//                ( firstTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+//                ( firstTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+//                cartesianAccelerationFirstTransmitterWrtReceiver_ );
 
-    secondPartialOfDeclinationSecondTransmitterWrtTime_ = computeSecondPartialDeclinationWrtTime(
-                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
-                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ),
-                cartesianAccelerationSecondTransmitterWrtReceiver_ );
+//    secondPartialOfDeclinationSecondTransmitterWrtTime_ = computeSecondPartialDeclinationWrtTime(
+//                ( secondTransmitterState_ - receiverState_ ).segment( 0, 3 ),
+//                ( secondTransmitterState_ - receiverState_ ).segment( 3, 3 ),
+//                cartesianAccelerationSecondTransmitterWrtReceiver_ );
 
 
     // Compute relative position, velocity and acceleration between two transmitters in the instrumental frame of
@@ -2595,13 +2595,13 @@ void ModifiedMutualApproximationScaling::update( const std::vector< Eigen::Vecto
     instrumentalFrameRelativeVelocity_ = computeRelativeVelocityInInstrumentalFrame( );
 //    std::cout << "instrumental frame relative velocity: " << instrumentalFrameRelativeVelocity_.transpose( ) << "\n\n";
 
-    instrumentalFrameRelativeAcceleration_ = computeRelativeAccelerationInInstrumentalFrame( );
-//    std::cout << "instrumental frame relative acceleration: " << instrumentalFrameRelativeAcceleration_.transpose( ) << "\n\n";
+//    instrumentalFrameRelativeAcceleration_ = computeRelativeAccelerationInInstrumentalFrame( );
+////    std::cout << "instrumental frame relative acceleration: " << instrumentalFrameRelativeAcceleration_.transpose( ) << "\n\n";
 
 
-    // Compute apparent distance.
-    double apparentDistance = std::sqrt( instrumentalFrameRelativePosition_[ 0 ] * instrumentalFrameRelativePosition_[ 0 ]
-            + instrumentalFrameRelativePosition_[ 1 ] * instrumentalFrameRelativePosition_[ 1 ] );
+//    // Compute apparent distance.
+//    double apparentDistance = std::sqrt( instrumentalFrameRelativePosition_[ 0 ] * instrumentalFrameRelativePosition_[ 0 ]
+//            + instrumentalFrameRelativePosition_[ 1 ] * instrumentalFrameRelativePosition_[ 1 ] );
 
 
 
@@ -2609,22 +2609,25 @@ void ModifiedMutualApproximationScaling::update( const std::vector< Eigen::Vecto
     computePartialOfRelativePositionInInstrumentalFrameWrtLinkEndPosition( );
     computePartialOfRelativeVelocityInInstrumentalFrameWrtLinkEndPosition( );
 
-    // Compute partials of relative acceleration between two transmitters in the instrumental frame wrt link end cartesian positions.
-    computePartialOfRelativeAccelerationInInstrumentalFrameWrtLinkEndPosition(
-                cartesianAccelerationFirstTransmitterWrtReceiver_, cartesianAccelerationSecondTransmitterWrtReceiver_, partialAccelerationFirstTransmitterWrtReceiverPosition_,
-                partialAccelerationFirstTransmitterWrtTransmitterPosition_, partialAccelerationSecondTransmitterWrtReceiverPosition_, partialAccelerationSecondTransmitterWrtTransmitterPosition_,
-                partialAccelerationFirstTransmitterWrtOtherTransmitterPosition_, partialAccelerationSecondTransmitterWrtOtherTransmitterPosition_,
-                partialsOfInstrumentalFrameRelativeAccelerationWrtFirstTransmitterPosition_, partialsOfInstrumentalFrameRelativeAccelerationWrtSecondTransmitterPosition_,
-                partialsOfInstrumentalFrameRelativeAccelerationWrtReceiverPosition_ );
+//    // Compute partials of relative acceleration between two transmitters in the instrumental frame wrt link end cartesian positions.
+//    computePartialOfRelativeAccelerationInInstrumentalFrameWrtLinkEndPosition(
+//                cartesianAccelerationFirstTransmitterWrtReceiver_, cartesianAccelerationSecondTransmitterWrtReceiver_, partialAccelerationFirstTransmitterWrtReceiverPosition_,
+//                partialAccelerationFirstTransmitterWrtTransmitterPosition_, partialAccelerationSecondTransmitterWrtReceiverPosition_, partialAccelerationSecondTransmitterWrtTransmitterPosition_,
+//                partialAccelerationFirstTransmitterWrtOtherTransmitterPosition_, partialAccelerationSecondTransmitterWrtOtherTransmitterPosition_,
+//                partialsOfInstrumentalFrameRelativeAccelerationWrtFirstTransmitterPosition_, partialsOfInstrumentalFrameRelativeAccelerationWrtSecondTransmitterPosition_,
+//                partialsOfInstrumentalFrameRelativeAccelerationWrtReceiverPosition_ );
 
-    // Compute coefficients of the cubic polynomial for the central instant t0.
-    cubicPolynomialCoefficients_ = computeCubicPolynomialCoefficients( );
+//    // Compute coefficients of the cubic polynomial for the central instant t0.
+//    cubicPolynomialCoefficients_ = computeCubicPolynomialCoefficients( );
 
-    // Compute coefficients of the depressed cubic polynomial for the central instant t0.
-    depressedCubicPolynomialCoefficients_ = computeDepressedCubicPolynomialCoefficients( );
+//    // Compute coefficients of the depressed cubic polynomial for the central instant t0.
+//    depressedCubicPolynomialCoefficients_ = computeDepressedCubicPolynomialCoefficients( );
 
-    // Compute partials of central instant w.r.t. link ends positions.
-    computePartialsOfCentralInstantWrtLinkEndPosition( times );
+//    // Compute partials of central instant w.r.t. link ends positions.
+//    computePartialsOfCentralInstantWrtLinkEndPosition( times );
+
+    // Compute partial of the modified mutual approximation observable w.r.t. link end cartesian positions.
+    computePartialsOfModifiedObservableWrtLinkEndPosition( );
 
 
     currentLinkEndType_ = fixedLinkEnd;
@@ -2642,7 +2645,7 @@ MutualApproximationPartial::MutualApproximationPartialReturnType MutualApproxima
 {
     if( linkEndOfFixedTime != mutualApproximationScaler_->getCurrentLinkEndType( ) )
     {
-        throw std::runtime_error( "Error mutual approximation partial and scaling are inconsistent" );
+        throw std::runtime_error( "Error mutual approximation partial and scaling are inconsistent." );
     }
 
     MutualApproximationPartialReturnType returnPartial;
@@ -2667,12 +2670,24 @@ MutualApproximationPartial::MutualApproximationPartialReturnType MutualApproxima
             currentTime_ = times[ 2 ];
         }
 
-//        // Scale position partials
-//        returnPartial.push_back(
-//                    std::make_pair(
-//                        mutualApproximationScaler_->getScalingFactor( positionPartialIterator_->first ) *
-//                        ( positionPartialIterator_->second->calculatePartialOfPosition(
-//                              currentState_ , currentTime_ ) ), currentTime_ ) );
+
+        // Retrieve scaling factor.
+        Eigen::Matrix< double, 1, 3 > scalingFactor = Eigen::Matrix< double, 1, 3 >::Zero( );
+        if ( std::dynamic_pointer_cast< MutualApproximationScaling >( mutualApproximationScaler_ ) != nullptr )
+        {
+            scalingFactor = std::dynamic_pointer_cast< MutualApproximationScaling >( mutualApproximationScaler_ )
+                    ->getScalingFactor( positionPartialIterator_->first );
+        }
+        else
+        {
+            scalingFactor = std::dynamic_pointer_cast< ModifiedMutualApproximationScaling >( mutualApproximationScaler_ )
+                    ->getScalingFactor( positionPartialIterator_->first );
+        }
+
+        // Scale position partials
+        returnPartial.push_back( std::make_pair(
+                                     scalingFactor * ( positionPartialIterator_->second->calculatePartialOfPosition( currentState_ , currentTime_ ) ),
+                                     currentTime_ ) );
     }
 
 
@@ -2698,6 +2713,75 @@ MutualApproximationPartial::MutualApproximationPartialReturnType MutualApproxima
 
     return returnPartial;
 }
+
+
+
+//! Function to calculate the observation partial(s) at required time and state
+MutualApproximationWithImpactParameterPartial::MutualApproximationWithImpactParameterPartialReturnType MutualApproximationWithImpactParameterPartial::calculatePartial(
+        const std::vector< Eigen::Vector6d >& states,
+        const std::vector< double >& times,
+        const observation_models::LinkEndType linkEndOfFixedTime,
+        const Eigen::Vector2d& currentObservation )
+{
+    if( linkEndOfFixedTime != mutualApproximationScaler_->getCurrentLinkEndType( ) )
+    {
+        throw std::runtime_error( "Error mutual approximation with impact parameter partial and scaling are inconsistent." );
+    }
+
+    MutualApproximationWithImpactParameterPartialReturnType returnPartial;
+
+    // Iterate over all link ends
+    for( positionPartialIterator_ = positionPartialList_.begin( ); positionPartialIterator_ != positionPartialList_.end( );
+         positionPartialIterator_++ )
+    {
+        if( positionPartialIterator_->first == observation_models::transmitter )
+        {
+            currentState_  = states[ 0 ];
+            currentTime_ = times[ 0 ];
+        }
+        else if( positionPartialIterator_->first == observation_models::transmitter2 )
+        {
+            currentState_  = states[ 1 ];
+            currentTime_ = times[ 1 ];
+        }
+        else if( positionPartialIterator_->first == observation_models::receiver )
+        {
+            currentState_ = states[ 2 ];
+            currentTime_ = times[ 2 ];
+        }
+
+        // Scale position partials
+        returnPartial.push_back(
+                    std::make_pair(
+                        mutualApproximationScaler_->getScalingFactor( positionPartialIterator_->first ) *
+                        ( positionPartialIterator_->second->calculatePartialOfPosition(
+                              currentState_ , currentTime_ ) ), currentTime_ ) );
+    }
+
+
+//    // Add scaled light-time correcion partials.
+//    for( unsigned int i = 0; i < lighTimeCorrectionPartialsFunctionsFirstTransmitter_.size( ); i++ )
+//    {
+//        currentLinkTimeCorrectionPartialFirstTransmitter_ = lighTimeCorrectionPartialsFunctionsFirstTransmitter_.at( i )( states, times );
+//        currentLinkTimeCorrectionPartialSecondTransmitter_ = lighTimeCorrectionPartialsFunctionsSecondTransmitter_.at( i )( states, times );
+
+//        if ( currentLinkTimeCorrectionPartialFirstTransmitter_.second !=
+//             currentLinkTimeCorrectionPartialSecondTransmitter_.second )
+//        {
+//            throw std::runtime_error( "Error when making mutual approximation light time correction partials, unconsistency"
+//                                      " in receiver times between receiver - first transmitter and receiver - second transmitter legs." );
+//        }
+
+//        returnPartial.push_back(
+//                    std::make_pair( mutualApproximationScaler_->getLightTimePartialScalingFactor( ) *
+//                                    physical_constants::SPEED_OF_LIGHT * currentLinkTimeCorrectionPartialFirstTransmitter_.first,
+//                    currentLinkTimeCorrectionPartialFirstTransmitter_.second ) );
+//    }
+
+
+    return returnPartial;
+}
+
 
 }
 

@@ -427,7 +427,7 @@ std::shared_ptr< MutualApproximationCalculator > createMutualApproximationCalcul
 {
     if ( observationViabilitySettings->observationViabilityType_ != existence_central_instant )
     {
-        throw std::runtime_error( "Error when making mutual approximation calculator, inconsistent input" );
+        throw std::runtime_error( "Error when making mutual approximation calculator, inconsistent input." );
     }
 
 //    if( bodyMap.count( observationViabilitySettings->getStringParameter( ) ) == 0 )
@@ -436,9 +436,9 @@ std::shared_ptr< MutualApproximationCalculator > createMutualApproximationCalcul
 //                                  observationViabilitySettings->getStringParameter( ) + " not found." );
 //    }
 
-    if ( observationType != mutual_approximation )
+    if ( ( observationType != mutual_approximation ) && ( observationType != mutual_approximation_with_impact_parameter ) )
     {
-        throw std::runtime_error( "Error when making mutual approximation calculator, inconsistent input" );
+        throw std::runtime_error( "Error when making mutual approximation calculator, inconsistent observation type." );
     }
 
 //    // Create state function of occulting body.

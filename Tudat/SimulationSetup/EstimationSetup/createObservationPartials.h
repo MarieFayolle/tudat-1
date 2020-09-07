@@ -17,6 +17,7 @@
 #include "Tudat/Astrodynamics/ObservationModels/oneWayDopplerObservationModel.h"
 #include "Tudat/Astrodynamics/ObservationModels/angularPositionObservationModel.h"
 #include "Tudat/Astrodynamics/ObservationModels/apparentDistanceObservationModel.h"
+#include "Tudat/Astrodynamics/ObservationModels/mutualApproximationObservationModel.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createAngularPositionPartials.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createOneWayRangePartials.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createDopplerPartials.h"
@@ -378,10 +379,27 @@ public:
             {
                 throw std::runtime_error( "Error when creating mutual approximation partials, no dependent variables interface object found." );
             }
-            observationPartialList = createMutualApproximationPartials< ObservationScalarType >(
-                        utilities::createVectorFromMapKeys( observationModelList ), bodyMap, parametersToEstimate,
-                        getLightTimeCorrectionsList( observationModelList ), dependentVariablesInterface );
+
+            if ( std::dynamic_pointer_cast< observation_models::MutualApproximationObservationModel< ObservationScalarType, TimeType > >
+                 ( observationModelList.begin( )->second ) != nullptr )
+            {
+                observationPartialList = createMutualApproximationPartials< ObservationScalarType >(
+                            utilities::createVectorFromMapKeys( observationModelList ), bodyMap, parametersToEstimate, true,
+                            getLightTimeCorrectionsList( observationModelList ), dependentVariablesInterface );
+            }
+            else if ( std::dynamic_pointer_cast< observation_models::ModifiedMutualApproximationObservationModel< ObservationScalarType, TimeType > >
+                      ( observationModelList.begin( )->second ) != nullptr )
+            {
+                observationPartialList = createMutualApproximationPartials< ObservationScalarType >(
+                            utilities::createVectorFromMapKeys( observationModelList ), bodyMap, parametersToEstimate, false,
+                            getLightTimeCorrectionsList( observationModelList ), dependentVariablesInterface );
+            }
+            else
+            {
+                throw std::runtime_error( "Error when creating mutual approximation partials, inconsistent observation model." );
+            }
             break;
+
         default:
             std::string errorMessage =
                     "Error when making observation partial set, could not recognize observable " +
@@ -435,6 +453,15 @@ public:
             observationPartialList = createAngularPositionPartials< ObservationScalarType >(
                         utilities::createVectorFromMapKeys( observationModelList ), bodyMap, parametersToEstimate,
                         getLightTimeCorrectionsList( observationModelList ) );
+            break;
+        case observation_models::mutual_approximation_with_impact_parameter:
+            if ( dependentVariablesInterface == nullptr )
+            {
+                throw std::runtime_error( "Error when creating mutual approximation with impact parameter partials, no dependent variables interface object found." );
+            }
+                observationPartialList = createMutualApproximationWithImpactParameterPartials< ObservationScalarType >(
+                            utilities::createVectorFromMapKeys( observationModelList ), bodyMap, parametersToEstimate,
+                            getLightTimeCorrectionsList( observationModelList ), dependentVariablesInterface );
             break;
         default:
             std::string errorMessage =

@@ -527,7 +527,7 @@ public:
         if ( ( observableType_ != mutual_approximation ) && ( observableType_ != mutual_approximation_with_impact_parameter )  )
         {
             throw std::runtime_error( "Error when making mutual approximation settings, observable type should be either"
-                                      " mutual_approximation or mutual_approximation_with_impact_parameter" );
+                                      " mutual_approximation or mutual_approximation_with_impact_parameter." );
         }
     }
 
@@ -1287,15 +1287,15 @@ public:
             }
             if( linkEnds.count( receiver ) == 0 )
             {
-                throw std::runtime_error( "Error when making mutual approximation model, no receiver found" );
+                throw std::runtime_error( "Error when making mutual approximation model, no receiver found." );
             }
             if( linkEnds.count( transmitter ) == 0 )
             {
-                throw std::runtime_error( "Error when making mutual approximation model, no transmitter found" );
+                throw std::runtime_error( "Error when making mutual approximation model, no transmitter found." );
             }
             if( linkEnds.count( transmitter2 ) == 0 )
             {
-                throw std::runtime_error( "Error when making mutual approximation model, no second transmitter found" );
+                throw std::runtime_error( "Error when making mutual approximation model, no second transmitter found." );
             }
 
 
@@ -1402,11 +1402,11 @@ public:
             }
             if( linkEnds.count( receiver ) == 0 )
             {
-                throw std::runtime_error( "Error when making angular position model, no receiver found" );
+                throw std::runtime_error( "Error when making angular position model, no receiver found." );
             }
             if( linkEnds.count( transmitter ) == 0 )
             {
-                throw std::runtime_error( "Error when making angular position model, no transmitter found" );
+                throw std::runtime_error( "Error when making angular position model, no transmitter found." );
             }
 
 
@@ -1439,15 +1439,15 @@ public:
             }
             if( linkEnds.count( receiver ) == 0 )
             {
-                throw std::runtime_error( "Error when making mutual approximation with impact parameter model, no receiver found" );
+                throw std::runtime_error( "Error when making mutual approximation with impact parameter model, no receiver found." );
             }
             if( linkEnds.count( transmitter ) == 0 )
             {
-                throw std::runtime_error( "Error when making mutual approximation with impact parameter model, no transmitter found" );
+                throw std::runtime_error( "Error when making mutual approximation with impact parameter model, no transmitter found." );
             }
             if( linkEnds.count( transmitter2 ) == 0 )
             {
-                throw std::runtime_error( "Error when making mutual approximation with impact parameter model, no second transmitter found" );
+                throw std::runtime_error( "Error when making mutual approximation with impact parameter model, no second transmitter found." );
             }
 
 

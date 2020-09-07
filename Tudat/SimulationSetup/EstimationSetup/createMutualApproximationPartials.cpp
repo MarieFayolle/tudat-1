@@ -27,10 +27,8 @@ std::shared_ptr< MutualApproximationPartial > createMutualApproximationPartialWr
         const observation_models::LinkEnds mutualApproximationLinkEnds,
         const simulation_setup::NamedBodyMap& bodyMap,
         const std::string bodyToEstimate,
-        const std::shared_ptr< MutualApproximationScaling > mutualApproximationScaler,
-        const std::vector< std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > >&
-        lightTimeCorrectionPartialObjects,
-        const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface )
+        const std::shared_ptr< MutualApproximationScalingBase > mutualApproximationScaler,
+        const std::vector< std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > >& lightTimeCorrectionPartialObjects )
 {
     // Create position partials of link ends for current body position
     std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartial > > positionPartials =
@@ -43,7 +41,33 @@ std::shared_ptr< MutualApproximationPartial > createMutualApproximationPartialWr
         mutualApproximationPartial = std::make_shared< MutualApproximationPartial >(
                     mutualApproximationScaler, positionPartials, std::make_pair(
                         estimatable_parameters::initial_body_state, std::make_pair( bodyToEstimate, "" ) ),
-                    lightTimeCorrectionPartialObjects, dependentVariablesInterface );
+                    lightTimeCorrectionPartialObjects );
+    }
+
+    return mutualApproximationPartial;
+}
+
+
+//! Function to generate mutual approximation with impact parameter partial wrt a position of a body.
+std::shared_ptr< MutualApproximationWithImpactParameterPartial > createMutualApproximationWithImpactParameterPartialWrtBodyPosition(
+        const observation_models::LinkEnds mutualApproximationLinkEnds,
+        const simulation_setup::NamedBodyMap& bodyMap,
+        const std::string bodyToEstimate,
+        const std::shared_ptr< MutualApproximationWithImpactParameterScaling > mutualApproximationScaler,
+        const std::vector< std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > >& lightTimeCorrectionPartialObjects )
+{
+    // Create position partials of link ends for current body position
+    std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartial > > positionPartials =
+            createCartesianStatePartialsWrtBodyState( mutualApproximationLinkEnds, bodyMap, bodyToEstimate );
+
+    // Create mutual approximation if any position partials are created (i.e. if any dependency exists).
+    std::shared_ptr< MutualApproximationWithImpactParameterPartial > mutualApproximationPartial;
+    if( positionPartials.size( ) > 0 )
+    {
+        mutualApproximationPartial = std::make_shared< MutualApproximationWithImpactParameterPartial >(
+                    mutualApproximationScaler, positionPartials, std::make_pair(
+                        estimatable_parameters::initial_body_state, std::make_pair( bodyToEstimate, "" ) ),
+                    lightTimeCorrectionPartialObjects );
     }
 
     return mutualApproximationPartial;

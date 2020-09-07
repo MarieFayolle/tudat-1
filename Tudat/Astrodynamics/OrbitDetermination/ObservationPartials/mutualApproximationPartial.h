@@ -786,19 +786,25 @@ public:
      * \param lighTimeCorrectionPartials List if light-time correction partial objects.
      */
     MutualApproximationPartial(
-            const std::shared_ptr< MutualApproximationScaling > mutualApproximationScaler,
+            const std::shared_ptr< MutualApproximationScalingBase > mutualApproximationScaler,
             const std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartial > >& positionPartialList,
             const estimatable_parameters::EstimatebleParameterIdentifier parameterIdentifier,
             const std::vector< std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > >& lighTimeCorrectionPartials =
-            std::vector< std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > >( ),
-            const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface
-                    = std::shared_ptr< propagators::DependentVariablesInterface >( ) ):
+            std::vector< std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > >( ) ):
         ObservationPartial< 1 >( parameterIdentifier ),
         mutualApproximationScaler_( mutualApproximationScaler ), positionPartialList_( positionPartialList ) //,
 //        lighTimeCorrectionPartials_( lighTimeCorrectionPartials )
     {
         std::cout << "TEST -> CONSTRUCTOR MUTUAL APPROXIMATION PARTIAL" << "\n\n";
 
+        // Check if the correct scaling object is provided as input.
+        if ( ( std::dynamic_pointer_cast< MutualApproximationScaling >( mutualApproximationScaler_ ) == nullptr )
+             && ( std::dynamic_pointer_cast< ModifiedMutualApproximationScaling >( mutualApproximationScaler_ ) == nullptr ) )
+        {
+            throw std::runtime_error( "Error when calculating mutual approximation partials, inconsistent scaling object." );
+        }
+
+        // Process light-time correction partials.
         if ( lighTimeCorrectionPartials.size( ) != 0 )
         {
             if ( lighTimeCorrectionPartials.size( ) != 2 )
@@ -890,7 +896,7 @@ public:
 protected:
 
     //! Scaling object used for mapping partials of positions to partials of observable
-    std::shared_ptr< MutualApproximationScaling > mutualApproximationScaler_;
+    std::shared_ptr< MutualApproximationScalingBase > mutualApproximationScaler_;
 
     //! List of position partials per link end.
     std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartial > > positionPartialList_;
@@ -923,6 +929,161 @@ protected:
     //! Pre-declared time variable to be used in calculatePartial function.
     double currentTime_;
 };
+
+
+
+//! Class to compute the partial derivatives of a mutual approximation with impact parameter observation partial.
+class MutualApproximationWithImpactParameterPartial: public ObservationPartial< 2 >
+{
+public:
+    typedef std::vector< std::pair< Eigen::Matrix< double, 2, Eigen::Dynamic >, double > > MutualApproximationWithImpactParameterPartialReturnType;
+    typedef std::pair< Eigen::Matrix< double, 1, Eigen::Dynamic >, double > SingleOneWayRangePartialReturnType;
+
+    //! Constructor
+    /*!
+     * Constructor
+     * \param apparentDistanceScaler Scaling object used for mapping partials of positions to partials of observable
+     * \param positionPartialList List of position partials per link end.
+     * \param parameterIdentifier Id of parameter for which instance of class computes partial derivatives.
+     * \param lighTimeCorrectionPartials List if light-time correction partial objects.
+     */
+    MutualApproximationWithImpactParameterPartial(
+            const std::shared_ptr< MutualApproximationWithImpactParameterScaling > mutualApproximationScaler,
+            const std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartial > >& positionPartialList,
+            const estimatable_parameters::EstimatebleParameterIdentifier parameterIdentifier,
+            const std::vector< std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > >& lighTimeCorrectionPartials =
+            std::vector< std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > >( ) ):
+        ObservationPartial< 2 >( parameterIdentifier ),
+        mutualApproximationScaler_( mutualApproximationScaler ), positionPartialList_( positionPartialList ) //,
+//        lighTimeCorrectionPartials_( lighTimeCorrectionPartials )
+    {
+        std::cout << "TEST -> CONSTRUCTOR MUTUAL APPROXIMATION WITH IMPACT PARAMETER PARTIAL" << "\n\n";
+
+        if ( lighTimeCorrectionPartials.size( ) != 0 )
+        {
+            if ( lighTimeCorrectionPartials.size( ) != 2 )
+            {
+                throw std::runtime_error( "Error when making mutual approximation with impact parameter partials, light time corrections for "
+                                          + std::to_string( lighTimeCorrectionPartials.size( ) ) + " links found, instead of 2.");
+            }
+            else
+            {
+                lighTimeCorrectionPartialsFirstTransmitter_ = lighTimeCorrectionPartials[ 0 ];
+                lighTimeCorrectionPartialsSecondTransmitter_ = lighTimeCorrectionPartials[ 1 ];
+
+                if ( lighTimeCorrectionPartialsFunctionsFirstTransmitter_.size( ) !=
+                     lighTimeCorrectionPartialsFunctionsSecondTransmitter_.size( ) )
+                {
+                    throw std::runtime_error( "Error when making mutual approximation with impact parameter partials, number of  light time "
+                                              "corrections partials functions not consistent between the first transmitter leg"
+                                              "and the second transmitter leg." );
+                }
+
+                // Create light time correction partial functions for link between receiver and first transmitter.
+                std::pair< std::function< SingleOneWayRangePartialReturnType(
+                            const std::vector< Eigen::Vector6d >&, const std::vector< double >& ) >, bool > lightTimeCorrectionPartialFirstTransmitter;
+                for( unsigned int i = 0; i < lighTimeCorrectionPartialsFirstTransmitter_.size( ); i++ )
+                {
+                    lightTimeCorrectionPartialFirstTransmitter = getLightTimeParameterPartialFunction(
+                                parameterIdentifier, lighTimeCorrectionPartialsFirstTransmitter_.at( i ) );
+                    if( lightTimeCorrectionPartialFirstTransmitter.second != 0 )
+                    {
+                        lighTimeCorrectionPartialsFunctionsFirstTransmitter_.push_back( lightTimeCorrectionPartialFirstTransmitter.first );
+                    }
+                }
+
+
+                // Create light time correction partial functions for link between receiver and second transmitter.
+                std::pair< std::function< SingleOneWayRangePartialReturnType(
+                            const std::vector< Eigen::Vector6d >&, const std::vector< double >& ) >, bool > lightTimeCorrectionPartialSecondTransmitter;
+                for( unsigned int i = 0; i < lighTimeCorrectionPartialsSecondTransmitter_.size( ); i++ )
+                {
+                    lightTimeCorrectionPartialSecondTransmitter = getLightTimeParameterPartialFunction(
+                                parameterIdentifier, lighTimeCorrectionPartialsSecondTransmitter_.at( i ) );
+                    if( lightTimeCorrectionPartialSecondTransmitter.second != 0 )
+                    {
+                        lighTimeCorrectionPartialsFunctionsSecondTransmitter_.push_back( lightTimeCorrectionPartialSecondTransmitter.first );
+                    }
+                }
+
+            }
+        }
+    }
+
+    //! Destructor.
+    ~MutualApproximationWithImpactParameterPartial( ){ }
+
+    //! Function to calculate the observation partial(s) at required time and state
+    /*!
+     *  Function to calculate the observation partial(s) at required time and state. State and time
+     *  are typically obtained from evaluation of observation model.
+     *  \param states Link end states. Index maps to link end for a given ObsevableType through getLinkEndIndex function.
+     *  \param times Link end time.
+     *  \param linkEndOfFixedTime Link end that is kept fixed when computing the observable.
+     *  \param currentObservation Value of the observation for which the partial is to be computed (default NaN for
+     *  compatibility purposes)
+     *  \return Vector of pairs containing partial values and associated times.
+     */
+    MutualApproximationWithImpactParameterPartialReturnType calculatePartial(
+            const std::vector< Eigen::Vector6d >& states,
+            const std::vector< double >& times,
+            const observation_models::LinkEndType linkEndOfFixedTime,
+            const Eigen::Vector2d& currentObservation = Eigen::Vector2d::Constant( TUDAT_NAN ) );
+
+    //! Function to get the number of light-time correction partial functions.
+    /*!
+     * Number of light-time correction partial functions.
+     * \return Number of light-time correction partial functions.
+     */
+    int getNumberOfLighTimeCorrectionPartialsFunctions( )
+    {
+//        if ( lighTimeCorrectionPartialsFunctionsFirstTransmitter_.size( ) !=
+//             lighTimeCorrectionPartialsFunctionsSecondTransmitter_.size( ) )
+//        {
+//            throw std::runtime_error( "Error when making apparent distance partials, number of  light time "
+//                                      "corrections partials functions not consistent between the first transmitter leg"
+//                                      "and the second transmitter leg." );
+//        }
+        return lighTimeCorrectionPartialsFunctionsFirstTransmitter_.size( );
+    }
+
+protected:
+
+    //! Scaling object used for mapping partials of positions to partials of observable
+    std::shared_ptr< MutualApproximationWithImpactParameterScaling > mutualApproximationScaler_;
+
+    //! List of position partials per link end.
+    std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartial > > positionPartialList_;
+
+    //! Iterator over list of position partials per link end.
+    std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartial > >::iterator positionPartialIterator_;
+
+    //! List of light-time correction partial functions.
+    std::vector< std::function< SingleOneWayRangePartialReturnType(
+            const std::vector< Eigen::Vector6d >&, const std::vector< double >& ) > >
+    lighTimeCorrectionPartialsFunctionsFirstTransmitter_;
+
+    std::vector< std::function< SingleOneWayRangePartialReturnType(
+            const std::vector< Eigen::Vector6d >&, const std::vector< double >& ) > >
+    lighTimeCorrectionPartialsFunctionsSecondTransmitter_;
+
+    //! List of light-time correction partial objects.
+    std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > lighTimeCorrectionPartialsFirstTransmitter_;
+
+    std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > lighTimeCorrectionPartialsSecondTransmitter_;
+
+    //! Pre-declare partial for current link end.
+    std::pair< Eigen::Matrix< double, 1, Eigen::Dynamic >, double > currentLinkTimeCorrectionPartialFirstTransmitter_;
+
+    std::pair< Eigen::Matrix< double, 1, Eigen::Dynamic >, double > currentLinkTimeCorrectionPartialSecondTransmitter_;
+
+    //! Pre-declared state variable to be used in calculatePartial function.
+    Eigen::Vector6d currentState_;
+
+    //! Pre-declared time variable to be used in calculatePartial function.
+    double currentTime_;
+};
+
 
 }
 
