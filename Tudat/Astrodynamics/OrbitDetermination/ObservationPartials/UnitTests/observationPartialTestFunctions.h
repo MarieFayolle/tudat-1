@@ -186,8 +186,10 @@ void testObservationPartials(
          linkEndIterator++ )
     {
 
-        if ( ( ( observableType != apparent_distance ) && ( observableType != mutual_approximation ) && ( observableType != mutual_approximation_with_impact_parameter ) )
-             || ( ( ( observableType == apparent_distance ) || ( observableType == mutual_approximation ) || ( observableType == mutual_approximation_with_impact_parameter ) )
+        if ( ( ( observableType != apparent_distance ) && ( observableType != mutual_approximation ) && ( observableType != mutual_approximation_with_impact_parameter )
+               && ( observableType != impact_parameter_mutual_approx ) )
+             || ( ( ( observableType == apparent_distance ) || ( observableType == mutual_approximation ) || ( observableType == mutual_approximation_with_impact_parameter )
+                    || ( observableType == impact_parameter_mutual_approx ) )
                   && ( linkEndIterator->first == receiver ) ) )
         {
 
@@ -196,7 +198,8 @@ void testObservationPartials(
         std::vector< Eigen::Vector6d > vectorOfStates;
         std::vector< double > vectorOfTimes;
         double observationTime = 1.1e7;
-        if ( ( observableType == mutual_approximation ) || ( observableType == mutual_approximation_with_impact_parameter ) )
+        if ( ( observableType == mutual_approximation ) || ( observableType == mutual_approximation_with_impact_parameter )
+             || ( observableType == impact_parameter_mutual_approx ) )
         {
             observationTime = estimateObservationTime;
         }

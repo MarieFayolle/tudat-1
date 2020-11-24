@@ -53,7 +53,8 @@ std::pair< Eigen::Matrix< ObservationScalarType, Eigen::Dynamic, 1 >, bool > sim
 
     // Special case for mutual approximation observables.
     if ( ( observationModel->getObservableType( ) == mutual_approximation ) ||
-         ( observationModel->getObservableType( ) == mutual_approximation_with_impact_parameter ) )
+         ( observationModel->getObservableType( ) == mutual_approximation_with_impact_parameter ) ||
+         ( observationModel->getObservableType( ) == impact_parameter_mutual_approx ) )
     {
         // Viability calculators must be taken into account when simulating the intermediate apparent distance observables.
         std::vector< std::shared_ptr< ObservationViabilityCalculator > > viabilityCalculatorsApparentDistances;
@@ -96,6 +97,15 @@ std::pair< Eigen::Matrix< ObservationScalarType, Eigen::Dynamic, 1 >, bool > sim
 
             checkExistenceMutualApproximation = mutualApproximationObservationModel->isExistenceOfMutualApproximationChecked( );
             checkObservableDuplicates = mutualApproximationObservationModel->areObservableDuplicatesRevoved( );
+        }
+        if ( observationModel->getObservableType( ) == impact_parameter_mutual_approx )
+        {
+            std::shared_ptr< ImpactParameterMutualApproxObservationModel< ObservationScalarType, TimeType > > impactParameterObservationModel =
+                    std::dynamic_pointer_cast< ImpactParameterMutualApproxObservationModel< ObservationScalarType, TimeType > >( observationModel );
+            impactParameterObservationModel->setViabilityCalculatorsApparentDistances( viabilityCalculatorsApparentDistances );
+
+            checkExistenceMutualApproximation = impactParameterObservationModel->isExistenceOfMutualApproximationChecked( );
+            checkObservableDuplicates = impactParameterObservationModel->areObservableDuplicatesRevoved( );
         }
 
 

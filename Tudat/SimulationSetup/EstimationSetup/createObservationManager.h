@@ -433,6 +433,16 @@ std::shared_ptr< ObservationManagerBase< ObservationScalarType, TimeType > > cre
                     observableType, settingsPerLinkEnds, bodyMap, parametersToEstimate,
                     stateTransitionMatrixInterface, dependentVariablesInterface );
         break;
+    case impact_parameter_mutual_approx:
+        if ( dependentVariablesInterface == nullptr )
+        {
+            throw std::runtime_error( "Error when creating observation manager for impact parameter of mutual approximation, no dependent variables interface"
+                                      " object found." );
+        }
+        observationManager = createObservationManager< 1, ObservationScalarType, TimeType >(
+                    observableType, settingsPerLinkEnds, bodyMap, parametersToEstimate,
+                    stateTransitionMatrixInterface, dependentVariablesInterface );
+        break;
     default:
         throw std::runtime_error(
                     "Error when making observation manager, could not identify observable type " +

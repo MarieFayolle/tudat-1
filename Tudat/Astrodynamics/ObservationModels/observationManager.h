@@ -237,6 +237,33 @@ public:
         std::shared_ptr< ObservationModel< ObservationSize, ObservationScalarType, TimeType > > selectedObservationModel =
                 observationSimulator_->getObservationModel( linkEnds );
 
+        // Clear observation models if needed.
+        if ( selectedObservationModel->getObservableType( ) == observation_models::mutual_approximation )
+        {
+           if ( std::dynamic_pointer_cast< observation_models::MutualApproximationObservationModel< ObservationScalarType, TimeType > >( selectedObservationModel ) != nullptr )
+           {
+               std::dynamic_pointer_cast< observation_models::MutualApproximationObservationModel< ObservationScalarType, TimeType > >( selectedObservationModel )
+                       ->clearAlreadyComputedCentralInstants( );
+           }
+           else if ( std::dynamic_pointer_cast< observation_models::ModifiedMutualApproximationObservationModel< ObservationScalarType, TimeType > >( selectedObservationModel ) != nullptr )
+           {
+               std::dynamic_pointer_cast< observation_models::ModifiedMutualApproximationObservationModel< ObservationScalarType, TimeType > >( selectedObservationModel )
+                       ->clearAlreadyComputedCentralInstants( );
+           }
+        }
+        else if ( selectedObservationModel->getObservableType( ) == observation_models::mutual_approximation_with_impact_parameter )
+        {
+            std::dynamic_pointer_cast< observation_models::MutualApproximationWithImpactParameterObservationModel
+                    < ObservationScalarType, TimeType > >( selectedObservationModel )
+                    ->clearAlreadyComputedCentralInstants( );
+        }
+        else if ( selectedObservationModel->getObservableType( ) == observation_models::impact_parameter_mutual_approx )
+        {
+            std::dynamic_pointer_cast< observation_models::ImpactParameterMutualApproxObservationModel
+                    < ObservationScalarType, TimeType > >( selectedObservationModel )
+                    ->clearAlreadyComputedCentralInstants( );
+        }
+
         // Initialize vectors of states and times of link ends to be used in calculations.
         std::vector< Eigen::Vector6d > vectorOfStates;
         std::vector< double > vectorOfTimes;
@@ -253,13 +280,51 @@ public:
             // Compute observation
             currentObservation = selectedObservationModel->computeObservationsWithLinkEndData(
                         times[ i ], linkEndAssociatedWithTime, vectorOfTimes, vectorOfStates );
-            observations[ times[ i ] ] = currentObservation;
+
+            if ( ( selectedObservationModel->getObservableType( ) == observation_models::mutual_approximation )
+                 || ( selectedObservationModel->getObservableType( ) == observation_models::mutual_approximation_with_impact_parameter )
+                 || ( selectedObservationModel->getObservableType( ) == observation_models::impact_parameter_mutual_approx ) )
+            {
+                if (  !boost::math::isnan( currentObservation[ 0 ] ) )
+                {
+//                    std::cout << "DETECTED NAN, NO OBSERVATION" << "\n\n";
+//                }
+//                else
+//                {
+//                    std::cout << "REAL MUTUAL APPROX DETECTED" << "\n\n";
+                    observations[ times[ i ] ] = currentObservation;
+                }
+            }
+            else
+            {
+                observations[ times[ i ] ] = currentObservation;
+            }
 
             // Compute observation partial
             currentObservationSize = currentObservation.rows( );
-            observationMatrices[ times[ i ] ] = determineObservationPartialMatrix(
-                        currentObservationSize, vectorOfStates, vectorOfTimes, linkEnds, currentObservation,
-                        linkEndAssociatedWithTime );
+            if ( ( selectedObservationModel->getObservableType( ) == observation_models::mutual_approximation )
+                 || ( selectedObservationModel->getObservableType( ) == observation_models::mutual_approximation_with_impact_parameter )
+                 || ( selectedObservationModel->getObservableType( ) == observation_models::impact_parameter_mutual_approx ) )
+            {
+                if ( !boost::math::isnan( currentObservation[ 0 ] /*== TUDAT_NAN*/ ) )
+                {
+//                    std::cout << "DETECTED NAN, NO OBSERVATION PARTIALS" << "\n\n";
+//                }
+//                else
+//                {
+//                    std::cout << "REAL MUTUAL APPROX DETECTED, PARTIALS" << "\n\n";
+                    observationMatrices[ times[ i ] ] = determineObservationPartialMatrix(
+                                currentObservationSize, vectorOfStates, vectorOfTimes, linkEnds, currentObservation,
+                                linkEndAssociatedWithTime );
+                }
+            }
+            else
+            {
+                observationMatrices[ times[ i ] ] = determineObservationPartialMatrix(
+                            currentObservationSize, vectorOfStates, vectorOfTimes, linkEnds, currentObservation,
+                            linkEndAssociatedWithTime );
+            }
+
 
         }
 

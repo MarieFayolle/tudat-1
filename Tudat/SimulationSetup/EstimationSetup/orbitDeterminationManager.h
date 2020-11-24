@@ -466,6 +466,9 @@ public:
         // Set current parameter estimate as both previous and current estimate
         ParameterVectorType newParameterEstimate = currentParameterEstimate_ +
                 podInput->getInitialParameterDeviationEstimate( );
+        std::cout << "initial parameter deviation estimation: " << podInput->getInitialParameterDeviationEstimate( ).transpose( ) << "\n\n";
+        std::cout << "old parameters: " << currentParameterEstimate_.transpose( ) << "\n\n";
+        std::cout << "new parameters estimate: " << newParameterEstimate.transpose( ) << "\n\n";
         ParameterVectorType oldParameterEstimate = currentParameterEstimate_;
 
         int numberOfEstimatedParameters = parameterVectorSize;
@@ -802,7 +805,8 @@ protected:
             variationalEquationsSolver_ =
                     simulation_setup::createVariationalEquationsSolver(
                         bodyMap, integratorSettings, propagatorSettings, parametersToEstimate_, 1,
-                        std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ), 0, propagateOnCreation );
+                        std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ), 0, propagateOnCreation,
+                        std::dynamic_pointer_cast< propagators::SingleArcPropagatorSettings< double > >( propagatorSettings )->getDependentVariablesToSave( ) );
         }
 
         if( integrateAndEstimateOrbit_ )

@@ -4601,6 +4601,9 @@ BOOST_AUTO_TEST_CASE( testCentralInstantPartials )
             nameOutputFile = "apparentDistancesHistory_variationZearth.dat";
         }
 
+        std::cout << "TEST CASE: " << testCase << "\n\n";
+        std::cout << "variation position at central instant: " << variationPositionCentralInstant.transpose( ) << "\n\n";
+
         Eigen::VectorXd variationVectorInitialEpoch = centralInstantStateTransitionMatrix.inverse( ) * totalVariationVectorCentralInstant;
 
         std::cout << "variation vector initial epoch: " << variationVectorInitialEpoch.transpose( ) << "\n\n";
@@ -4766,8 +4769,3038 @@ BOOST_AUTO_TEST_CASE( testCentralInstantPartials )
                  ( partialCentralInstantWrtReceiverPosition[ 2 ] - numericalEstimationPartialT0wrtZearth ) / numericalEstimationPartialT0wrtZearth << "\n\n";
 
 
+
+
+////    // Create observation settings
+////    std::shared_ptr< MutualApproximationObservationSettings > mutualApproximationSettings = std::make_shared< MutualApproximationObservationSettings >
+////            ( lightTimeCorrectionSettings, 15.0 * 60.0, 30.0, 15.0 * mathematical_constants::PI / ( 3600.0 * 180.0 ), 4, true, false,
+////              std::make_shared< root_finders::RootFinderSettings >( root_finders::bisection_root_finder, 1.0e-12, 60 ),
+////              std::make_shared< ConstantObservationBiasSettings >( ( Eigen::Vector1d( ) << 0.0 ).finished( ), true ),
+////              std::make_shared< ConstantObservationBiasSettings >( ( Eigen::Vector1d( ) << 0.0 * mathematical_constants::PI / ( 3600.0 * 180.0 ) ).finished( ), true ) );
+
+////    // Create observation model.
+////    std::shared_ptr< ObservationModel< 1, double, double > > observationModel =
+////           ObservationModelCreator< 1, double, double >::createObservationModel( linkEnds, mutualApproximationSettings, bodyMap );
+////    std::shared_ptr< ObservationBias< 1 > > observationBias = observationModel->getObservationBiasCalculator( );
+
+//    // Create estimatable parameters.
+//    std::vector< std::shared_ptr< EstimatableParameter< Eigen::VectorXd > > > estimatedInitialStateParameters;
+//    estimatedInitialStateParameters.push_back(
+//                std::make_shared< InitialTranslationalStateParameter< double > >(
+//                    "Earth", propagators::getInitialStateOfBody(
+//                        "Earth", "SSB", bodyMap, simulationStartEpoch ) ) );
+//    estimatedInitialStateParameters.push_back(
+//                std::make_shared< InitialTranslationalStateParameter< double > >(
+//                    "Io", propagators::getInitialStateOfBody(
+//                        "Io", "Jupiter", bodyMap, simulationStartEpoch ) ) );
+//    estimatedInitialStateParameters.push_back(
+//                std::make_shared< InitialTranslationalStateParameter< double > >(
+//                    "Europa", propagators::getInitialStateOfBody(
+//                        "Europa", "Jupiter", bodyMap, simulationStartEpoch ) ) );
+
+//    std::vector< std::shared_ptr< EstimatableParameter< double > > > estimatableDoubleParameters;
+//    std::vector< std::shared_ptr< EstimatableParameter< Eigen::VectorXd > > > estimatableVectorParameters;
+
+//    std::shared_ptr< EstimatableParameterSet< double > > fullEstimatableParameterSet =
+//            std::make_shared< EstimatableParameterSet< double > >( estimatableDoubleParameters, estimatableVectorParameters,
+//                                                                   estimatedInitialStateParameters );
+
+//    // Create observation partials.
+//    std::map< LinkEnds, std::shared_ptr< ObservationModel< 1 > > > observationModelList;
+//    observationModelList[ linkEnds ] = observationModel;
+
+//    std::shared_ptr< ObservationPartialCreator< 1, double, double > > observationPartialCreator =
+//            std::make_shared< ObservationPartialCreator< 1, double, double > >( );
+//    std::pair< std::map< std::pair< int, int >, std::shared_ptr< ObservationPartial< 1 > > >,
+//            std::shared_ptr< PositionPartialScaling > > fullAnalyticalPartialSet =
+//            observationPartialCreator->createObservationPartials(
+//                mutual_approximation, observationModelList, bodyMap, fullEstimatableParameterSet, dependentVariablesInterface ).begin( )->second;
+//    std::shared_ptr< PositionPartialScaling > positionPartialScaler = fullAnalyticalPartialSet.second;
+
+//    for ( std::map< std::pair< int, int >, std::shared_ptr< ObservationPartial< 1 > > >::iterator itr = fullAnalyticalPartialSet.first.begin( ) ;
+//          itr != fullAnalyticalPartialSet.first.end( ) ; itr++ )
+//    {
+//         std::cout << "parameter index " << itr->first.first << " and parameter size " << itr->first.second << "\n\n";
+
+//         std::vector< Eigen::Vector6d > states;
+//         std::vector< double > times;
+//         LinkEndType linkEndOfFixedTime = receiver;
+////         Eigen::Matrix< double, 1, Eigen::Dynamic > currentObservation =
+////                 Eigen::Matrix< double, 1, Eigen::Dynamic >::Constant( 1, TUDAT_NAN );
+
+//         std::vector< Eigen::Vector6d > vectorOfStates;
+//         std::vector< double > vectorOfTimes;
+
+//         Eigen::VectorXd currentObservation = observationModel->computeObservationsWithLinkEndData(
+//                     1.344133697040542e+06, receiver, vectorOfTimes, vectorOfStates );
+
+//         std::cout << "estimated central instant: " << estimatedCentralInstant << "\n\n";
+//         std::cout << "current observation: " << currentObservation[ 0 ] << "\n\n";
+
+//         positionPartialScaler->update( vectorOfStates, vectorOfTimes, static_cast< LinkEndType >( receiver ), linkEnds,
+//                                         currentObservation );
+
+//         std::vector< std::pair< Eigen::Matrix< double, 1, Eigen::Dynamic >, double > > partialList
+//                 = itr->second->calculatePartial( vectorOfStates, vectorOfTimes, linkEndOfFixedTime, currentObservation );
+
+//         std::cout << "size vector partial list: " << partialList.size( ) << "\n\n";
+//         std::cout << "partials of central instant w.r.t. link end position: " << partialList[ 0 ].first << "\n\n";
+//    }
+
+////    typedef std::vector< std::pair< Eigen::Matrix< double, 1, Eigen::Dynamic >, double > > ObservationPartialReturnType;
+////    std::vector< ObservationPartialReturnType > analyticalObservationPartials =
+////            calculateAnalyticalPartials< 1 >(
+////                fullAnalyticalPartialSet.first, vectorOfStates, vectorOfTimes, linkEndIterator->first, currentObservation );
+
+
 }
 
+
+//BOOST_AUTO_TEST_CASE( testOtherMutualApproximationPartials )
+//{
+//    std::cout.precision( 16 );
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////            USING STATEMENTS              //////////////////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    using namespace tudat;
+//    using namespace tudat::simulation_setup;
+//    using namespace tudat::propagators;
+//    using namespace tudat::numerical_integrators;
+//    using namespace tudat::orbital_element_conversions;
+//    using namespace tudat::basic_mathematics;
+//    using namespace tudat::gravitation;
+//    using namespace tudat::numerical_integrators;
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////     CREATE ENVIRONMENT AND VEHICLE       //////////////////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Load Spice kernels.
+//    spice_interface::loadStandardSpiceKernels( );
+
+//    // Set simulation time settings.
+//    const double simulationStartEpoch = 1300000.0; // 41680.0; //0.0;
+//    const double simulationEndEpoch = 2.0 * tudat::physical_constants::JULIAN_YEAR;
+
+//    // Define body settings for simulation.
+//    std::vector< std::string > bodiesToCreate;
+//    bodiesToCreate.push_back( "Sun" );
+//    bodiesToCreate.push_back( "Earth" );
+//    bodiesToCreate.push_back( "Jupiter" );
+//    bodiesToCreate.push_back( "Io" );
+//    bodiesToCreate.push_back( "Europa" );
+//    bodiesToCreate.push_back( "Ganymede" );
+
+//    // Create body objects.
+//    std::map< std::string, std::shared_ptr< BodySettings > > bodySettings =
+//            getDefaultBodySettings( bodiesToCreate, simulationStartEpoch - 300.0, simulationEndEpoch + 300.0 );
+//    for( unsigned int i = 0; i < bodiesToCreate.size( ); i++ )
+//    {
+//        bodySettings[ bodiesToCreate.at( i ) ]->ephemerisSettings->resetFrameOrientation( "J2000" );
+//        bodySettings[ bodiesToCreate.at( i ) ]->rotationModelSettings->resetOriginalFrame( "J2000" );
+//    }
+//    NamedBodyMap bodyMap = createBodies( bodySettings );
+
+//    // Finalize body creation.
+//    setGlobalFrameBodyEphemerides( bodyMap, "SSB", "J2000" );
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////            CREATE ACCELERATIONS          //////////////////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//    // Set accelerations between bodies that are to be taken into account (mutual point mass gravity between all bodies).
+//    SelectedAccelerationMap accelerationMap;
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsEarth;
+//    currentAccelerationsEarth[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEarth[ "Jupiter" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEarth[ "Io" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEarth[ "Europa" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEarth[ "Ganymede" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsJupiter;
+//    currentAccelerationsJupiter[ "Io" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsJupiter[ "Europa" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsJupiter[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsJupiter[ "Ganymede" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsIo;
+//    currentAccelerationsIo[ "Earth" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsIo[ "Jupiter" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsIo[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsIo[ "Europa" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsIo[ "Ganymede" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsEuropa;
+//    currentAccelerationsEuropa[ "Jupiter" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEuropa[ "Earth" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEuropa[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEuropa[ "Io" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEuropa[ "Ganymede" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsGanymede;
+//    currentAccelerationsGanymede[ "Jupiter" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsGanymede[ "Earth" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsGanymede[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsGanymede[ "Io" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsGanymede[ "Europa" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+
+//    accelerationMap[ "Ganymede" ] = currentAccelerationsGanymede;
+//    accelerationMap[ "Jupiter" ] = currentAccelerationsJupiter;
+//    accelerationMap[ "Io" ] = currentAccelerationsIo;
+//    accelerationMap[ "Europa" ] = currentAccelerationsEuropa;
+//    accelerationMap[ "Earth" ] = currentAccelerationsEarth;
+
+//    // Define list of bodies to propagate
+//    std::vector< std::string > bodiesToPropagate;
+//    bodiesToPropagate.push_back( "Earth" );
+//    bodiesToPropagate.push_back( "Jupiter" );
+//    bodiesToPropagate.push_back( "Io" );
+//    bodiesToPropagate.push_back( "Europa" );
+//    bodiesToPropagate.push_back( "Ganymede" );
+
+//    // Define central bodies to use in propagation.
+//    std::vector< std::string > centralBodies;
+//    centralBodies.push_back( "SSB" );
+//    centralBodies.push_back( "SSB" );
+//    centralBodies.push_back( "Jupiter" );
+//    centralBodies.push_back( "Jupiter" );
+//    centralBodies.push_back( "Jupiter" );
+
+//    // Create acceleration models and propagation settings.
+//    basic_astrodynamics::AccelerationMap accelerationModelMap = createAccelerationModelsMap(
+//                bodyMap, accelerationMap, bodiesToPropagate, centralBodies );
+
+
+
+//    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////             CREATE PROPAGATION SETTINGS            ///////////////////////////////////////
+//    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Get initial state vector as input to integration.
+//    Eigen::VectorXd systemInitialState = getInitialStatesOfBodies(
+//                bodiesToPropagate, centralBodies, bodyMap, simulationStartEpoch );
+////    systemInitialState[ 7 ] *= 0.999;
+
+
+//    // Define list of dependent variables to save.
+//    std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > dependentVariablesList;
+
+//    double limitValueImpactParameter = 10.0 / 3600.0 * mathematical_constants::PI / 180.0;
+//    std::cout << "limit value impact parameter: " << limitValueImpactParameter << "\n\n";
+
+
+//    for ( unsigned int currentBody = 2 ; currentBody < bodiesToPropagate.size( ) ; currentBody++ )
+//    {
+//        dependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                        relative_position_dependent_variable, bodiesToPropagate[ currentBody ], "Earth" ) );
+//    }
+
+//    for ( unsigned int currentBody = 2 ; currentBody < bodiesToPropagate.size( ) - 1 ; currentBody++ )
+//    {
+
+//        for ( unsigned int otherBody = currentBody + 1 ; otherBody < bodiesToPropagate.size( ) ; otherBody ++ )
+//        {
+//            dependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                  relative_distance_dependent_variable, bodiesToPropagate[ currentBody ],
+//                                                  bodiesToPropagate[ otherBody ] ) );
+//        }
+//    }
+
+//    std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > secondDependentVariablesList = dependentVariablesList;
+//    secondDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                    relative_velocity_dependent_variable, "Io", "Earth" ) );
+//    secondDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                    relative_velocity_dependent_variable, "Europa", "Earth" ) );
+
+//    // Create object with list of dependent variables
+//    std::shared_ptr< DependentVariableSaveSettings > dependentVariablesToSave =
+//            std::make_shared< DependentVariableSaveSettings >( secondDependentVariablesList );
+
+
+//    std::string observer = "Earth";
+//    std::vector< std::string > listOfObjects;
+//    listOfObjects.push_back( "Io" );
+//    listOfObjects.push_back( "Europa" );
+//    listOfObjects.push_back( "Ganymede" );
+//    bool useThresholdAsLowerLimit = true;;
+////    std::pair< std::string, std::string > bodiesInvolvedInMutualApproximations;
+//    std::function< bool( const double ) > customTerminationFunction =
+//            std::bind( &isApparentDistanceBelowThreshold, std::placeholders::_1, limitValueImpactParameter,
+//                       "Earth", listOfObjects, bodyMap, simulationEndEpoch, useThresholdAsLowerLimit); //, bodiesInvolvedInMutualApproximations );
+
+//    std::shared_ptr< PropagationTerminationSettings > customTerminationSettings =
+//            std::make_shared< PropagationCustomTerminationSettings >( customTerminationFunction );
+
+//    // Define propagator settings.
+//    std::shared_ptr< TranslationalStatePropagatorSettings< double > > propagatorSettings = std::make_shared< TranslationalStatePropagatorSettings< double > > (
+//                centralBodies, accelerationModelMap, bodiesToPropagate, systemInitialState, customTerminationSettings, cowell, dependentVariablesToSave );
+
+//    // Define numerical integrator settings.
+//    std::shared_ptr< IntegratorSettings< > > integratorSettings =
+//            std::make_shared< IntegratorSettings< > >( rungeKutta4, simulationStartEpoch, 3600.0 / 10.0 );
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////             PROPAGATE ORBITS            ///////////////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Create simulation object and propagate dynamics.
+//    SingleArcDynamicsSimulator< > dynamicsSimulator( bodyMap, integratorSettings, propagatorSettings );
+
+//    std::map< double, Eigen::VectorXd > integrationResult = dynamicsSimulator.getEquationsOfMotionNumericalSolution( );
+//    std::map< double, Eigen::VectorXd > dependentVariablesHistory = dynamicsSimulator.getDependentVariableHistory( );
+
+//    double epochEndFirstPropagation = integrationResult.rbegin( )->first;
+
+//    Eigen::VectorXd finalPropagatedState = integrationResult.rbegin( )->second;
+//    Eigen::VectorXd finalPropagatedStateIo = finalPropagatedState.segment( 12, 6 );
+//    Eigen::VectorXd finalPropagatedStateEuropa = finalPropagatedState.segment( 18, 6 );
+//    Eigen::VectorXd finalPropagatedStateGanymede = finalPropagatedState.segment( 24, 6 );
+
+//    Eigen::VectorXd finalDependentVariablesValues = dependentVariablesHistory.rbegin( )->second;
+
+//    double finalDistanceIoEuropa = finalDependentVariablesValues[ 9 ];
+//    double finalDistanceIoGanymede = finalDependentVariablesValues[ 10 ];
+//    double finalDistanceEuropaGanymede = finalDependentVariablesValues[ 11 ];
+
+//    Eigen::VectorXd finalRelativePositionIoEarth = finalDependentVariablesValues.segment( 0, 3 );
+//    Eigen::Matrix< double, 3, 1 > finalSphericalStateIo = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                finalRelativePositionIoEarth.segment( 0, 3 ) ).template cast< double >( );
+//    double rightAscensionIo = finalSphericalStateIo.z( );
+//    double declinationIo = mathematical_constants::PI / 2.0 - finalSphericalStateIo.y( );
+
+//    Eigen::VectorXd finalRelativePositionEuropaEarth = finalDependentVariablesValues.segment( 3, 3 );
+//    Eigen::Matrix< double, 3, 1 > finalSphericalStateEuropa = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                finalRelativePositionEuropaEarth.segment( 0, 3 ) ).template cast< double >( );
+//    double rightAscensionEuropa = finalSphericalStateEuropa.z( );
+//    double declinationEuropa = mathematical_constants::PI / 2.0 - finalSphericalStateEuropa.y( );
+
+//    Eigen::VectorXd finalRelativePositionGanymedeEarth = finalDependentVariablesValues.segment( 6, 3 );
+//    Eigen::Matrix< double, 3, 1 > finalSphericalStateGanymede = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                finalRelativePositionGanymedeEarth.segment( 0, 3 ) ).template cast< double >( );
+//    double rightAscensionGanymede = finalSphericalStateGanymede.z( );
+//    double declinationGanymede = mathematical_constants::PI / 2.0 - finalSphericalStateGanymede.y( );
+
+//    double deltaRightAscensionIoEuropa = rightAscensionEuropa - rightAscensionIo;
+//    double deltaDeclinationIoEuropa = declinationEuropa - declinationIo;
+//    double apparentDistanceIoEuropa = std::sqrt( ( deltaRightAscensionIoEuropa * std::cos( ( declinationIo + declinationEuropa ) / 2.0 ) )
+//                                                 * ( deltaRightAscensionIoEuropa * std::cos( ( declinationIo + declinationEuropa ) / 2.0 ) )
+//                                                 + deltaDeclinationIoEuropa * deltaDeclinationIoEuropa );
+
+//    double deltaRightAscensionIoGanymede = rightAscensionGanymede - rightAscensionIo;
+//    double deltaDeclinationIoGanymede = declinationGanymede - declinationIo;
+//    double apparentDistanceIoGanymede = std::sqrt( ( deltaRightAscensionIoGanymede * std::cos( ( declinationIo + declinationGanymede ) / 2.0 ) )
+//                                                   * ( deltaRightAscensionIoGanymede * std::cos( ( declinationIo + declinationGanymede ) / 2.0 ) )
+//                                                 + deltaDeclinationIoGanymede * deltaDeclinationIoGanymede );
+
+//    double deltaRightAscensionEuropaGanymede = rightAscensionGanymede - rightAscensionEuropa;
+//    double deltaDeclinationEuropaGanymede = declinationGanymede - declinationEuropa;
+//    double apparentDistanceEuropaGanymede = std::sqrt( ( deltaRightAscensionEuropaGanymede * std::cos( ( declinationEuropa + declinationGanymede ) / 2.0 ) )
+//                                                       * ( deltaRightAscensionEuropaGanymede * std::cos( ( declinationEuropa + declinationGanymede ) / 2.0 ) )
+//                                                 + deltaDeclinationEuropaGanymede * deltaDeclinationEuropaGanymede );
+
+//    std::cout << "apparent distance Io-Europa: " << apparentDistanceIoEuropa * 180.0 / mathematical_constants::PI * 3600.0 << " arcseconds." << "\n\n";
+//    std::cout << "apparent distance Io-Ganymede: " << apparentDistanceIoGanymede * 180.0 / mathematical_constants::PI * 3600.0 << " arcseconds." << "\n\n";
+//    std::cout << "apparent distance Europa-Ganymede: " << apparentDistanceEuropaGanymede * 180.0 / mathematical_constants::PI * 3600.0 << " arcseconds." << "\n\n";
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    /////////////////           SECOND PROPAGATION CLOSE MUTUAL APPROXIMATION          ////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    Eigen::VectorXd newSystemInitialState = finalPropagatedState;
+
+
+//    useThresholdAsLowerLimit = false;
+//    std::vector< std::string > newListOfObjects;
+//    newListOfObjects.push_back( "Io" );
+//    newListOfObjects.push_back( "Europa" );
+//    std::function< bool( const double ) > newCustomTerminationFunction =
+//            std::bind( &isApparentDistanceBelowThreshold, std::placeholders::_1, limitValueImpactParameter,
+//                       "Earth", newListOfObjects, bodyMap, simulationEndEpoch, useThresholdAsLowerLimit );
+
+//    std::shared_ptr< PropagationTerminationSettings > newCustomTerminationSettings =
+//            std::make_shared< PropagationCustomTerminationSettings >( newCustomTerminationFunction );
+
+//    // Define propagator settings.
+//    std::shared_ptr< TranslationalStatePropagatorSettings< double > > newPropagatorSettings =
+//            std::make_shared< TranslationalStatePropagatorSettings< double > > (
+//                centralBodies, accelerationModelMap, bodiesToPropagate, newSystemInitialState,
+//                newCustomTerminationSettings, cowell, dependentVariablesToSave );
+
+//    // Define numerical integrator settings.
+//    std::shared_ptr< IntegratorSettings< > > newIntegratorSettings = std::make_shared< IntegratorSettings< > >
+//            ( rungeKutta4, epochEndFirstPropagation, 1.0 );
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////             PROPAGATE ORBIT AND VARIATIONAL EQUATIONS         /////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Create simulation object and propagate dynamics.
+//    SingleArcDynamicsSimulator< > newDynamicsSimulator( bodyMap, newIntegratorSettings, newPropagatorSettings, true, false, true );
+
+//    std::map< double, Eigen::VectorXd > newIntegrationResult = newDynamicsSimulator.getEquationsOfMotionNumericalSolution( );
+//    std::map< double, Eigen::VectorXd > newDependentVariablesHistory = newDynamicsSimulator.getDependentVariableHistory( );
+
+
+//    // Create map with apparent relative distances.
+//    std::map< double, Eigen::VectorXd > apparentDistancesHistory;
+//    std::map< double, Eigen::VectorXd > angularPositionsHistory;
+
+//    std::map< double, Eigen::VectorXd > XYhistory;
+
+//    for ( std::map< double, Eigen::VectorXd >::iterator itr = newDependentVariablesHistory.begin( ) ;
+//          itr != newDependentVariablesHistory.end( ) ; itr++ )
+//    {
+//        Eigen::VectorXd relativePositionIoEarth = itr->second.segment( 0, 3 );
+//        Eigen::VectorXd relativePositionEuropaEarth = itr->second.segment( 3, 3 );
+//        Eigen::VectorXd relativePositionGanymedeEarth = itr->second.segment( 6, 3 );
+
+//        Eigen::VectorXd relativeVelocityIoEarth = itr->second.segment( 12, 3 );
+//        Eigen::VectorXd relativeVelocityEuropaEarth = itr->second.segment( 15, 3 );
+
+//        Eigen::Matrix< double, 3, 1 > sphericalStateIo = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                    relativePositionIoEarth.segment( 0, 3 ) ).template cast< double >( );
+//        double currentRightAscensionIo = sphericalStateIo.z( );
+//        double currentDeclinationIo = mathematical_constants::PI / 2.0 - sphericalStateIo.y( );
+
+//        Eigen::Matrix< double, 3, 1 > sphericalStateEuropa = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                    relativePositionEuropaEarth.segment( 0, 3 ) ).template cast< double >( );
+//        double currentRightAscensionEuropa = sphericalStateEuropa.z( );
+//        double currentDeclinationEuropa = mathematical_constants::PI / 2.0 - sphericalStateEuropa.y( );
+
+//        Eigen::Matrix< double, 3, 1 > sphericalStateGanymede = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                    relativePositionGanymedeEarth.segment( 0, 3 ) ).template cast< double >( );
+//        double currentRightAscensionGanymede = sphericalStateGanymede.z( );
+//        double currentDeclinationGanymede = mathematical_constants::PI / 2.0 - sphericalStateGanymede.y( );
+
+//        double differenceRightAscensionIoEuropa = currentRightAscensionEuropa - currentRightAscensionIo;
+//        double differenceDeclinationIoEuropa = currentDeclinationEuropa - currentDeclinationIo;
+//        double currentApparentDistanceIoEuropa = std::sqrt( ( differenceRightAscensionIoEuropa * std::cos( ( currentDeclinationIo + currentDeclinationEuropa ) / 2.0 ) )
+//                                                            * ( differenceRightAscensionIoEuropa * std::cos( ( currentDeclinationIo + currentDeclinationEuropa ) / 2.0 ) )
+//                                                     + differenceDeclinationIoEuropa * differenceDeclinationIoEuropa );
+
+//        double differenceRightAscensionIoGanymede = currentRightAscensionGanymede - currentRightAscensionIo;
+//        double differenceDeclinationIoGanymede = currentDeclinationGanymede - currentDeclinationIo;
+//        double currentApparentDistanceIoGanymede = std::sqrt( ( differenceRightAscensionIoGanymede * std::cos( ( currentDeclinationIo + currentDeclinationGanymede ) / 2.0 ) )
+//                                                              * ( differenceRightAscensionIoGanymede * std::cos( ( currentDeclinationIo + currentDeclinationGanymede ) / 2.0 ) )
+//                                                     + differenceDeclinationIoGanymede * differenceDeclinationIoGanymede );
+
+//        double differenceRightAscensionEuropaGanymede = currentRightAscensionGanymede - currentRightAscensionEuropa;
+//        double differenceDeclinationEuropaGanymede = currentDeclinationGanymede - currentDeclinationEuropa;
+//        double currentApparentDistanceEuropaGanymede = std::sqrt( ( differenceRightAscensionEuropaGanymede * std::cos( ( currentDeclinationEuropa + currentDeclinationGanymede ) / 2.0 ) )
+//                                                                  * ( differenceRightAscensionEuropaGanymede * std::cos( ( currentDeclinationEuropa + currentDeclinationGanymede ) / 2.0 ) )
+//                                                     + differenceDeclinationEuropaGanymede * differenceDeclinationEuropaGanymede );
+
+//        Eigen::VectorXd currentApparentDistancesVector = Eigen::VectorXd::Zero( 3 );
+//        currentApparentDistancesVector[ 0 ] = currentApparentDistanceIoEuropa * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+//        currentApparentDistancesVector[ 1 ] = currentApparentDistanceIoGanymede * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+//        currentApparentDistancesVector[ 2 ] = currentApparentDistanceEuropaGanymede * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+
+//        apparentDistancesHistory[ itr->first ] = currentApparentDistancesVector;
+
+//        Eigen::VectorXd currentAngularPositionsVector = Eigen::VectorXd::Zero( 6 );
+//        currentAngularPositionsVector = ( Eigen::Vector6d( ) << currentRightAscensionIo, currentDeclinationIo,
+//                                          currentRightAscensionEuropa, currentDeclinationEuropa,
+//                                          currentRightAscensionGanymede, currentDeclinationGanymede ).finished( );
+//        angularPositionsHistory[ itr->first ] = currentAngularPositionsVector;
+
+//    }
+
+
+//    input_output::writeDataMapToTextFile( apparentDistancesHistory,
+//                                          "apparentDistancesHistory_SecondTestCase.dat",
+//                                          "C:/Users/chamb/Documents/PhD/",
+//                                          "",
+//                                          std::numeric_limits< double >::digits10,
+//                                          std::numeric_limits< double >::digits10,
+//                                          "," );
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////    DEFINE PARAMETERS FOR WHICH SENSITIVITY IS TO BE COMPUTED   ////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Define list of parameters to estimate.
+//    Eigen::Vector6d initialStateJupiter = newSystemInitialState.segment( 6, 6 );
+//    Eigen::Vector6d initialStateIo = newSystemInitialState.segment( 12, 6 );
+//    Eigen::Vector6d initialStateEuropa = newSystemInitialState.segment( 18, 6 );
+//    Eigen::Vector6d initialStateGanymede = newSystemInitialState.segment( 24, 6 );
+//    std::vector< std::shared_ptr< estimatable_parameters::EstimatableParameterSettings > > parameterNames;
+//    parameterNames.push_back( std::make_shared< estimatable_parameters::InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Earth", initialStateJupiter, "SSB" ) );
+//    parameterNames.push_back( std::make_shared< estimatable_parameters::InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Jupiter", initialStateJupiter, "SSB" ) );
+//    parameterNames.push_back( std::make_shared< estimatable_parameters::InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Io", initialStateIo, "Jupiter" ) );
+//    parameterNames.push_back( std::make_shared< estimatable_parameters::InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Europa", initialStateEuropa, "Jupiter" ) );
+//    parameterNames.push_back( std::make_shared< estimatable_parameters::InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Ganymede", initialStateGanymede, "Jupiter" ) );
+
+//    // Create parameters
+//    std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate =
+//            createParametersToEstimate( parameterNames, bodyMap );
+
+
+//    double estimatedCentralInstant = 1.341664001596912e6;// 1.341664005849638e6; // from Matlab
+
+
+//    // Create light-time correction settings
+//    std::vector< std::string > perturbingBodies = { "Sun" };
+//    std::vector< std::shared_ptr< observation_models::LightTimeCorrectionSettings > > lightTimeCorrectionSettings;
+//    lightTimeCorrectionSettings.push_back( std::make_shared< observation_models::FirstOrderRelativisticLightTimeCorrectionSettings >(
+//                                                perturbingBodies ) );
+
+//    // Create observation settings
+//    std::shared_ptr< observation_models::ObservationSettings > observableSettings = std::make_shared< observation_models::ObservationSettings >
+//            ( observation_models::apparent_distance, lightTimeCorrectionSettings, std::make_shared< observation_models::ConstantObservationBiasSettings >(
+//                  ( Eigen::Vector1d( ) << 0.0 ).finished( ), true ) );
+
+//    observation_models::LinkEnds linkEnds;
+//    linkEnds[ observation_models::receiver ] = std::make_pair( "Earth" , ""  );
+//    linkEnds[ observation_models::transmitter ] = std::make_pair( "Io" , ""  );
+//    linkEnds[ observation_models::transmitter2 ] = std::make_pair( "Europa" , ""  );
+
+//    // Create apparent distance observation model.
+//    std::shared_ptr< observation_models::ObservationModel< 1, double, double > > apparentDistanceModel =
+//           observation_models::ObservationModelCreator< 1, double, double >::createObservationModel(
+//                linkEnds, observableSettings, bodyMap );
+
+//    std::vector< double > linkEndTimes;
+//    std::vector< Eigen::Vector6d > linkEndStates;
+//    Eigen::Vector1d observationFromReceptionTime = 3600.0 * 180.0 / mathematical_constants::PI * apparentDistanceModel->computeObservationsWithLinkEndData( estimatedCentralInstant, observation_models::receiver, linkEndTimes, linkEndStates );
+//    std::cout << "apparent distance at central instant from observation model: " << observationFromReceptionTime << "\n\n";
+//    std::cout << "link end times: " << linkEndTimes[ 0 ] << " & " << linkEndTimes[ 1 ] << " & " << linkEndTimes[ 2 ] << "\n\n";
+
+////    std::map< double, Eigen::VectorXd > lightTimeCorrectedApparentDistances;
+////    for ( double i = estimatedCentralInstant - 20.0 * 60.0 ; i <= estimatedCentralInstant + 30.0 * 60.0 ; i += 30.0 )
+////    {
+////        lightTimeCorrectedApparentDistances[ i ] = 3600.0 * 180.0 / mathematical_constants::PI *
+////                apparentDistanceModel->computeObservations( i, observation_models::receiver );
+////    }
+
+
+////    input_output::writeDataMapToTextFile( lightTimeCorrectedApparentDistances,
+////                                          "lightTimeCorrectedApparentDistancesHistory.dat",
+////                                          "C:/Users/chamb/Documents/PhD/",
+////                                          "",
+////                                          std::numeric_limits< double >::digits10,
+////                                          std::numeric_limits< double >::digits10,
+////                                          "," );
+
+
+//    // Define more complete list of dependent variables to save.
+//    std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > updatedDependentVariablesList;
+//    updatedDependentVariablesList = dependentVariablesList;
+
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Io", "Sun" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Io", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Io", "Europa" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Io", "Ganymede" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Europa", "Sun" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Europa", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Europa", "Ganymede" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_velocity_dependent_variable, "Io", "Earth" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_velocity_dependent_variable, "Europa", "Earth" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Earth", "Sun" ) );
+
+//    updatedDependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::total_acceleration_dependent_variable, "Io" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::total_acceleration_dependent_variable, "Europa" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::total_acceleration_dependent_variable, "Earth" ) );
+
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Io", "Io", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Io", "Earth", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Io", "Europa", "Jupiter" ) );
+
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Europa", "Europa", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Europa", "Earth", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Europa", "Io", "Jupiter" ) );
+
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Earth", "Earth", "Sun" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Earth", "Io", "Sun" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Earth", "Europa", "Sun" ) );
+
+//    // Create object with list of dependent variables
+//    std::shared_ptr< DependentVariableSaveSettings > updatedDependentVariablesToSave =
+//            std::make_shared< DependentVariableSaveSettings >( updatedDependentVariablesList );
+
+
+
+//    // Redefine propagator settings.
+//    newPropagatorSettings = std::make_shared< TranslationalStatePropagatorSettings< double > > (
+//                centralBodies, accelerationModelMap, bodiesToPropagate, newSystemInitialState,
+//                std::make_shared< propagators::PropagationTimeTerminationSettings > ( estimatedCentralInstant, true ),
+//                cowell, updatedDependentVariablesToSave );
+
+//    // Create simulation object and propagate dynamics.
+//    SingleArcVariationalEquationsSolver< > variationalEquationsSimulator(
+//                bodyMap, newIntegratorSettings, newPropagatorSettings, parametersToEstimate, true,
+//                std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ), false, true );
+
+
+//    // Retrieve dependent variables history.
+//    std::map< double, Eigen::VectorXd > dependentVariablesHistoryForInterface = variationalEquationsSimulator.getDynamicsSimulator( )->getDependentVariableHistory( );
+//    // Create dependent variables interpolator.
+//    std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd > > dependentVariablesInterpolator
+//            = std::make_shared< interpolators::LagrangeInterpolator< double, Eigen::VectorXd > >(
+//                utilities::createVectorFromMapKeys< Eigen::VectorXd, double >( dependentVariablesHistoryForInterface ),
+//                utilities::createVectorFromMapValues< Eigen::VectorXd, double >( dependentVariablesHistoryForInterface ), 4 );
+
+//    std::shared_ptr< propagators::SingleArcDependentVariablesInterface > dependentVariablesInterface = std::make_shared< propagators::SingleArcDependentVariablesInterface >(
+//                dependentVariablesInterpolator, updatedDependentVariablesToSave );
+
+//    std::shared_ptr< observation_partials::MutualApproximationScaling > mutualApproximationScaling =
+//            std::make_shared< observation_partials::MutualApproximationScaling >( dependentVariablesInterface );
+
+//    std::shared_ptr< observation_partials::MutualApproximationWithImpactParameterScaling > mutualApproximationWithImpactParameterScaling =
+//            std::make_shared< observation_partials::MutualApproximationWithImpactParameterScaling >( dependentVariablesInterface );
+
+//    std::shared_ptr< observation_partials::ModifiedMutualApproximationScaling > modifiedMutualApproximationScaling =
+//            std::make_shared< observation_partials::ModifiedMutualApproximationScaling >( dependentVariablesInterface );
+
+
+
+
+//    Eigen::VectorXd centralInstantRelativePositionIoEarth = variationalEquationsSimulator.getDynamicsSimulator( )
+//            ->getDependentVariableHistory( ).rbegin( )->second.segment( 0, 3 );
+//    Eigen::VectorXd centralInstantRelativePositionEuropaEarth = variationalEquationsSimulator.getDynamicsSimulator( )
+//            ->getDependentVariableHistory( ).rbegin( )->second.segment( 3, 3 );
+
+//    Eigen::VectorXd centralInstantRelativeVelocityIoEarth = variationalEquationsSimulator.getDynamicsSimulator( )
+//            ->getDependentVariableHistory( ).rbegin( )->second.segment( 33, 3 );
+//    Eigen::VectorXd centralInstantRelativeVelocityEuropaEarth = variationalEquationsSimulator.getDynamicsSimulator( )
+//            ->getDependentVariableHistory( ).rbegin( )->second.segment( 36, 3 );
+
+//    Eigen::VectorXd centralInstantDependentVariables = variationalEquationsSimulator.getDynamicsSimulator( )
+//            ->getDependentVariableHistory( ).rbegin( )->second;
+
+//    Eigen::Matrix< double, 3, 1 > centralInstantSphericalStateIo =
+//            tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                centralInstantRelativePositionIoEarth.segment( 0, 3 ) ).template cast< double >( );
+//    double centralInstantRightAscensionIo = centralInstantSphericalStateIo.z( );
+//    double centralInstantDeclinationIo = mathematical_constants::PI / 2.0 - centralInstantSphericalStateIo.y( );
+
+//    Eigen::Matrix< double, 3, 1 > centralInstantSphericalStateEuropa =
+//            tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                centralInstantRelativePositionEuropaEarth.segment( 0, 3 ) ).template cast< double >( );
+//    double centralInstantRightAscensionEuropa = centralInstantSphericalStateEuropa.z( );
+//    double centralInstantDeclinationEuropa = mathematical_constants::PI / 2.0 - centralInstantSphericalStateEuropa.y( );
+
+//    double centralInstantDifferenceRightAscensionIoEuropa = centralInstantRightAscensionEuropa - centralInstantRightAscensionIo;
+//    double centralInstantDifferenceDeclinationIoEuropa = centralInstantDeclinationEuropa - centralInstantDeclinationIo;
+
+//    double centralInstantAverageDeclination = ( centralInstantDeclinationIo + centralInstantDeclinationEuropa ) / 2.0;
+
+//    double centralInstantApparentDistanceIoEuropa =
+//            std::sqrt( ( centralInstantDifferenceRightAscensionIoEuropa * std::cos( centralInstantAverageDeclination ) )
+//                       * ( centralInstantDifferenceRightAscensionIoEuropa * std::cos( centralInstantAverageDeclination ) )
+//                       + centralInstantDifferenceDeclinationIoEuropa * centralInstantDifferenceDeclinationIoEuropa );
+
+//    std::cout << "estimated central instant: " << estimatedCentralInstant << "\n\n";
+//    std::cout << "apparent distance between Io and Europa at estimated central instant: " <<
+//                 centralInstantApparentDistanceIoEuropa * 180.0 / mathematical_constants::PI * 3600.0 << "\n\n";
+
+
+//    /// Compute nomimal modified mutual approximation observable.
+
+//    // Compute partials of right ascension w.r.t. time.
+//    double timeDerivativeRightAscensionIo = observation_partials::computePartialOfRightAscensionWrtTime(
+//                centralInstantRelativePositionIoEarth.segment( 0, 3 ), centralInstantRelativeVelocityIoEarth.segment( 0, 3 ) );
+//    double timeDerivativeRightAscensionEuropa = observation_partials::computePartialOfRightAscensionWrtTime(
+//                centralInstantRelativePositionEuropaEarth.segment( 0, 3 ), centralInstantRelativeVelocityEuropaEarth.segment( 0, 3 ) );
+
+//    // Compute partials of declination w.r.t. time.
+//    double timeDerivativeDeclinationIo = observation_partials::computePartialOfDeclinationWrtTime(
+//                centralInstantRelativePositionIoEarth.segment( 0, 3 ), centralInstantRelativeVelocityIoEarth.segment( 0, 3 ) );
+//    double timeDerivativeDeclinationEuropa = observation_partials::computePartialOfDeclinationWrtTime(
+//                centralInstantRelativePositionEuropaEarth.segment( 0, 3 ), centralInstantRelativeVelocityEuropaEarth.segment( 0, 3 ) );
+
+//    Eigen::Vector2d relativePositionInReceiverFrame =
+//            ( Eigen::Vector2d( ) << centralInstantDifferenceRightAscensionIoEuropa * std::cos( centralInstantAverageDeclination ),
+//              centralInstantDifferenceDeclinationIoEuropa ).finished( );
+
+//    Eigen::Vector2d relativeVelocityInReceiverFrame =
+//            ( Eigen::Vector2d( ) << ( timeDerivativeRightAscensionEuropa - timeDerivativeRightAscensionIo )
+//            * std::cos( centralInstantAverageDeclination )
+//            - ( centralInstantRightAscensionEuropa - centralInstantRightAscensionIo ) / 2.0
+//            * std::sin( centralInstantAverageDeclination ) * ( timeDerivativeDeclinationIo + timeDerivativeDeclinationEuropa ),
+//              timeDerivativeDeclinationEuropa - timeDerivativeDeclinationIo ).finished( );
+
+//    double centralInstantModifiedObservable = 1.0 / ( centralInstantApparentDistanceIoEuropa )
+//            * ( relativePositionInReceiverFrame[ 0 ] * relativeVelocityInReceiverFrame[ 0 ]
+//            + relativePositionInReceiverFrame[ 1 ] * relativeVelocityInReceiverFrame[ 1 ] );
+
+
+
+
+//    std::map< double, Eigen::MatrixXd > stateTransitionResult =
+//            variationalEquationsSimulator.getNumericalVariationalEquationsSolution( ).at( 0 );
+
+//    Eigen::VectorXd centralInstantState = variationalEquationsSimulator.getDynamicsSimulator( )
+//            ->getEquationsOfMotionNumericalSolution( ).rbegin( )->second;
+
+//    Eigen::MatrixXd centralInstantStateTransitionMatrix = stateTransitionResult.rbegin( )->second;
+//    Eigen::Vector3d centralInstantVectorFromIoToEuropa = centralInstantState.segment( 18, 3 ) - centralInstantState.segment( 12, 3 );
+//    Eigen::Vector3d centralInstantUnitVectorFromIoToEuropa = centralInstantVectorFromIoToEuropa / centralInstantVectorFromIoToEuropa.norm( );
+//    double centralInstantDistanceIoEuropa = centralInstantVectorFromIoToEuropa.norm( );
+
+//    Eigen::Vector3d variationPositionCentralInstant = centralInstantDistanceIoEuropa * 0.005
+//            * centralInstantUnitVectorFromIoToEuropa;
+
+
+//    Eigen::Matrix< double, 1, 3 > numericalPartialsImpactParameterWrtPositionIo = Eigen::Matrix< double, 1, 3 >::Zero( );
+//    Eigen::Matrix< double, 1, 3 > numericalPartialsImpactParameterWrtPositionEuropa = Eigen::Matrix< double, 1, 3 >::Zero( );
+//    Eigen::Matrix< double, 1, 3 > numericalPartialsImpactParameterWrtPositionEarth = Eigen::Matrix< double, 1, 3 >::Zero( );
+
+//    Eigen::Matrix< double, 1, 3 > numericalPartialsModifiedObservableWrtPositionIo = Eigen::Matrix< double, 1, 3 >::Zero( );
+//    Eigen::Matrix< double, 1, 3 > numericalPartialsModifiedObservableWrtPositionEuropa = Eigen::Matrix< double, 1, 3 >::Zero( );
+//    Eigen::Matrix< double, 1, 3 > numericalPartialsModifiedObservableWrtPositionEarth = Eigen::Matrix< double, 1, 3 >::Zero( );
+
+//    for ( unsigned int testCase = 0 ; testCase < 10 ; testCase++ )
+//    {
+
+//        Eigen::VectorXd totalVariationVectorCentralInstant = Eigen::VectorXd::Zero( 6 * 5 );
+//        std::string nameOutputFile;
+//        double updatedCentralInstant;
+//        if ( testCase == 0 )
+//        {
+//            variationPositionCentralInstant = ( Eigen::Vector3d( ) << centralInstantState[ 12 ] * 0.0001, 0.0 , 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 12, 3 ) = variationPositionCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationXio.dat";
+//            updatedCentralInstant = 1.341663136337792e6;
+//        }
+//        else if ( testCase == 1 )
+//        {
+//            variationPositionCentralInstant = ( Eigen::Vector3d( ) << 0.0, centralInstantState[ 13 ] * 0.0001, 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 12, 3 ) = variationPositionCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationYio.dat";
+//            updatedCentralInstant = 1.341661179576671e6;
+//        }
+//        else if ( testCase == 2 )
+//        {
+//            variationPositionCentralInstant = ( Eigen::Vector3d( ) << 0.0, 0.0, centralInstantState[ 14 ] * 0.0001 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 12, 3 ) = variationPositionCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationZio.dat";
+//            updatedCentralInstant = 1.341663461629118e6;
+//        }
+//        else if ( testCase == 3 )
+//        {
+//            variationPositionCentralInstant = ( Eigen::Vector3d( ) << centralInstantState[ 18 ] * 0.0001, 0.0, 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 18, 3 ) = variationPositionCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationXeuropa.dat";
+//            updatedCentralInstant = 1.341666923508797e6;
+//        }
+//        else if ( testCase == 4 )
+//        {
+//            variationPositionCentralInstant = ( Eigen::Vector3d( ) << 0.0, centralInstantState[ 19 ] * 0.0001, 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 18, 3 ) = variationPositionCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationYeuropa.dat";
+//            updatedCentralInstant = 1.341665122400299e6;
+//        }
+//        else if ( testCase == 5 )
+//        {
+//            variationPositionCentralInstant = ( Eigen::Vector3d( ) << 0.0, 0.0, centralInstantState[ 20 ] * 0.0001 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 18, 3 ) = variationPositionCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationZeuropa.dat";
+//            updatedCentralInstant = 1.341664180485040e6;
+//        }
+//        else if ( testCase == 6 )
+//        {
+//            variationPositionCentralInstant = ( Eigen::Vector3d( ) << centralInstantState[ 0 ] * 0.0001, 0.0, 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 0, 3 ) = variationPositionCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationXearth.dat";
+//            updatedCentralInstant = 1.341663794129857e6;
+//        }
+//        else if ( testCase == 7 )
+//        {
+//            variationPositionCentralInstant = ( Eigen::Vector3d( ) << 0.0, centralInstantState[ 1 ] * 0.0001, 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 0, 3 ) = variationPositionCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationYearth.dat";
+//            updatedCentralInstant = 1.341663273347678e6;
+//        }
+//        else if ( testCase == 8 )
+//        {
+//            variationPositionCentralInstant = ( Eigen::Vector3d( ) << 0.0, 0.0, centralInstantState[ 2 ] * 0.0001 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 0, 3 ) = variationPositionCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationZearth.dat";
+//            updatedCentralInstant = 1.341663890645573e6;
+//        }
+//        else if ( testCase == 9 )
+//        {
+//            variationPositionCentralInstant = centralInstantDistanceIoEuropa * 0.0001 * centralInstantUnitVectorFromIoToEuropa;
+//            totalVariationVectorCentralInstant.segment( 12, 3 ) = variationPositionCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationIoAlongIoEuropa.dat";
+//            updatedCentralInstant = 1.341664003484260e6;
+//        }
+
+//        Eigen::VectorXd variationVectorInitialEpoch = centralInstantStateTransitionMatrix.inverse( ) * totalVariationVectorCentralInstant;
+
+//        std::cout << "variation vector initial epoch: " << variationVectorInitialEpoch.transpose( ) << "\n\n";
+
+
+//        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        ///////////////////////             PROPAGATE PERTURBED INITIAL STATE                 /////////////////////////////////
+//        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//        Eigen::VectorXd updatedSystemInitialState = newSystemInitialState + variationVectorInitialEpoch;
+
+//        // Define propagator settings.
+//        std::shared_ptr< TranslationalStatePropagatorSettings< double > > updatedPropagatorSettings =
+//                std::make_shared< TranslationalStatePropagatorSettings< double > > (
+//                    centralBodies, accelerationModelMap, bodiesToPropagate, updatedSystemInitialState,
+//                    newCustomTerminationSettings, cowell, updatedDependentVariablesToSave );
+
+//        // Create simulation object and propagate dynamics.
+//        SingleArcDynamicsSimulator< > updatedDynamicsSimulator( bodyMap, newIntegratorSettings, updatedPropagatorSettings, true, false, true );
+//        std::map< double, Eigen::VectorXd > updatedDependentVariablesHistory = updatedDynamicsSimulator.getDependentVariableHistory( );
+
+//        std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd > > updatedDependentVariablesInterpolator
+//                = std::make_shared< interpolators::LagrangeInterpolator< double, Eigen::VectorXd > >(
+//                    utilities::createVectorFromMapKeys< Eigen::VectorXd, double >( updatedDependentVariablesHistory ),
+//                    utilities::createVectorFromMapValues< Eigen::VectorXd, double >( updatedDependentVariablesHistory ), 4 );
+
+//        // Create map with apparent relative distances.
+//        std::map< double, Eigen::VectorXd > updatedApparentDistancesHistory;
+
+//        for ( std::map< double, Eigen::VectorXd >::iterator itr = updatedDependentVariablesHistory.begin( ) ;
+//              itr != updatedDependentVariablesHistory.end( ) ; itr++ )
+//        {
+//            Eigen::VectorXd relativePositionIoEarth = itr->second.segment( 0, 3 );
+//            Eigen::VectorXd relativePositionEuropaEarth = itr->second.segment( 3, 3 );
+//            Eigen::VectorXd relativePositionGanymedeEarth = itr->second.segment( 6, 3 );
+
+//            Eigen::Matrix< double, 3, 1 > sphericalStateIo = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                        relativePositionIoEarth.segment( 0, 3 ) ).template cast< double >( );
+//            double currentRightAscensionIo = sphericalStateIo.z( );
+//            double currentDeclinationIo = mathematical_constants::PI / 2.0 - sphericalStateIo.y( );
+
+//            Eigen::Matrix< double, 3, 1 > sphericalStateEuropa = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                        relativePositionEuropaEarth.segment( 0, 3 ) ).template cast< double >( );
+//            double currentRightAscensionEuropa = sphericalStateEuropa.z( );
+//            double currentDeclinationEuropa = mathematical_constants::PI / 2.0 - sphericalStateEuropa.y( );
+
+//            Eigen::Matrix< double, 3, 1 > sphericalStateGanymede = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                        relativePositionGanymedeEarth.segment( 0, 3 ) ).template cast< double >( );
+//            double currentRightAscensionGanymede = sphericalStateGanymede.z( );
+//            double currentDeclinationGanymede = mathematical_constants::PI / 2.0 - sphericalStateGanymede.y( );
+
+//            double updatedAverageDeclinationIoEuropa = ( currentDeclinationIo + currentDeclinationEuropa ) / 2.0;
+//            double updatedAverageDeclinationIoGanymede = ( currentDeclinationIo + currentDeclinationGanymede ) / 2.0;
+//            double updatedAverageDeclinationEuropaGanymede = ( currentDeclinationEuropa + currentDeclinationGanymede ) / 2.0;
+
+//            double differenceRightAscensionIoEuropa = currentRightAscensionEuropa - currentRightAscensionIo;
+//            double differenceDeclinationIoEuropa = currentDeclinationEuropa - currentDeclinationIo;
+//            double currentApparentDistanceIoEuropa = std::sqrt( ( differenceRightAscensionIoEuropa * std::cos( updatedAverageDeclinationIoEuropa ) )
+//                                                                * ( differenceRightAscensionIoEuropa * std::cos( updatedAverageDeclinationIoEuropa ) )
+//                                                         + differenceDeclinationIoEuropa * differenceDeclinationIoEuropa );
+
+//            double differenceRightAscensionIoGanymede = currentRightAscensionGanymede - currentRightAscensionIo;
+//            double differenceDeclinationIoGanymede = currentDeclinationGanymede - currentDeclinationIo;
+//            double currentApparentDistanceIoGanymede = std::sqrt( ( differenceRightAscensionIoGanymede * std::cos( updatedAverageDeclinationIoGanymede ) )
+//                                                                  * ( differenceRightAscensionIoGanymede * std::cos( updatedAverageDeclinationIoGanymede ) )
+//                                                         + differenceDeclinationIoGanymede * differenceDeclinationIoGanymede );
+
+//            double differenceRightAscensionEuropaGanymede = currentRightAscensionGanymede - currentRightAscensionEuropa;
+//            double differenceDeclinationEuropaGanymede = currentDeclinationGanymede - currentDeclinationEuropa;
+//            double currentApparentDistanceEuropaGanymede = std::sqrt( ( differenceRightAscensionEuropaGanymede * std::cos( updatedAverageDeclinationEuropaGanymede ) )
+//                                                                      * ( differenceRightAscensionEuropaGanymede * std::cos( updatedAverageDeclinationEuropaGanymede ) )
+//                                                         + differenceDeclinationEuropaGanymede * differenceDeclinationEuropaGanymede );
+
+//            Eigen::VectorXd currentApparentDistancesVector = Eigen::VectorXd::Zero( 3 );
+//            currentApparentDistancesVector[ 0 ] = currentApparentDistanceIoEuropa * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+//            currentApparentDistancesVector[ 1 ] = currentApparentDistanceIoGanymede * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+//            currentApparentDistancesVector[ 2 ] = currentApparentDistanceEuropaGanymede * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+
+//            updatedApparentDistancesHistory[ itr->first ] = currentApparentDistancesVector;
+
+//        }
+
+
+//        // At new central instant.
+//        Eigen::VectorXd dependentVariablesAtNewCentralInstant = updatedDependentVariablesInterpolator->interpolate( updatedCentralInstant );
+//        Eigen::VectorXd relativePositionIoEarth = dependentVariablesAtNewCentralInstant.segment( 0, 3 );
+//        Eigen::VectorXd relativePositionEuropaEarth = dependentVariablesAtNewCentralInstant.segment( 3, 3 );
+//        Eigen::VectorXd relativeVelocityIoEarth = dependentVariablesAtNewCentralInstant.segment( 33, 3 );
+//        Eigen::VectorXd relativeVelocityEuropaEarth = dependentVariablesAtNewCentralInstant.segment( 36, 3 );
+
+//        Eigen::Matrix< double, 3, 1 > sphericalStateIo = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                    relativePositionIoEarth.segment( 0, 3 ) ).template cast< double >( );
+//        double currentRightAscensionIo = sphericalStateIo.z( );
+//        double currentDeclinationIo = mathematical_constants::PI / 2.0 - sphericalStateIo.y( );
+
+//        Eigen::Matrix< double, 3, 1 > sphericalStateEuropa = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                    relativePositionEuropaEarth.segment( 0, 3 ) ).template cast< double >( );
+//        double currentRightAscensionEuropa = sphericalStateEuropa.z( );
+//        double currentDeclinationEuropa = mathematical_constants::PI / 2.0 - sphericalStateEuropa.y( );
+
+//        double updatedAverageDeclination = ( currentDeclinationIo + currentDeclinationEuropa ) / 2.0;
+
+//        double differenceRightAscensionIoEuropa = currentRightAscensionEuropa - currentRightAscensionIo;
+//        double differenceDeclinationIoEuropa = currentDeclinationEuropa - currentDeclinationIo;
+//        double updatedApparentDistanceIoEuropa = std::sqrt( ( differenceRightAscensionIoEuropa * std::cos( updatedAverageDeclination ) )
+//                                                            * ( differenceRightAscensionIoEuropa * std::cos( updatedAverageDeclination ) )
+//                                                     + differenceDeclinationIoEuropa * differenceDeclinationIoEuropa );
+
+
+//        // At former central instant.
+//        Eigen::VectorXd dependentVariablesAtOldCentralInstant = updatedDependentVariablesInterpolator->interpolate( estimatedCentralInstant );
+//        relativePositionIoEarth = dependentVariablesAtOldCentralInstant.segment( 0, 3 );
+//        relativePositionEuropaEarth = dependentVariablesAtOldCentralInstant.segment( 3, 3 );
+//        relativeVelocityIoEarth = dependentVariablesAtOldCentralInstant.segment( 33, 3 );
+//        relativeVelocityEuropaEarth = dependentVariablesAtOldCentralInstant.segment( 36, 3 );
+
+//        sphericalStateIo = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                    relativePositionIoEarth.segment( 0, 3 ) ).template cast< double >( );
+//        currentRightAscensionIo = sphericalStateIo.z( );
+//        currentDeclinationIo = mathematical_constants::PI / 2.0 - sphericalStateIo.y( );
+
+//        sphericalStateEuropa = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                    relativePositionEuropaEarth.segment( 0, 3 ) ).template cast< double >( );
+//        currentRightAscensionEuropa = sphericalStateEuropa.z( );
+//        currentDeclinationEuropa = mathematical_constants::PI / 2.0 - sphericalStateEuropa.y( );
+
+//        updatedAverageDeclination = ( currentDeclinationIo + currentDeclinationEuropa ) / 2.0;
+
+//        differenceRightAscensionIoEuropa = currentRightAscensionEuropa - currentRightAscensionIo;
+//        differenceDeclinationIoEuropa = currentDeclinationEuropa - currentDeclinationIo;
+//        double oldApparentDistanceIoEuropa = std::sqrt( ( differenceRightAscensionIoEuropa * std::cos( updatedAverageDeclination ) )
+//                                                            * ( differenceRightAscensionIoEuropa * std::cos( updatedAverageDeclination ) )
+//                                                     + differenceDeclinationIoEuropa * differenceDeclinationIoEuropa );
+
+//        // Compute partials of right ascension w.r.t. time.
+//        double updatedTimeDerivativeRightAscensionIo = observation_partials::computePartialOfRightAscensionWrtTime(
+//                    relativePositionIoEarth.segment( 0, 3 ), relativeVelocityIoEarth.segment( 0, 3 ) );
+//        double updatedTimeDerivativeRightAscensionEuropa = observation_partials::computePartialOfRightAscensionWrtTime(
+//                    relativePositionEuropaEarth.segment( 0, 3 ), relativeVelocityEuropaEarth.segment( 0, 3 ) );
+
+//        // Compute partials of declination w.r.t. time.
+//        double updatedTimeDerivativeDeclinationIo = observation_partials::computePartialOfDeclinationWrtTime(
+//                    relativePositionIoEarth.segment( 0, 3 ), relativeVelocityIoEarth.segment( 0, 3 ) );
+//        double updatedTimeDerivativeDeclinationEuropa = observation_partials::computePartialOfDeclinationWrtTime(
+//                    relativePositionEuropaEarth.segment( 0, 3 ), relativeVelocityEuropaEarth.segment( 0, 3 ) );
+
+//        Eigen::Vector2d updatedRelativePositionInReceiverFrame =
+//                ( Eigen::Vector2d( ) << differenceRightAscensionIoEuropa * std::cos( updatedAverageDeclination ),
+//                  differenceDeclinationIoEuropa ).finished( );
+
+//        Eigen::Vector2d updatedRelativeVelocityInReceiverFrame =
+//                ( Eigen::Vector2d( ) << ( updatedTimeDerivativeRightAscensionEuropa - updatedTimeDerivativeRightAscensionIo )
+//                * std::cos( updatedAverageDeclination )
+//                - ( currentRightAscensionEuropa - currentRightAscensionIo ) / 2.0
+//                * std::sin( updatedAverageDeclination ) * ( updatedTimeDerivativeDeclinationIo + updatedTimeDerivativeDeclinationEuropa ),
+//                  updatedTimeDerivativeDeclinationEuropa - updatedTimeDerivativeDeclinationIo ).finished( );
+
+//        double updatedModifiedObservable = 1.0 / ( oldApparentDistanceIoEuropa )
+//                * ( updatedRelativePositionInReceiverFrame[ 0 ] * updatedRelativeVelocityInReceiverFrame[ 0 ]
+//                + updatedRelativePositionInReceiverFrame[ 1 ] * updatedRelativeVelocityInReceiverFrame[ 1 ] );
+
+
+//        input_output::writeDataMapToTextFile( updatedApparentDistancesHistory,
+//                                              nameOutputFile,
+//                                              "C:/Users/chamb/Documents/PhD/",
+//                                              "",
+//                                              std::numeric_limits< double >::digits10,
+//                                              std::numeric_limits< double >::digits10,
+//                                              "," );
+
+//        if ( testCase == 0 )
+//        {
+//            numericalPartialsImpactParameterWrtPositionIo( 0, 0 ) = ( updatedApparentDistanceIoEuropa - centralInstantApparentDistanceIoEuropa ) / ( centralInstantState[ 12 ] * 0.0001 );
+//            numericalPartialsModifiedObservableWrtPositionIo( 0, 0 ) = ( updatedModifiedObservable -  centralInstantModifiedObservable ) / ( centralInstantState[ 12 ] * 0.0001 );
+//        }
+//        else if ( testCase == 1 )
+//        {
+//            numericalPartialsImpactParameterWrtPositionIo( 0, 1 ) = ( updatedApparentDistanceIoEuropa - centralInstantApparentDistanceIoEuropa ) / ( centralInstantState[ 13 ] * 0.0001 );
+//            numericalPartialsModifiedObservableWrtPositionIo( 0, 1 ) = ( updatedModifiedObservable -  centralInstantModifiedObservable ) / ( centralInstantState[ 13 ] * 0.0001 );
+//        }
+//        else if ( testCase == 2 )
+//        {
+//            numericalPartialsImpactParameterWrtPositionIo( 0, 2 ) = ( updatedApparentDistanceIoEuropa - centralInstantApparentDistanceIoEuropa ) / ( centralInstantState[ 14 ] * 0.0001 );
+//            numericalPartialsModifiedObservableWrtPositionIo( 0, 2 ) = ( updatedModifiedObservable -  centralInstantModifiedObservable ) / ( centralInstantState[ 14 ] * 0.0001 );
+//        }
+//        else if ( testCase == 3 )
+//        {
+//            numericalPartialsImpactParameterWrtPositionEuropa( 0, 0 ) = ( updatedApparentDistanceIoEuropa - centralInstantApparentDistanceIoEuropa ) / ( centralInstantState[ 18 ] * 0.0001 );
+//            numericalPartialsModifiedObservableWrtPositionEuropa( 0, 0 ) = ( updatedModifiedObservable -  centralInstantModifiedObservable ) / ( centralInstantState[ 18 ] * 0.0001 );
+//        }
+//        else if ( testCase == 4 )
+//        {
+//            numericalPartialsImpactParameterWrtPositionEuropa( 0, 1 ) = ( updatedApparentDistanceIoEuropa - centralInstantApparentDistanceIoEuropa ) / ( centralInstantState[ 19 ] * 0.0001 );
+//            numericalPartialsModifiedObservableWrtPositionEuropa( 0, 1 ) = ( updatedModifiedObservable -  centralInstantModifiedObservable ) / ( centralInstantState[ 19 ] * 0.0001 );
+//        }
+//        else if ( testCase == 5 )
+//        {
+//            numericalPartialsImpactParameterWrtPositionEuropa( 0, 2 ) = ( updatedApparentDistanceIoEuropa - centralInstantApparentDistanceIoEuropa ) / ( centralInstantState[ 20 ] * 0.0001 );
+//            numericalPartialsModifiedObservableWrtPositionEuropa( 0, 2 ) = ( updatedModifiedObservable -  centralInstantModifiedObservable ) / ( centralInstantState[ 20 ] * 0.0001 );
+//        }
+//        else if ( testCase == 6 )
+//        {
+//            numericalPartialsImpactParameterWrtPositionEarth( 0, 0 ) = ( updatedApparentDistanceIoEuropa - centralInstantApparentDistanceIoEuropa ) / ( centralInstantState[ 0 ] * 0.0001 );
+//            numericalPartialsModifiedObservableWrtPositionEarth( 0, 0 ) = ( updatedModifiedObservable -  centralInstantModifiedObservable ) / ( centralInstantState[ 0 ] * 0.0001 );
+//        }
+//        else if ( testCase == 7 )
+//        {
+//            numericalPartialsImpactParameterWrtPositionEarth( 0, 1 ) = ( updatedApparentDistanceIoEuropa - centralInstantApparentDistanceIoEuropa ) / ( centralInstantState[ 1 ] * 0.0001 );
+//            numericalPartialsModifiedObservableWrtPositionEarth( 0, 1 ) = ( updatedModifiedObservable -  centralInstantModifiedObservable ) / ( centralInstantState[ 1 ] * 0.0001 );
+//        }
+//        else if ( testCase == 8 )
+//        {
+//            numericalPartialsImpactParameterWrtPositionEarth( 0, 2 ) = ( updatedApparentDistanceIoEuropa - centralInstantApparentDistanceIoEuropa ) / ( centralInstantState[ 2 ] * 0.0001 );
+//            numericalPartialsModifiedObservableWrtPositionEarth( 0, 2 ) = ( updatedModifiedObservable -  centralInstantModifiedObservable ) / ( centralInstantState[ 2 ] * 0.0001 );
+//        }
+//        else if ( testCase == 9 )
+//        {
+//            std::cout << "difference in central instant [s]: " << updatedCentralInstant - estimatedCentralInstant << "\n\n";
+//            std::cout << "difference in impact parameter: " << updatedApparentDistanceIoEuropa - centralInstantApparentDistanceIoEuropa << "\n\n";
+//            std::cout << "difference in modified observable: " << updatedModifiedObservable -  centralInstantModifiedObservable << "\n\n";
+//        }
+
+//    }
+
+
+//    Eigen::Vector3d centralInstantEarthToIo = centralInstantDependentVariables.segment( 0, 3 );
+//    Eigen::Vector3d centralInstantEarthToEuropa = centralInstantDependentVariables.segment( 3, 3 );
+
+//    Eigen::Vector3d centralInstantRelativeVelocityIoWrtEarth = centralInstantDependentVariables.segment( 33, 3 );
+//    Eigen::Vector3d centralInstantRelativeVelocityEuropaWrtEarth = centralInstantDependentVariables.segment( 36, 3 );
+
+
+//    double numericalEstimationPartialT0wrtXio = -0.865259120473638 / ( centralInstantState[ 12 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtYio = -2.822020240593702 / ( centralInstantState[ 13 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtZio = -0.539967793738470 / ( centralInstantState[ 14 ] * 0.0001 );
+
+//    double numericalEstimationPartialT0wrtXeuropa = 2.921911884797737 / ( centralInstantState[ 18 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtYeuropa = 1.120803386438638 / ( centralInstantState[ 19 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtZeuropa = 0.178888128371909 / ( centralInstantState[ 20 ] * 0.0001 );
+
+//    double numericalEstimationPartialT0wrtXearth = -0.207467054948211 / ( centralInstantState[ 0 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtYearth = -0.728249233681709 / ( centralInstantState[ 1 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtZearth = -0.110951339593157 / ( centralInstantState[ 2 ] * 0.0001 );
+
+
+//    // Update mutual approximation scaling.
+//    linkEndStates.clear( );
+//    Eigen::Vector6d currentStateForLinkEnd;
+//    currentStateForLinkEnd.segment( 0, 3 ) = centralInstantEarthToIo;
+//    currentStateForLinkEnd.segment( 3, 3 ) = centralInstantRelativeVelocityIoWrtEarth;
+//    linkEndStates.push_back( currentStateForLinkEnd );
+//    currentStateForLinkEnd.segment( 0, 3 ) = centralInstantEarthToEuropa;
+//    currentStateForLinkEnd.segment( 3, 3 ) = centralInstantRelativeVelocityEuropaWrtEarth;
+//    linkEndStates.push_back( currentStateForLinkEnd );
+//    linkEndStates.push_back( Eigen::Vector6d::Zero( ) );
+
+//    std::vector< double > times;
+//    times.push_back( estimatedCentralInstant );
+//    times.push_back( estimatedCentralInstant );
+//    times.push_back( estimatedCentralInstant );
+
+//    Eigen::VectorXd currentObservation;
+//    mutualApproximationScaling->update( linkEndStates, times, observation_models::receiver, linkEnds, currentObservation );
+//    Eigen::Matrix< double, 1, 3 > partialCentralInstantWrtFirstTransmitterPosition = mutualApproximationScaling->getScalingFactor( observation_models::transmitter );
+//    Eigen::Matrix< double, 1, 3 > partialCentralInstantWrtSecondTransmitterPosition = mutualApproximationScaling->getScalingFactor( observation_models::transmitter2 );
+//    Eigen::Matrix< double, 1, 3 > partialCentralInstantWrtReceiverPosition = mutualApproximationScaling->getScalingFactor( observation_models::receiver );
+
+//    mutualApproximationWithImpactParameterScaling->update( linkEndStates, times, observation_models::receiver, linkEnds, currentObservation );
+//    Eigen::Matrix< double, 2, 3 > partialCentralInstantAndImpactWrtFirstTransmitterPosition = mutualApproximationWithImpactParameterScaling->getScalingFactor( observation_models::transmitter );
+//    Eigen::Matrix< double, 2, 3 > partialCentralInstantAndImpactWrtSecondTransmitterPosition = mutualApproximationWithImpactParameterScaling->getScalingFactor( observation_models::transmitter2 );
+//    Eigen::Matrix< double, 2, 3 > partialCentralInstantAndImpactWrtReceiverPosition = mutualApproximationWithImpactParameterScaling->getScalingFactor( observation_models::receiver );
+
+//    modifiedMutualApproximationScaling->update( linkEndStates, times, observation_models::receiver, linkEnds, currentObservation );
+//    Eigen::Matrix< double, 1, 3 > partialModifiedObservableWrtFirstTransmitterPosition = modifiedMutualApproximationScaling->getScalingFactor( observation_models::transmitter );
+//    Eigen::Matrix< double, 1, 3 > partialModifiedObservableWrtSecondTransmitterPosition = modifiedMutualApproximationScaling->getScalingFactor( observation_models::transmitter2 );
+//    Eigen::Matrix< double, 1, 3 > partialModifiedObservableWrtReceiverPosition = modifiedMutualApproximationScaling->getScalingFactor( observation_models::receiver );
+
+//    std::cout << "partials central instant w.r.t. Io position from getScalingFactor function: " << partialCentralInstantWrtFirstTransmitterPosition << "\n\n";
+//    std::cout << "numerical partials central instant w.r.t. Io position: " << numericalEstimationPartialT0wrtXio << "  " <<
+//              numericalEstimationPartialT0wrtYio << "  " << numericalEstimationPartialT0wrtZio << "\n\n";
+//    std::cout << "partials central instant and impact parameter w.r.t. Io position: " << partialCentralInstantAndImpactWrtFirstTransmitterPosition << "\n\n";
+//    std::cout << "numerical partials impact parameter w.r.t. Io position: " << numericalPartialsImpactParameterWrtPositionIo << "\n\n";
+//    std::cout << "partials modified observable w.r.t. Io position: " << partialModifiedObservableWrtFirstTransmitterPosition << "\n\n";
+//    std::cout << "numerical partials modified observable w.r.t. Io position: " << numericalPartialsModifiedObservableWrtPositionIo << "\n\n";
+
+//    std::cout << "partials central instant w.r.t. Europa position from getScalingFactor function: " << partialCentralInstantWrtSecondTransmitterPosition << "\n\n";
+//    std::cout << "numerical partials central instant w.r.t. Europa position: " << numericalEstimationPartialT0wrtXeuropa << "  " <<
+//              numericalEstimationPartialT0wrtYeuropa << "  " << numericalEstimationPartialT0wrtZeuropa << "\n\n";
+//    std::cout << "partials central instant and impact parameter w.r.t. Europa position: " << partialCentralInstantAndImpactWrtSecondTransmitterPosition << "\n\n";
+//    std::cout << "numerical partials impact parameter w.r.t. Europa position: " << numericalPartialsImpactParameterWrtPositionEuropa << "\n\n";
+//    std::cout << "partials modified observable w.r.t. Europa position: " << partialModifiedObservableWrtSecondTransmitterPosition << "\n\n";
+//    std::cout << "numerical partials modified observable w.r.t. Europa position: " << numericalPartialsModifiedObservableWrtPositionEuropa << "\n\n";
+
+//    std::cout << "partials central instant w.r.t. Earth position from getScalingFactor function: " << partialCentralInstantWrtReceiverPosition << "\n\n";
+//    std::cout << "numerical partials central instant w.r.t. Earth position: " << numericalEstimationPartialT0wrtXearth << "  " <<
+//              numericalEstimationPartialT0wrtYearth << "  " << numericalEstimationPartialT0wrtZearth << "\n\n";
+//    std::cout << "partials central instant and impact parameter w.r.t. Earth position: " << partialCentralInstantAndImpactWrtReceiverPosition << "\n\n";
+//    std::cout << "numerical partials impact parameter w.r.t. Earth position: " << numericalPartialsImpactParameterWrtPositionEarth << "\n\n";
+//    std::cout << "partials modified observable w.r.t. Earth position: " << partialModifiedObservableWrtReceiverPosition << "\n\n";
+//    std::cout << "numerical partials modified observable w.r.t. Earth position: " << numericalPartialsModifiedObservableWrtPositionEarth << "\n\n";
+
+
+//    std::cout << "relative difference partial t0 wrt x Io: " <<
+//                 ( partialCentralInstantWrtFirstTransmitterPosition[ 0 ] - numericalEstimationPartialT0wrtXio ) / numericalEstimationPartialT0wrtXio << "\n\n";
+//    std::cout << "relative difference partial t0 wrt y Io: " <<
+//                 ( partialCentralInstantWrtFirstTransmitterPosition[ 1 ] - numericalEstimationPartialT0wrtYio ) / numericalEstimationPartialT0wrtYio << "\n\n";
+//    std::cout << "relative difference partial t0 wrt z Io: " <<
+//                 ( partialCentralInstantWrtFirstTransmitterPosition[ 2 ] - numericalEstimationPartialT0wrtZio ) / numericalEstimationPartialT0wrtZio << "\n\n";
+
+
+//    std::cout << "relative difference partial t0 wrt x Europa: " <<
+//                 ( partialCentralInstantWrtSecondTransmitterPosition[ 0 ] - numericalEstimationPartialT0wrtXeuropa ) / numericalEstimationPartialT0wrtXeuropa << "\n\n";
+//    std::cout << "relative difference partial t0 wrt y Europa: " <<
+//                 ( partialCentralInstantWrtSecondTransmitterPosition[ 1 ] - numericalEstimationPartialT0wrtYeuropa ) / numericalEstimationPartialT0wrtYeuropa << "\n\n";
+//    std::cout << "relative difference partial t0 wrt z Europa: " <<
+//                 ( partialCentralInstantWrtSecondTransmitterPosition[ 2 ] - numericalEstimationPartialT0wrtZeuropa ) / numericalEstimationPartialT0wrtZeuropa << "\n\n";
+
+
+//    std::cout << "relative difference partial t0 wrt x Earth: " <<
+//                 ( partialCentralInstantWrtReceiverPosition[ 0 ] - numericalEstimationPartialT0wrtXearth ) / numericalEstimationPartialT0wrtXearth << "\n\n";
+//    std::cout << "relative difference partial t0 wrt y Earth: " <<
+//                 ( partialCentralInstantWrtReceiverPosition[ 1 ] - numericalEstimationPartialT0wrtYearth ) / numericalEstimationPartialT0wrtYearth << "\n\n";
+//    std::cout << "relative difference partial t0 wrt z Earth: " <<
+//                 ( partialCentralInstantWrtReceiverPosition[ 2 ] - numericalEstimationPartialT0wrtZearth ) / numericalEstimationPartialT0wrtZearth << "\n\n";
+
+
+//}
+
+
+
+
+////! Test partial derivatives of mutual approximation observable, using general test suite of observation partials.
+//BOOST_AUTO_TEST_CASE( testIntermediateVariablesVelocityPartials )
+//{
+
+//    std::cout.precision( 16 );
+
+//    // Load Spice kernels.
+//    spice_interface::loadStandardSpiceKernels( );
+
+//    // Set simulation time settings.
+//    const double simulationStartEpoch = 1341680.0 - 0.5 * 3600.0;
+//    const double simulationEndEpoch = 1341680.0 + 0.5 * 3600.0;
+
+//    // Define body settings for simulation.
+//    std::vector< std::string > bodiesToCreate;
+//    bodiesToCreate.push_back( "Sun" );
+//    bodiesToCreate.push_back( "Earth" );
+//    bodiesToCreate.push_back( "Jupiter" );
+//    bodiesToCreate.push_back( "Io" );
+//    bodiesToCreate.push_back( "Europa" );
+
+//    // Create body objects.
+//    std::map< std::string, std::shared_ptr< BodySettings > > bodySettings =
+//            getDefaultBodySettings( bodiesToCreate, simulationStartEpoch - 300.0, simulationEndEpoch + 300.0 );
+//    for( unsigned int i = 0; i < bodiesToCreate.size( ); i++ )
+//    {
+//        bodySettings[ bodiesToCreate.at( i ) ]->ephemerisSettings->resetFrameOrientation( "J2000" );
+//        bodySettings[ bodiesToCreate.at( i ) ]->rotationModelSettings->resetOriginalFrame( "J2000" );
+//    }
+//    NamedBodyMap bodyMap = createBodies( bodySettings );
+
+//    // Finalize body creation.
+//    setGlobalFrameBodyEphemerides( bodyMap, "SSB", "J2000" );
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////            CREATE ACCELERATIONS          //////////////////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//    // Set accelerations between bodies that are to be taken into account (mutual point mass gravity between all bodies).
+//    SelectedAccelerationMap accelerationMap;
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsEarth;
+//    currentAccelerationsEarth[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEarth[ "Jupiter" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEarth[ "Io" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEarth[ "Europa" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsJupiter;
+//    currentAccelerationsJupiter[ "Io" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsJupiter[ "Europa" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsJupiter[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsIo;
+//    currentAccelerationsIo[ "Jupiter" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsIo[ "Earth" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsIo[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsIo[ "Europa" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsEuropa;
+//    currentAccelerationsEuropa[ "Jupiter" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEuropa[ "Earth" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEuropa[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEuropa[ "Io" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+
+//    accelerationMap[ "Earth" ] = currentAccelerationsEarth;
+//    accelerationMap[ "Jupiter" ] = currentAccelerationsJupiter;
+//    accelerationMap[ "Io" ] = currentAccelerationsIo;
+//    accelerationMap[ "Europa" ] = currentAccelerationsEuropa;
+
+//    // Define list of bodies to propagate
+//    std::vector< std::string > bodiesToPropagate;
+//    bodiesToPropagate.push_back( "Earth" );
+//    bodiesToPropagate.push_back( "Jupiter" );
+//    bodiesToPropagate.push_back( "Io" );
+//    bodiesToPropagate.push_back( "Europa" );
+
+//    // Define central bodies to use in propagation.
+//    std::vector< std::string > centralBodies;
+//    centralBodies.push_back( "SSB" );
+//    centralBodies.push_back( "SSB" );
+//    centralBodies.push_back( "Jupiter" );
+//    centralBodies.push_back( "Jupiter" );
+
+//    // Create acceleration models and propagation settings.
+//    basic_astrodynamics::AccelerationMap accelerationModelMap = createAccelerationModelsMap(
+//                bodyMap, accelerationMap, bodiesToPropagate, centralBodies );
+
+
+
+//    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////             CREATE PROPAGATION SETTINGS            ///////////////////////////////////////
+//    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Get initial state vector as input to integration.
+//    Eigen::VectorXd systemInitialState = propagators::getInitialStatesOfBodies(
+//                bodiesToPropagate, centralBodies, bodyMap, simulationStartEpoch );
+
+
+//    // Define list of dependent variables to save.
+//    std::vector< std::shared_ptr< propagators::SingleDependentVariableSaveSettings > > dependentVariablesList;
+
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::total_acceleration_dependent_variable, "Io" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::total_acceleration_dependent_variable, "Europa" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::total_acceleration_dependent_variable, "Earth" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_position_dependent_variable, "Io", "Earth" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_velocity_dependent_variable, "Io", "Earth" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_position_dependent_variable, "Europa", "Earth" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_velocity_dependent_variable, "Europa", "Earth" ) );
+
+//    dependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Io", "Io", "Jupiter" ) );
+//    dependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Io", "Earth", "Jupiter" ) );
+//    dependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Io", "Europa", "Jupiter" ) );
+
+//    dependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Europa", "Europa", "Jupiter" ) );
+//    dependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Europa", "Earth", "Jupiter" ) );
+//    dependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Europa", "Io", "Jupiter" ) );
+
+//    dependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Earth", "Earth", "Sun" ) );
+//    dependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Earth", "Io", "Sun" ) );
+//    dependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Earth", "Europa", "Sun" ) );
+
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::total_acceleration_dependent_variable, "Jupiter" ) );
+
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_position_dependent_variable, "Earth", "Sun" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_velocity_dependent_variable, "Earth", "Sun" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_position_dependent_variable, "Jupiter", "Sun" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_velocity_dependent_variable, "Jupiter", "Sun" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_position_dependent_variable, "Io", "Sun" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_velocity_dependent_variable, "Io", "Sun" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_position_dependent_variable, "Europa", "Sun" ) );
+//    dependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::relative_velocity_dependent_variable, "Europa", "Sun" ) );
+
+
+//    // Create object with list of dependent variables
+//    std::shared_ptr< propagators::DependentVariableSaveSettings > dependentVariablesToSave =
+//            std::make_shared< propagators::DependentVariableSaveSettings >( dependentVariablesList );
+
+//    // Define propagator settings.
+//    std::shared_ptr< propagators::TranslationalStatePropagatorSettings< double > > propagatorSettings = std::make_shared< propagators::TranslationalStatePropagatorSettings< double > > (
+//                centralBodies, accelerationModelMap, bodiesToPropagate, systemInitialState,
+//                std::make_shared< propagators::PropagationTimeTerminationSettings > ( simulationEndEpoch, true ), propagators::cowell, dependentVariablesToSave );
+
+//    // Define numerical integrator settings.
+//    std::shared_ptr< numerical_integrators:: IntegratorSettings< > > integratorSettings =
+//            std::make_shared< numerical_integrators::IntegratorSettings< > >( numerical_integrators::rungeKutta4, simulationStartEpoch, 60.0 );
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////             PROPAGATE ORBITS            ///////////////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Define list of parameters to estimate.
+//    std::vector< std::shared_ptr< EstimatableParameterSettings > > parameterNames;
+//    parameterNames.push_back( std::make_shared< InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Earth", systemInitialState.segment( 0, 6 ), "SSB" ) );
+//    parameterNames.push_back( std::make_shared< InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Jupiter", systemInitialState.segment( 6, 6 ), "SSB" ) );
+//    parameterNames.push_back( std::make_shared< InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Io", systemInitialState.segment( 12, 6 ), "Jupiter" ) );
+//    parameterNames.push_back( std::make_shared< InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Europa", systemInitialState.segment( 18, 6 ), "Jupiter" ) );
+
+
+//    // Create parameters
+//    std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate =
+//            createParametersToEstimate( parameterNames, bodyMap );
+
+//    // Print identifiers and indices of parameters to terminal.
+//    printEstimatableParameterEntries( parametersToEstimate );
+
+//    // Create simulation object and propagate dynamics.
+//    propagators::SingleArcVariationalEquationsSolver< > variationalEquationsSimulator(
+//                bodyMap, integratorSettings, propagatorSettings, parametersToEstimate, true,
+//                std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ), false, true, true,
+//                dependentVariablesToSave );
+
+//    std::shared_ptr< propagators::SingleArcDynamicsSimulator< > > dynamicsSimulator = variationalEquationsSimulator.getDynamicsSimulator( );
+
+//    std::map< double, Eigen::MatrixXd > stateTransitionHistory = variationalEquationsSimulator.getNumericalVariationalEquationsSolution( )[ 0 ];
+//    std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::MatrixXd > > stateTransitionInterpolator
+//            = std::make_shared< interpolators::LagrangeInterpolator< double, Eigen::MatrixXd > >(
+//                utilities::createVectorFromMapKeys< Eigen::MatrixXd, double >( stateTransitionHistory ),
+//                utilities::createVectorFromMapValues< Eigen::MatrixXd, double >( stateTransitionHistory ), 4 );
+
+
+//    // Create state history interpolator.
+//    std::map< double, Eigen::VectorXd > stateHistory = dynamicsSimulator->getEquationsOfMotionNumericalSolution( );
+//    std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd > > stateHistoryInterpolator
+//            = std::make_shared< interpolators::LagrangeInterpolator< double, Eigen::VectorXd > >(
+//                utilities::createVectorFromMapKeys< Eigen::VectorXd, double >( stateHistory ),
+//                utilities::createVectorFromMapValues< Eigen::VectorXd, double >( stateHistory ), 4 );
+
+//    // Retrieve dependent variables history.
+//    std::map< double, Eigen::VectorXd > dependentVariablesHistory = dynamicsSimulator->getDependentVariableHistory( );
+//    // Create dependent variables interpolator.
+//    std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd > > dependentVariablesInterpolator
+//            = std::make_shared< interpolators::LagrangeInterpolator< double, Eigen::VectorXd > >(
+//                utilities::createVectorFromMapKeys< Eigen::VectorXd, double >( dependentVariablesHistory ),
+//                utilities::createVectorFromMapValues< Eigen::VectorXd, double >( dependentVariablesHistory ), 4 );
+
+//    std::shared_ptr< propagators::SingleArcDependentVariablesInterface > dependentVariablesInterface = std::make_shared< propagators::SingleArcDependentVariablesInterface >(
+//                dependentVariablesInterpolator, dependentVariablesToSave );
+
+//    std::shared_ptr< observation_partials::MutualApproximationScaling > mutualApproximationScaling =
+//            std::make_shared< observation_partials::MutualApproximationScaling >( dependentVariablesInterface );
+
+//    std::shared_ptr< observation_partials::MutualApproximationScaling > modifiedMutualApproximationScaling =
+//            std::make_shared< observation_partials::MutualApproximationScaling >( dependentVariablesInterface );
+
+//    double estimatedCentralInstant = computeCentralInstantFromDependentVariables( simulationStartEpoch, 60.0,
+//                                                                                  dependentVariablesHistory );
+//    std::cout << "estimatedCentralInstant: " << estimatedCentralInstant << "\n\n";
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////        TEST PARTIAL RIGHT ASCENSION/DECLINATION WRT POSITION      /////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    std::cout << "state transition matrix at estimated central instant: " << stateTransitionInterpolator->interpolate( estimatedCentralInstant ) << "\n\n";
+
+//    Eigen::VectorXd centralInstantState = stateHistoryInterpolator->interpolate( estimatedCentralInstant );
+//    Eigen::VectorXd centralInstantDependentVariables = dependentVariablesInterpolator->interpolate( estimatedCentralInstant );
+//    Eigen::Vector6d centralInstantEarthState = centralInstantDependentVariables.segment( 186, 6 );
+//    Eigen::Vector6d centralInstantIoState = centralInstantDependentVariables.segment( 198, 6 );
+//    Eigen::Vector6d centralInstantEuropaState = centralInstantDependentVariables.segment( 204, 6 );
+
+//    observation_models::LinkEnds linkEnds;
+//    linkEnds[ observation_models::receiver ] = std::make_pair( "Earth" , ""  );
+//    linkEnds[ observation_models::transmitter ] = std::make_pair( "Io" , ""  );
+//    linkEnds[ observation_models::transmitter2 ] = std::make_pair( "Europa" , ""  );
+
+//    std::vector< Eigen::Vector6d > linkEndStates;
+//    linkEndStates.push_back( centralInstantIoState );
+//    linkEndStates.push_back( centralInstantEuropaState );
+//    linkEndStates.push_back( centralInstantEarthState );
+
+//    std::vector< double > linkEndsTimes;
+//    linkEndsTimes.push_back( estimatedCentralInstant );
+//    linkEndsTimes.push_back( estimatedCentralInstant );
+//    linkEndsTimes.push_back( estimatedCentralInstant );
+
+//    Eigen::VectorXd currentObservation;
+//    mutualApproximationScaling->update( linkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, currentObservation );
+
+
+
+//    std::pair< double, double > rightAscensionAndDeclinationIo = computeRightAscensionDeclination( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ) );
+//    std::pair< double, double > rightAscensionAndDeclinationEuropa = computeRightAscensionDeclination( ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ) );
+
+//    Eigen::Vector2d instrumentalFrameRelativePosition = mutualApproximationScaling->getInstrumentalFrameRelativePosition( );
+//    double centralInstantValueX = instrumentalFrameRelativePosition[ 0 ];
+//    double centralInstantValueY = instrumentalFrameRelativePosition[ 1 ];
+
+//    Eigen::Vector3d velocityPartialOfPartialRightAscensionWrtTime =
+//            computePartialOfFirstTimeDerivativeRightAscensionWrtLinkEndVelocity( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ) );
+//    Eigen::Vector3d velocityPartialOfPartialDeclinationWrtTime =
+//            computePartialOfFirstTimeDerivativeDeclinationWrtLinkEndVelocity( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ) );
+
+//    Eigen::Vector2d instrumentalFrameRelativeVelocity = mutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+//    double firstTimePartialOfX = instrumentalFrameRelativeVelocity[ 0 ];
+//    double firstTimePartialOfY = instrumentalFrameRelativeVelocity[ 1 ];
+
+
+//    Eigen::Matrix< double, 2, 3 > partialOfInstrumentalFrameRelativeVelocityWrtFirstTransmitterVelocity
+//            = mutualApproximationScaling->getPartialsOfRelativeVelocityInInstrumentalFrameWrtFirstTransmitterVelocity( );
+//    Eigen::Vector3d velocityPartialOfFirstTimeDerivativeOfX = partialOfInstrumentalFrameRelativeVelocityWrtFirstTransmitterVelocity.block( 0, 0, 1, 3 ).transpose( );
+//    Eigen::Vector3d velocityPartialOfFirstTimeDerivativeOfY = partialOfInstrumentalFrameRelativeVelocityWrtFirstTransmitterVelocity.block( 1, 0, 1, 3 ).transpose( );
+
+//    Eigen::Vector3d variationCentralInstantVelocityIoEarth = 0.0001 * centralInstantState.segment( 15, 3 );
+//    Eigen::Vector3d variationCentralInstantVelocityEuropaEarth = 0.0001 * centralInstantState.segment( 21, 3 );
+
+
+
+//    /// x - axis
+//    Eigen::Vector3d modifiedCentralInstantVelocityIoEarth = ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ) +
+//            ( Eigen::Vector3d( ) << variationCentralInstantVelocityIoEarth[ 0 ], 0.0, 0.0 ).finished( );
+
+//    std::vector< Eigen::Vector6d > modifiedLinkEndStates;
+//    Eigen::Vector6d modifiedCentralInstantIo = centralInstantIoState;
+//    modifiedCentralInstantIo[ 3 ] += variationCentralInstantVelocityIoEarth[ 0 ];
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantIo );
+//    modifiedLinkEndStates.push_back( centralInstantEuropaState );
+//    modifiedLinkEndStates.push_back( centralInstantEarthState );
+
+//    Eigen::VectorXd modifiedObservation;
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    double partialRightAscensionWrtTime = computePartialOfRightAscensionWrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                               ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ) );
+//    double modifiedPartialRightAscensionWrtTime = computePartialOfRightAscensionWrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                                         modifiedCentralInstantVelocityIoEarth );
+//    double variationPartialRightAscensionWrtTime = ( modifiedPartialRightAscensionWrtTime - partialRightAscensionWrtTime )
+//            / variationCentralInstantVelocityIoEarth[ 0 ];
+
+//    double partialDeclinationWrtTime = computePartialOfDeclinationWrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                         ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ) );
+//    double modifiedPartialDeclinationWrtTime = computePartialOfDeclinationWrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                                   modifiedCentralInstantVelocityIoEarth );
+//    double variationPartialDeclinationWrtTime = ( modifiedPartialDeclinationWrtTime - partialDeclinationWrtTime )
+//            / variationCentralInstantVelocityIoEarth[ 0 ];
+
+//    std::cout << "Io: numerical velocity partial of first partial right ascension wrt time - Vx: " << variationPartialRightAscensionWrtTime << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfPartialRightAscensionWrtTime[ 0 ] << "\n\n";
+//    std::cout << "Io: numerical velocity partial of first partial declination wrt time - Vx: " << variationPartialDeclinationWrtTime << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfPartialDeclinationWrtTime[ 0 ] << "\n\n";
+
+//    Eigen::Vector2d modifiedInstrumentalFrameRelativeVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+//    double modifiedFirstTimeDerivativeOfX = modifiedInstrumentalFrameRelativeVelocity[ 0 ];
+
+//    double variationFirstTimePartiaOfX = ( modifiedFirstTimeDerivativeOfX - firstTimePartialOfX ) / variationCentralInstantVelocityIoEarth[ 0 ];
+
+//    double modifiedFirstTimeDerivativeOfY = modifiedInstrumentalFrameRelativeVelocity[ 1 ];
+//    double variationFirstTimePartiaOfY = ( modifiedFirstTimeDerivativeOfY - firstTimePartialOfY ) / variationCentralInstantVelocityIoEarth[ 0 ];
+
+//    std::cout << "Io: numerical velocity partial of first partial X wrt time - Vx: " << variationFirstTimePartiaOfX << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfFirstTimeDerivativeOfX[ 0 ] << "\n\n";
+//    std::cout << "Io: numerical velocity partial of first partial Y wrt time - Vx: " << variationFirstTimePartiaOfY << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfFirstTimeDerivativeOfY[ 0 ] << "\n\n";
+
+
+
+//    /// y - axis
+//    modifiedCentralInstantVelocityIoEarth = ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ) +
+//            ( Eigen::Vector3d( ) << 0.0, variationCentralInstantVelocityIoEarth[ 1 ], 0.0 ).finished( );
+
+//    modifiedLinkEndStates.clear( );
+//    modifiedCentralInstantIo = centralInstantIoState;
+//    modifiedCentralInstantIo[ 4 ] += variationCentralInstantVelocityIoEarth[ 1 ];
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantIo );
+//    modifiedLinkEndStates.push_back( centralInstantEuropaState );
+//    modifiedLinkEndStates.push_back( centralInstantEarthState );
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    modifiedPartialRightAscensionWrtTime = computePartialOfRightAscensionWrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                                  modifiedCentralInstantVelocityIoEarth );
+//    variationPartialRightAscensionWrtTime = ( modifiedPartialRightAscensionWrtTime - partialRightAscensionWrtTime )
+//            / variationCentralInstantVelocityIoEarth[ 1 ];
+
+//    modifiedPartialDeclinationWrtTime = computePartialOfDeclinationWrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                             modifiedCentralInstantVelocityIoEarth );
+//    variationPartialDeclinationWrtTime = ( modifiedPartialDeclinationWrtTime - partialDeclinationWrtTime )
+//            / variationCentralInstantVelocityIoEarth[ 1 ];
+
+//    std::cout << "Io: numerical velocity partial of first partial right ascension wrt time - Vy: " << variationPartialRightAscensionWrtTime << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfPartialRightAscensionWrtTime[ 1 ] << "\n\n";
+//    std::cout << "Io: numerical velocity partial of first partial declination wrt time - Vy: " << variationPartialDeclinationWrtTime << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfPartialDeclinationWrtTime[ 1 ] << "\n\n";
+
+//    modifiedInstrumentalFrameRelativeVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+//    modifiedFirstTimeDerivativeOfX = modifiedInstrumentalFrameRelativeVelocity[ 0 ];
+
+//    variationFirstTimePartiaOfX = ( modifiedFirstTimeDerivativeOfX - firstTimePartialOfX ) / variationCentralInstantVelocityIoEarth[ 1 ];
+
+//    modifiedFirstTimeDerivativeOfY = modifiedInstrumentalFrameRelativeVelocity[ 1 ];
+//    variationFirstTimePartiaOfY = ( modifiedFirstTimeDerivativeOfY - firstTimePartialOfY ) / variationCentralInstantVelocityIoEarth[ 1 ];
+
+//    std::cout << "Io: numerical position partial of first partial X wrt time - Vy: " << variationFirstTimePartiaOfX << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfFirstTimeDerivativeOfX[ 1 ] << "\n\n";
+//    std::cout << "Io: numerical position partial of first partial Y wrt time - Vy: " << variationFirstTimePartiaOfY << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfFirstTimeDerivativeOfY[ 1 ] << "\n\n";
+
+
+
+
+//    /// z - axis
+//    modifiedCentralInstantVelocityIoEarth = ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ) +
+//            ( Eigen::Vector3d( ) << 0.0, 0.0, variationCentralInstantVelocityIoEarth[ 2 ] ).finished( );
+
+//    modifiedLinkEndStates.clear( );
+//    modifiedCentralInstantIo = centralInstantIoState;
+//    modifiedCentralInstantIo[ 5 ] += variationCentralInstantVelocityIoEarth[ 2 ];
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantIo );
+//    modifiedLinkEndStates.push_back( centralInstantEuropaState );
+//    modifiedLinkEndStates.push_back( centralInstantEarthState );
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    modifiedPartialRightAscensionWrtTime = computePartialOfRightAscensionWrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                                  modifiedCentralInstantVelocityIoEarth );
+//    variationPartialRightAscensionWrtTime = ( modifiedPartialRightAscensionWrtTime - partialRightAscensionWrtTime )
+//            / variationCentralInstantVelocityIoEarth[ 2 ];
+
+//    modifiedPartialDeclinationWrtTime = computePartialOfDeclinationWrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                            modifiedCentralInstantVelocityIoEarth);
+//    variationPartialDeclinationWrtTime = ( modifiedPartialDeclinationWrtTime - partialDeclinationWrtTime )
+//            / variationCentralInstantVelocityIoEarth[ 2 ];
+
+//    std::cout << "Io: numerical velocity partial of first partial right ascension wrt time - Vz: " << variationPartialRightAscensionWrtTime << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfPartialRightAscensionWrtTime[ 2 ] << "\n\n";
+//    std::cout << "Io: numerical velocity partial of first partial declination wrt time - Vz: " << variationPartialDeclinationWrtTime << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfPartialDeclinationWrtTime[ 2 ] << "\n\n";
+
+
+//    modifiedInstrumentalFrameRelativeVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+//    modifiedFirstTimeDerivativeOfX = modifiedInstrumentalFrameRelativeVelocity[ 0 ];
+
+//    variationFirstTimePartiaOfX = ( modifiedFirstTimeDerivativeOfX - firstTimePartialOfX ) / variationCentralInstantVelocityIoEarth[ 2 ];
+
+//    modifiedFirstTimeDerivativeOfY = modifiedInstrumentalFrameRelativeVelocity[ 1 ];
+//    variationFirstTimePartiaOfY = ( modifiedFirstTimeDerivativeOfY - firstTimePartialOfY ) / variationCentralInstantVelocityIoEarth[ 2 ];
+
+//    std::cout << "Io: numerical velocity partial of first partial X wrt time - Vz: " << variationFirstTimePartiaOfX << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfFirstTimeDerivativeOfX[ 2 ] << "\n\n";
+//    std::cout << "Io: numerical velocity partial of first partial Y wrt time - Vz: " << variationFirstTimePartiaOfY << "\n\n";
+//    std::cout << "Io: validation: " << velocityPartialOfFirstTimeDerivativeOfY[ 2 ] << "\n\n";
+
+
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ////////////        TEST POSITION PARTIAL OF SECOND PARTIAL RIGHT ASCENSION/DECLINATION WRT TIME      /////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    std::vector< std::string > sunCentralBodies;
+//    sunCentralBodies.push_back( "Sun" );
+//    sunCentralBodies.push_back( "Sun" );
+//    sunCentralBodies.push_back( "Sun" );
+//    sunCentralBodies.push_back( "Sun" );
+
+//    Eigen::VectorXd sunCenteredState = centralInstantDependentVariables.segment( 186, 24 );
+//    Eigen::Vector3d centralInstantAccelerationIo = centralInstantDependentVariables.segment( 0, 3 );
+//    Eigen::Vector3d centralInstantAccelerationEuropa = centralInstantDependentVariables.segment( 3, 3 );
+
+
+//    // Compute acceleration partials.
+//    Eigen::Matrix3d partialsAccelerationIoWrtVelocityIo = Eigen::Matrix3d::Zero( );
+
+//    Eigen::Vector3d centralInstantAccelerationEarth = centralInstantDependentVariables.segment( 6, 3 );
+
+//    Eigen::Vector3d partialOfSecondTimeDerivativeRightAscensionWrtIoVelocity =
+//            computePartialOfSecondTimeDerivativeRightAscensionWrtLinkEndVelocity( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                                  ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ),
+//                                                                                  partialsAccelerationIoWrtVelocityIo, true );
+
+//    Eigen::Vector3d partialOfSecondTimeDerivativeDeclinationWrtIoVelocity =
+//            computePartialOfSecondTimeDerivativeDeclinationWrtLinkEndVelocity( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                               ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ),
+//                                                                               partialsAccelerationIoWrtVelocityIo, true );
+
+//    double secondPartialRightAscensionWrtTime = computeSecondPartialRightAscensionWrtTime(
+//                ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ),
+//                centralInstantAccelerationIo - centralInstantAccelerationEarth );
+
+//    double secondPartialDeclinationWrtTime = computeSecondPartialDeclinationWrtTime(
+//                ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ),
+//                centralInstantAccelerationIo - centralInstantAccelerationEarth );
+
+//    Eigen::Vector2d instrumentalFrameRelativeAcceleration = mutualApproximationScaling->getInstrumentalFrameRelativeAcceleration( );
+
+//    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeAccelerationWrtVelocityIo =
+//            mutualApproximationScaling->getPartialsOfInstrumentalFrameRelativeAccelerationWrtFirstTransmitterVelocity( );
+//    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeAccelerationWrtVelocityEuropa =
+//            mutualApproximationScaling->getPartialsOfInstrumentalFrameRelativeAccelerationWrtSecondTransmitterVelocity( );
+//    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeAccelerationWrtVelocityEarth =
+//            mutualApproximationScaling->getPartialsOfInstrumentalFrameRelativeAccelerationWrtReceiverVelocity( );
+
+//    Eigen::Vector3d partialOfSecondTimeDerivativeXwrtVelocityIo = partialsOfInstrumentalFrameRelativeAccelerationWrtVelocityIo.block( 0, 0, 1, 3 ).transpose( );
+
+//    Eigen::Vector3d partialOfSecondTimeDerivativeXwrtVelocityEarth = partialsOfInstrumentalFrameRelativeAccelerationWrtVelocityEarth.block( 0, 0, 1, 3 ).transpose( );
+
+//    Eigen::Vector3d partialOfSecondTimeDerivativeXwrtVelocityEuropa = partialsOfInstrumentalFrameRelativeAccelerationWrtVelocityEuropa.block( 0, 0, 1, 3 ).transpose( );
+
+//    double initialSecondPartialXwrtTime = instrumentalFrameRelativeAcceleration[ 0 ];
+
+//    Eigen::Vector3d partialOfSecondTimeDerivativeYwrtVelocityIo = partialsOfInstrumentalFrameRelativeAccelerationWrtVelocityIo.block( 1, 0, 1, 3 ).transpose( );
+
+//    Eigen::Vector3d partialOfSecondTimeDerivativeYwrtVelocityEarth = partialsOfInstrumentalFrameRelativeAccelerationWrtVelocityEarth.block( 1, 0, 1, 3 ).transpose( );
+
+//    Eigen::Vector3d partialOfSecondTimeDerivativeYwrtVelocityIoForEuropa = partialsOfInstrumentalFrameRelativeAccelerationWrtVelocityEuropa.block( 1, 0, 1, 3 ).transpose( );
+
+
+//    double initialSecondPartialYwrtTime = instrumentalFrameRelativeAcceleration[ 1 ];
+
+
+//    Eigen::Vector4d cubicPolynomialCoefficients = mutualApproximationScaling->getCubicPolynomialCoefficients( );
+
+//    Eigen::Vector4d computedCubicPolynomialCoefficients;
+//    computedCubicPolynomialCoefficients[ 0 ] =
+//            instrumentalFrameRelativeAcceleration[ 0 ] * instrumentalFrameRelativeAcceleration[ 0 ]
+//            + instrumentalFrameRelativeAcceleration[ 1 ] * instrumentalFrameRelativeAcceleration[ 1 ];
+//    computedCubicPolynomialCoefficients[ 1 ] =
+//            3.0 * ( instrumentalFrameRelativeAcceleration[ 0 ] * instrumentalFrameRelativeVelocity[ 0 ]
+//            + instrumentalFrameRelativeAcceleration[ 1 ] * instrumentalFrameRelativeVelocity[ 1 ] );
+//    computedCubicPolynomialCoefficients[ 2 ] =
+//            2.0 * ( instrumentalFrameRelativePosition[ 0 ] * instrumentalFrameRelativeAcceleration[ 0 ]
+//            + instrumentalFrameRelativePosition[ 1 ] * instrumentalFrameRelativeAcceleration[ 1 ]
+//            + instrumentalFrameRelativeVelocity[ 0 ] * instrumentalFrameRelativeVelocity[ 0 ]
+//            + instrumentalFrameRelativeVelocity[ 1 ] * instrumentalFrameRelativeVelocity[ 1 ] );
+//    computedCubicPolynomialCoefficients[ 3 ] =
+//            2.0 * ( instrumentalFrameRelativePosition[ 0 ] * instrumentalFrameRelativeVelocity[ 0 ]
+//            + instrumentalFrameRelativePosition[ 1 ] * instrumentalFrameRelativeVelocity[ 1 ] );
+
+//    std::cout << "cubic polynomial coefficients: " << cubicPolynomialCoefficients.transpose( ) << "\n\n";
+//    std::cout << "manually computed cubic polynomial coefficients: " << computedCubicPolynomialCoefficients.transpose( ) << "\n\n";
+
+
+//    /// x - axis
+
+//    Eigen::Vector3d variationCentralInstantVelocityIo = ( Eigen::Vector3d( ) << variationCentralInstantVelocityIoEarth[ 0 ], 0.0, 0.0 ).finished( );
+//    modifiedCentralInstantVelocityIoEarth = ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ) +  variationCentralInstantVelocityIo;
+//    Eigen::Vector6d modifiedCentralInstantStateIo = centralInstantIoState;
+//    modifiedCentralInstantStateIo.segment( 3, 3 ) +=  variationCentralInstantVelocityIo;
+
+//    modifiedLinkEndStates.clear( );
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantStateIo );
+//    modifiedLinkEndStates.push_back( centralInstantEuropaState );
+//    modifiedLinkEndStates.push_back( centralInstantEarthState );
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    double modifiedSecondPartialRightAscensionWrtTime = computeSecondPartialRightAscensionWrtTime(
+//                ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), modifiedCentralInstantVelocityIoEarth,
+//                centralInstantAccelerationIo - centralInstantAccelerationEarth );
+
+//    double variationSecondPartialRightAscensionWrtTime = ( modifiedSecondPartialRightAscensionWrtTime - secondPartialRightAscensionWrtTime )
+//            / variationCentralInstantVelocityIoEarth[ 0 ];
+
+//    std::cout << "Io: numerical velocity partial of second partial right ascension wrt time - Vx: " << variationSecondPartialRightAscensionWrtTime << "\n\n";
+//    std::cout << "Io: validation: " << partialOfSecondTimeDerivativeRightAscensionWrtIoVelocity[ 0 ] << "\n\n";
+
+
+//    double modifiedSecondPartialDeclinationWrtTime = computeSecondPartialDeclinationWrtTime(
+//                ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), modifiedCentralInstantVelocityIoEarth,
+//                centralInstantAccelerationIo - centralInstantAccelerationEarth );
+
+//    double variationSecondPartialDeclinationWrtTime = ( modifiedSecondPartialDeclinationWrtTime - secondPartialDeclinationWrtTime )
+//            / variationCentralInstantVelocityIoEarth[ 0 ];
+
+//    std::cout << "Io: numerical velocity partial of second partial declination wrt time - Vx: " << variationSecondPartialDeclinationWrtTime << "\n\n";
+//    std::cout << "Io: validation: " << partialOfSecondTimeDerivativeDeclinationWrtIoVelocity[ 0 ] << "\n\n";
+
+//    // CANNOT USE INSTRUMENTAL FRAM ACCELERATION FROM MODIFIED MUTUAL APPROXIMATION SCALING
+//    // BECAUSE THE DEPENDENT VARIABLES ARE NOT UPDATED -> ISSUE WITH THE ACCELERATION VALUES
+//    double modifiedSecondTimeDerivativeOfX = computeSecondPartialXwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                         ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                         modifiedCentralInstantVelocityIoEarth, ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ),
+//                                                                         centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth,
+//                                                                         rightAscensionAndDeclinationIo.first, rightAscensionAndDeclinationIo.second,
+//                                                                         rightAscensionAndDeclinationEuropa.first, rightAscensionAndDeclinationEuropa.second );
+//    double variationSecondPartialXwrtTime = ( modifiedSecondTimeDerivativeOfX - initialSecondPartialXwrtTime ) / variationCentralInstantVelocityIoEarth[ 0 ];
+
+//    double modifiedSecondTimeDerivativeOfY = computeSecondPartialYwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                         ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                         modifiedCentralInstantVelocityIoEarth, ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ),
+//                                                                         centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth );
+//    double variationSecondPartialYwrtTime = ( modifiedSecondTimeDerivativeOfY - initialSecondPartialYwrtTime ) / variationCentralInstantVelocityIoEarth[ 0 ];
+
+//    std::cout << "Io: numerical velocity partial of second partial X wrt time - Vx: " << variationSecondPartialXwrtTime << "\n\n";
+//    std::cout << "Io: validation: " << partialOfSecondTimeDerivativeXwrtVelocityIo[ 0 ] << "\n\n";
+//    std::cout << "Io: numerical velocity partial of second partial Y wrt time - Vx: " << variationSecondPartialYwrtTime << "\n\n";
+//    std::cout << "Io: validation: " << partialOfSecondTimeDerivativeYwrtVelocityIo[ 0 ] << "\n\n";
+
+
+//    Eigen::Vector2d modifiedInstrumentalFramePosition = modifiedMutualApproximationScaling->getInstrumentalFrameRelativePosition( );
+//    Eigen::Vector2d modifiedInstrumentalFrameVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+
+//    Eigen::Vector4d modifiedCubicPolynomialCoefficients;
+//    modifiedCubicPolynomialCoefficients[ 0 ] =
+//            modifiedSecondTimeDerivativeOfX * modifiedSecondTimeDerivativeOfX
+//            + modifiedSecondTimeDerivativeOfY * modifiedSecondTimeDerivativeOfY;
+//    modifiedCubicPolynomialCoefficients[ 1 ] =
+//            3.0 * ( modifiedSecondTimeDerivativeOfX * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedSecondTimeDerivativeOfY * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 2 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedSecondTimeDerivativeOfX
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedSecondTimeDerivativeOfY
+//            + modifiedInstrumentalFrameVelocity[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFrameVelocity[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 3 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+
+//    Eigen::Vector4d variationCubicPolynomialCoefficients =
+//            ( modifiedCubicPolynomialCoefficients - cubicPolynomialCoefficients ) / variationCentralInstantVelocityIoEarth[ 0 ];
+
+//    std::cout << "Io: numerical velocity partial of cubic polynomial coefficients - Vx: " << variationCubicPolynomialCoefficients.transpose( ) << "\n\n";
+
+
+//    ///// W.R.T. SECOND TRANSMITTER POSITION, I.E. W.R.T. Europa position
+//    Eigen::Vector3d variationCentralInstantVelocityEuropa = ( Eigen::Vector3d( ) << variationCentralInstantVelocityEuropaEarth[ 0 ], 0.0, 0.0 ).finished( );
+//    Eigen::Vector3d modifiedCentralInstantVelocityEuropaEarth = ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ) +  variationCentralInstantVelocityEuropa;
+//    Eigen::Vector6d modifiedCentralInstantStateEuropa = centralInstantEuropaState;
+//    modifiedCentralInstantStateEuropa.segment( 3, 3 ) += variationCentralInstantVelocityEuropa;
+
+//    modifiedLinkEndStates.clear( );
+//    modifiedLinkEndStates.push_back( centralInstantIoState );
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantStateEuropa );
+//    modifiedLinkEndStates.push_back( centralInstantEarthState );
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    modifiedSecondTimeDerivativeOfX = computeSecondPartialXwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                  ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ), modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth,
+//                                                                  rightAscensionAndDeclinationIo.first, rightAscensionAndDeclinationIo.second,
+//                                                                  rightAscensionAndDeclinationEuropa.first, rightAscensionAndDeclinationEuropa.second );
+//    variationSecondPartialXwrtTime = ( modifiedSecondTimeDerivativeOfX - initialSecondPartialXwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 0 ];
+
+//    modifiedSecondTimeDerivativeOfY = computeSecondPartialYwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                  ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ), modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth );
+//    variationSecondPartialYwrtTime = ( modifiedSecondTimeDerivativeOfY - initialSecondPartialYwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 0 ];
+
+//    std::cout << "Europa: numerical velocity partial of second partial X wrt time - Vx: " << variationSecondPartialXwrtTime << "\n\n";
+//    std::cout << "Europa: validation: " << partialOfSecondTimeDerivativeXwrtVelocityEuropa[ 0 ] << "\n\n";
+//    std::cout << "Europa: numerical velocity partial of second partial Y wrt time - Vx: " << variationSecondPartialYwrtTime << "\n\n";
+//    std::cout << "Europa: validation: " << partialOfSecondTimeDerivativeYwrtVelocityIoForEuropa[ 0 ] << "\n\n";
+
+//    modifiedInstrumentalFramePosition = modifiedMutualApproximationScaling->getInstrumentalFrameRelativePosition( );
+//    modifiedInstrumentalFrameVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+
+//    modifiedCubicPolynomialCoefficients[ 0 ] =
+//            modifiedSecondTimeDerivativeOfX * modifiedSecondTimeDerivativeOfX
+//            + modifiedSecondTimeDerivativeOfY * modifiedSecondTimeDerivativeOfY;
+//    modifiedCubicPolynomialCoefficients[ 1 ] =
+//            3.0 * ( modifiedSecondTimeDerivativeOfX * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedSecondTimeDerivativeOfY * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 2 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedSecondTimeDerivativeOfX
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedSecondTimeDerivativeOfY
+//            + modifiedInstrumentalFrameVelocity[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFrameVelocity[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 3 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+
+//    variationCubicPolynomialCoefficients =
+//            ( modifiedCubicPolynomialCoefficients - cubicPolynomialCoefficients ) / variationCentralInstantVelocityEuropaEarth[ 0 ];
+//    std::cout << "Europa: numerical velocity partial of cubic polynomial coefficients - Vx: " << variationCubicPolynomialCoefficients.transpose( ) << "\n\n";
+
+
+//    ///// W.R.T. RECEIVER POSITION, I.E. W.R.T. Earth position
+//    Eigen::Vector3d variationCentralInstantVelocityEarth = ( Eigen::Vector3d( ) << variationCentralInstantVelocityEuropaEarth[ 0 ], 0.0, 0.0 ).finished( );
+
+//    modifiedCentralInstantVelocityEuropaEarth = ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ) -  variationCentralInstantVelocityEarth;
+//    modifiedCentralInstantVelocityIoEarth = ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ) -  variationCentralInstantVelocityEarth;
+//    Eigen::Vector6d modifiedCentralInstantStateEarth = centralInstantEarthState;
+//    modifiedCentralInstantStateEarth.segment( 3, 3 ) += variationCentralInstantVelocityEarth;
+
+//    modifiedLinkEndStates.clear( );
+//    modifiedLinkEndStates.push_back( centralInstantIoState );
+//    modifiedLinkEndStates.push_back( centralInstantEuropaState );
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantStateEarth );
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    modifiedSecondTimeDerivativeOfX = computeSecondPartialXwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                    modifiedCentralInstantVelocityIoEarth, modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth,
+//                                                                  rightAscensionAndDeclinationIo.first, rightAscensionAndDeclinationIo.second,
+//                                                                  rightAscensionAndDeclinationEuropa.first, rightAscensionAndDeclinationEuropa.second );
+//    variationSecondPartialXwrtTime = ( modifiedSecondTimeDerivativeOfX - initialSecondPartialXwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 0 ];
+
+//    modifiedSecondTimeDerivativeOfY = computeSecondPartialYwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                    modifiedCentralInstantVelocityIoEarth, modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth );
+//    variationSecondPartialYwrtTime = ( modifiedSecondTimeDerivativeOfY - initialSecondPartialYwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 0 ];
+
+//    std::cout << "Earth: numerical velocity partial of second partial X wrt time - Vx: " << variationSecondPartialXwrtTime << "\n\n";
+//    std::cout << "Earth: validation: " << partialOfSecondTimeDerivativeXwrtVelocityEarth[ 0 ] << "\n\n";
+//    std::cout << "Earth: numerical velocity partial of second partial Y wrt time - Vx: " << variationSecondPartialYwrtTime << "\n\n";
+//    std::cout << "Earth: validation: " << partialOfSecondTimeDerivativeYwrtVelocityEarth[ 0 ] << "\n\n";
+
+//    modifiedInstrumentalFramePosition = modifiedMutualApproximationScaling->getInstrumentalFrameRelativePosition( );
+//    modifiedInstrumentalFrameVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+
+//    modifiedCubicPolynomialCoefficients[ 0 ] =
+//            modifiedSecondTimeDerivativeOfX * modifiedSecondTimeDerivativeOfX
+//            + modifiedSecondTimeDerivativeOfY * modifiedSecondTimeDerivativeOfY;
+//    modifiedCubicPolynomialCoefficients[ 1 ] =
+//            3.0 * ( modifiedSecondTimeDerivativeOfX * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedSecondTimeDerivativeOfY * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 2 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedSecondTimeDerivativeOfX
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedSecondTimeDerivativeOfY
+//            + modifiedInstrumentalFrameVelocity[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFrameVelocity[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 3 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+
+//    variationCubicPolynomialCoefficients =
+//            ( modifiedCubicPolynomialCoefficients - cubicPolynomialCoefficients ) / variationCentralInstantVelocityEuropaEarth[ 0 ];
+
+//    std::cout << "Earth: numerical velocity partial of cubic polynomial coefficients - Vx: " << variationCubicPolynomialCoefficients.transpose( ) << "\n\n";
+
+
+//    /// y - axis
+//    variationCentralInstantVelocityIo = ( Eigen::Vector3d( ) << 0.0,  variationCentralInstantVelocityIoEarth[ 1 ], 0.0 ).finished( );
+//    modifiedCentralInstantVelocityIoEarth = ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ) +  variationCentralInstantVelocityIo;
+//    modifiedCentralInstantStateIo = centralInstantIoState;
+//    modifiedCentralInstantStateIo.segment( 3, 3 ) +=  variationCentralInstantVelocityIo;
+
+//    modifiedLinkEndStates.clear( );
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantStateIo );
+//    modifiedLinkEndStates.push_back( centralInstantEuropaState );
+//    modifiedLinkEndStates.push_back( centralInstantEarthState );
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    modifiedSecondTimeDerivativeOfX = computeSecondPartialXwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                         modifiedCentralInstantVelocityIoEarth, ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ),
+//                                                                         centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth,
+//                                                                         rightAscensionAndDeclinationIo.first, rightAscensionAndDeclinationIo.second,
+//                                                                         rightAscensionAndDeclinationEuropa.first, rightAscensionAndDeclinationEuropa.second );
+//    variationSecondPartialXwrtTime = ( modifiedSecondTimeDerivativeOfX - initialSecondPartialXwrtTime ) / variationCentralInstantVelocityIoEarth[ 1 ];
+
+//    modifiedSecondTimeDerivativeOfY = computeSecondPartialYwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                  modifiedCentralInstantVelocityIoEarth, ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ),
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth );
+//    variationSecondPartialYwrtTime = ( modifiedSecondTimeDerivativeOfY - initialSecondPartialYwrtTime ) / variationCentralInstantVelocityIoEarth[ 1 ];
+
+//    std::cout << "Io: numerical velocity partial of second partial X wrt time - Vy: " << variationSecondPartialXwrtTime << "\n\n";
+//    std::cout << "Io: validation: " << partialOfSecondTimeDerivativeXwrtVelocityIo[ 1 ] << "\n\n";
+//    std::cout << "Io: numerical velocity partial of second partial Y wrt time - Vy: " << variationSecondPartialYwrtTime << "\n\n";
+//    std::cout << "Io: validation: " << partialOfSecondTimeDerivativeYwrtVelocityIo[ 1 ] << "\n\n";
+
+//    modifiedInstrumentalFramePosition = modifiedMutualApproximationScaling->getInstrumentalFrameRelativePosition( );
+//    modifiedInstrumentalFrameVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+
+//    modifiedCubicPolynomialCoefficients[ 0 ] =
+//            modifiedSecondTimeDerivativeOfX * modifiedSecondTimeDerivativeOfX
+//            + modifiedSecondTimeDerivativeOfY * modifiedSecondTimeDerivativeOfY;
+//    modifiedCubicPolynomialCoefficients[ 1 ] =
+//            3.0 * ( modifiedSecondTimeDerivativeOfX * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedSecondTimeDerivativeOfY * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 2 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedSecondTimeDerivativeOfX
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedSecondTimeDerivativeOfY
+//            + modifiedInstrumentalFrameVelocity[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFrameVelocity[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 3 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+
+//    variationCubicPolynomialCoefficients =
+//            ( modifiedCubicPolynomialCoefficients - cubicPolynomialCoefficients ) / variationCentralInstantVelocityIoEarth[ 1 ];
+//    std::cout << "Io: numerical velocity partial of cubic polynomial coefficients - Vy: " << variationCubicPolynomialCoefficients.transpose( ) << "\n\n";
+
+
+//    ///// W.R.T. SECOND TRANSMITTER POSITION, I.E. W.R.T. Europa position
+//    variationCentralInstantVelocityEuropa = ( Eigen::Vector3d( ) << 0.0, variationCentralInstantVelocityEuropaEarth[ 1 ], 0.0 ).finished( );
+//    modifiedCentralInstantVelocityEuropaEarth = ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ) +  variationCentralInstantVelocityEuropa;
+//    modifiedCentralInstantStateEuropa = centralInstantEuropaState;
+//    modifiedCentralInstantStateEuropa.segment( 3, 3 ) += variationCentralInstantVelocityEuropa;
+
+//    modifiedLinkEndStates.clear( );
+//    modifiedLinkEndStates.push_back( centralInstantIoState );
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantStateEuropa );
+//    modifiedLinkEndStates.push_back( centralInstantEarthState );
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    modifiedSecondTimeDerivativeOfX = computeSecondPartialXwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                  ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ), modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth,
+//                                                                  rightAscensionAndDeclinationIo.first, rightAscensionAndDeclinationIo.second,
+//                                                                  rightAscensionAndDeclinationEuropa.first, rightAscensionAndDeclinationEuropa.second );
+//    variationSecondPartialXwrtTime = ( modifiedSecondTimeDerivativeOfX - initialSecondPartialXwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 1 ];
+
+//    modifiedSecondTimeDerivativeOfY = computeSecondPartialYwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                  ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ), modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth );
+//    variationSecondPartialYwrtTime = ( modifiedSecondTimeDerivativeOfY - initialSecondPartialYwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 1 ];
+
+//    std::cout << "Europa: numerical velocity partial of second partial X wrt time - Vy: " << variationSecondPartialXwrtTime << "\n\n";
+//    std::cout << "Europa: validation: " << partialOfSecondTimeDerivativeXwrtVelocityEuropa[ 1 ] << "\n\n";
+//    std::cout << "Europa: numerical velocity partial of second partial Y wrt time - Vy: " << variationSecondPartialYwrtTime << "\n\n";
+//    std::cout << "Europa: validation: " << partialOfSecondTimeDerivativeYwrtVelocityIoForEuropa[ 1 ] << "\n\n";
+
+//    modifiedInstrumentalFramePosition = modifiedMutualApproximationScaling->getInstrumentalFrameRelativePosition( );
+//    modifiedInstrumentalFrameVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+
+//    modifiedCubicPolynomialCoefficients[ 0 ] =
+//            modifiedSecondTimeDerivativeOfX * modifiedSecondTimeDerivativeOfX
+//            + modifiedSecondTimeDerivativeOfY * modifiedSecondTimeDerivativeOfY;
+//    modifiedCubicPolynomialCoefficients[ 1 ] =
+//            3.0 * ( modifiedSecondTimeDerivativeOfX * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedSecondTimeDerivativeOfY * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 2 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedSecondTimeDerivativeOfX
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedSecondTimeDerivativeOfY
+//            + modifiedInstrumentalFrameVelocity[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFrameVelocity[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 3 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+
+//    variationCubicPolynomialCoefficients =
+//            ( modifiedCubicPolynomialCoefficients - cubicPolynomialCoefficients ) / variationCentralInstantVelocityEuropaEarth[ 1 ];
+//    std::cout << "Europa: numerical velocity partial of cubic polynomial coefficients - Vy: " << variationCubicPolynomialCoefficients.transpose( ) << "\n\n";
+
+
+
+//    ///// W.R.T. RECEIVER POSITION, I.E. W.R.T. Earth position
+//    variationCentralInstantVelocityEarth = ( Eigen::Vector3d( ) << 0.0, variationCentralInstantVelocityEuropaEarth[ 1 ], 0.0 ).finished( );
+
+//    modifiedCentralInstantVelocityEuropaEarth = ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ) -  variationCentralInstantVelocityEarth;
+//    modifiedCentralInstantVelocityIoEarth = ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ) -  variationCentralInstantVelocityEarth;
+//    modifiedCentralInstantStateEarth = centralInstantEarthState;
+//    modifiedCentralInstantStateEarth.segment( 3, 3 ) += variationCentralInstantVelocityEarth;
+
+//    modifiedLinkEndStates.clear( );
+//    modifiedLinkEndStates.push_back( centralInstantIoState );
+//    modifiedLinkEndStates.push_back( centralInstantEuropaState );
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantStateEarth );
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    modifiedSecondTimeDerivativeOfX = computeSecondPartialXwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                    modifiedCentralInstantVelocityIoEarth, modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth,
+//                                                                  rightAscensionAndDeclinationIo.first, rightAscensionAndDeclinationIo.second,
+//                                                                  rightAscensionAndDeclinationEuropa.first, rightAscensionAndDeclinationEuropa.second );
+//    variationSecondPartialXwrtTime = ( modifiedSecondTimeDerivativeOfX - initialSecondPartialXwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 1 ];
+
+//    modifiedSecondTimeDerivativeOfY = computeSecondPartialYwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                    modifiedCentralInstantVelocityIoEarth, modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth );
+//    variationSecondPartialYwrtTime = ( modifiedSecondTimeDerivativeOfY - initialSecondPartialYwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 1 ];
+
+//    std::cout << "Earth: numerical velocity partial of second partial X wrt time - Vy: " << variationSecondPartialXwrtTime << "\n\n";
+//    std::cout << "Earth: validation: " << partialOfSecondTimeDerivativeXwrtVelocityEarth[ 1 ] << "\n\n";
+//    std::cout << "Earth: numerical velocity partial of second partial Y wrt time - Vy: " << variationSecondPartialYwrtTime << "\n\n";
+//    std::cout << "Earth: validation: " << partialOfSecondTimeDerivativeYwrtVelocityEarth[ 1 ] << "\n\n";
+
+//    modifiedInstrumentalFramePosition = modifiedMutualApproximationScaling->getInstrumentalFrameRelativePosition( );
+//    modifiedInstrumentalFrameVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+
+//    modifiedCubicPolynomialCoefficients[ 0 ] =
+//            modifiedSecondTimeDerivativeOfX * modifiedSecondTimeDerivativeOfX
+//            + modifiedSecondTimeDerivativeOfY * modifiedSecondTimeDerivativeOfY;
+//    modifiedCubicPolynomialCoefficients[ 1 ] =
+//            3.0 * ( modifiedSecondTimeDerivativeOfX * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedSecondTimeDerivativeOfY * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 2 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedSecondTimeDerivativeOfX
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedSecondTimeDerivativeOfY
+//            + modifiedInstrumentalFrameVelocity[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFrameVelocity[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 3 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+
+//    variationCubicPolynomialCoefficients =
+//            ( modifiedCubicPolynomialCoefficients - cubicPolynomialCoefficients ) / variationCentralInstantVelocityEuropaEarth[ 1 ];
+//    std::cout << "Earth: numerical velocity partial of cubic polynomial coefficients - Vy: " << variationCubicPolynomialCoefficients.transpose( ) << "\n\n";
+
+
+
+//    /// z- axis
+//    variationCentralInstantVelocityIo = ( Eigen::Vector3d( ) << 0.0, 0.0, variationCentralInstantVelocityIoEarth[ 2 ] ).finished( );
+//    modifiedCentralInstantVelocityIoEarth = ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ) + variationCentralInstantVelocityIo;
+//    modifiedCentralInstantStateIo = centralInstantIoState;
+//    modifiedCentralInstantStateIo.segment( 3, 3 ) +=  variationCentralInstantVelocityIo;
+
+//    modifiedLinkEndStates.clear( );
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantStateIo );
+//    modifiedLinkEndStates.push_back( centralInstantEuropaState );
+//    modifiedLinkEndStates.push_back( centralInstantEarthState );
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    modifiedSecondTimeDerivativeOfX = computeSecondPartialXwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                  modifiedCentralInstantVelocityIoEarth, ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ),
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth,
+//                                                                  rightAscensionAndDeclinationIo.first, rightAscensionAndDeclinationIo.second,
+//                                                                  rightAscensionAndDeclinationEuropa.first, rightAscensionAndDeclinationEuropa.second );
+//    variationSecondPartialXwrtTime = ( modifiedSecondTimeDerivativeOfX - initialSecondPartialXwrtTime ) / variationCentralInstantVelocityIoEarth[ 2 ];
+
+//    modifiedSecondTimeDerivativeOfY = computeSecondPartialYwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                  modifiedCentralInstantVelocityIoEarth, ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ),
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth );
+//    variationSecondPartialYwrtTime = ( modifiedSecondTimeDerivativeOfY - initialSecondPartialYwrtTime ) / variationCentralInstantVelocityIoEarth[ 2 ];
+
+//    std::cout << "Io: numerical velocity partial of second partial X wrt time - Vz: " << variationSecondPartialXwrtTime << "\n\n";
+//    std::cout << "Io: validation: " << partialOfSecondTimeDerivativeXwrtVelocityIo[ 2 ] << "\n\n";
+//    std::cout << "Io: numerical velocity partial of second partial Y wrt time - Vz: " << variationSecondPartialYwrtTime << "\n\n";
+//    std::cout << "Io: validation: " << partialOfSecondTimeDerivativeYwrtVelocityIo[ 2 ] << "\n\n";
+
+//    modifiedInstrumentalFramePosition = modifiedMutualApproximationScaling->getInstrumentalFrameRelativePosition( );
+//    modifiedInstrumentalFrameVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+
+//    modifiedCubicPolynomialCoefficients[ 0 ] =
+//            modifiedSecondTimeDerivativeOfX * modifiedSecondTimeDerivativeOfX
+//            + modifiedSecondTimeDerivativeOfY * modifiedSecondTimeDerivativeOfY;
+//    modifiedCubicPolynomialCoefficients[ 1 ] =
+//            3.0 * ( modifiedSecondTimeDerivativeOfX * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedSecondTimeDerivativeOfY * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 2 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedSecondTimeDerivativeOfX
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedSecondTimeDerivativeOfY
+//            + modifiedInstrumentalFrameVelocity[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFrameVelocity[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 3 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+
+//    variationCubicPolynomialCoefficients =
+//            ( modifiedCubicPolynomialCoefficients - cubicPolynomialCoefficients ) / variationCentralInstantVelocityIoEarth[ 2 ];
+//    std::cout << "Io: numerical velocity partial of cubic polynomial coefficients - Vz: " << variationCubicPolynomialCoefficients.transpose( ) << "\n\n";
+
+
+//    ///// W.R.T. SECOND TRANSMITTER POSITION, I.E. W.R.T. Europa position
+//    variationCentralInstantVelocityEuropa = ( Eigen::Vector3d( ) << 0.0, 0.0, variationCentralInstantVelocityEuropaEarth[ 2 ] ).finished( );
+//    modifiedCentralInstantVelocityEuropaEarth = ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ) +  variationCentralInstantVelocityEuropa;
+//    modifiedCentralInstantStateEuropa = centralInstantEuropaState;
+//    modifiedCentralInstantStateEuropa.segment( 3, 3 ) += variationCentralInstantVelocityEuropa;
+
+//    modifiedLinkEndStates.clear( );
+//    modifiedLinkEndStates.push_back( centralInstantIoState );
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantStateEuropa );
+//    modifiedLinkEndStates.push_back( centralInstantEarthState );
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    modifiedSecondTimeDerivativeOfX = computeSecondPartialXwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                  ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ), modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth,
+//                                                                  rightAscensionAndDeclinationIo.first, rightAscensionAndDeclinationIo.second,
+//                                                                  rightAscensionAndDeclinationEuropa.first, rightAscensionAndDeclinationEuropa.second );
+//    variationSecondPartialXwrtTime = ( modifiedSecondTimeDerivativeOfX - initialSecondPartialXwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 2 ];
+
+//    modifiedSecondTimeDerivativeOfY = computeSecondPartialYwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                  ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ), modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth );
+//    variationSecondPartialYwrtTime = ( modifiedSecondTimeDerivativeOfY - initialSecondPartialYwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 2 ];
+
+//    std::cout << "Europa: numerical velocity partial of second partial X wrt time - Vz: " << variationSecondPartialXwrtTime << "\n\n";
+//    std::cout << "Europa: validation: " << partialOfSecondTimeDerivativeXwrtVelocityEuropa[ 2 ] << "\n\n";
+//    std::cout << "Europa: numerical velocity partial of second partial Y wrt time - Vz: " << variationSecondPartialYwrtTime << "\n\n";
+//    std::cout << "Europa: validation: " << partialOfSecondTimeDerivativeYwrtVelocityIoForEuropa[ 2 ] << "\n\n";
+
+//    modifiedInstrumentalFramePosition = modifiedMutualApproximationScaling->getInstrumentalFrameRelativePosition( );
+//    modifiedInstrumentalFrameVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+
+//    modifiedCubicPolynomialCoefficients[ 0 ] =
+//            modifiedSecondTimeDerivativeOfX * modifiedSecondTimeDerivativeOfX
+//            + modifiedSecondTimeDerivativeOfY * modifiedSecondTimeDerivativeOfY;
+//    modifiedCubicPolynomialCoefficients[ 1 ] =
+//            3.0 * ( modifiedSecondTimeDerivativeOfX * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedSecondTimeDerivativeOfY * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 2 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedSecondTimeDerivativeOfX
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedSecondTimeDerivativeOfY
+//            + modifiedInstrumentalFrameVelocity[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFrameVelocity[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 3 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+
+//    variationCubicPolynomialCoefficients =
+//            ( modifiedCubicPolynomialCoefficients - cubicPolynomialCoefficients ) / variationCentralInstantVelocityEuropaEarth[ 2 ];
+//    std::cout << "Europa: numerical velocity partial of cubic polynomial coefficients - Vz: " << variationCubicPolynomialCoefficients.transpose( ) << "\n\n";
+
+
+
+//    ///// W.R.T. RECEIVER POSITION, I.E. W.R.T. Earth position
+//    variationCentralInstantVelocityEarth = ( Eigen::Vector3d( ) << 0.0, 0.0, variationCentralInstantVelocityEuropaEarth[ 2 ] ).finished( );
+
+//    modifiedCentralInstantVelocityEuropaEarth = ( centralInstantEuropaState - centralInstantEarthState ).segment( 3, 3 ) -  variationCentralInstantVelocityEarth;
+//    modifiedCentralInstantVelocityIoEarth = ( centralInstantIoState - centralInstantEarthState ).segment( 3, 3 ) -  variationCentralInstantVelocityEarth;
+//    modifiedCentralInstantStateEarth = centralInstantEarthState;
+//    modifiedCentralInstantStateEarth.segment( 3, 3 ) += variationCentralInstantVelocityEarth;
+
+//    modifiedLinkEndStates.clear( );
+//    modifiedLinkEndStates.push_back( centralInstantIoState );
+//    modifiedLinkEndStates.push_back( centralInstantEuropaState );
+//    modifiedLinkEndStates.push_back( modifiedCentralInstantStateEarth );
+//    modifiedMutualApproximationScaling->update( modifiedLinkEndStates, linkEndsTimes, observation_models::receiver, linkEnds, modifiedObservation );
+
+//    modifiedSecondTimeDerivativeOfX = computeSecondPartialXwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                  modifiedCentralInstantVelocityIoEarth, modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth,
+//                                                                  rightAscensionAndDeclinationIo.first, rightAscensionAndDeclinationIo.second,
+//                                                                  rightAscensionAndDeclinationEuropa.first, rightAscensionAndDeclinationEuropa.second );
+//    variationSecondPartialXwrtTime = ( modifiedSecondTimeDerivativeOfX - initialSecondPartialXwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 2 ];
+
+//    modifiedSecondTimeDerivativeOfY = computeSecondPartialYwrtTime( ( centralInstantIoState - centralInstantEarthState ).segment( 0, 3 ), ( centralInstantEuropaState - centralInstantEarthState ).segment( 0, 3 ),
+//                                                                  modifiedCentralInstantVelocityIoEarth, modifiedCentralInstantVelocityEuropaEarth,
+//                                                                  centralInstantAccelerationIo - centralInstantAccelerationEarth, centralInstantAccelerationEuropa - centralInstantAccelerationEarth );
+//    variationSecondPartialYwrtTime = ( modifiedSecondTimeDerivativeOfY - initialSecondPartialYwrtTime ) / variationCentralInstantVelocityEuropaEarth[ 2 ];
+
+//    std::cout << "Earth: numerical velocity partial of second partial X wrt time - Vz: " << variationSecondPartialXwrtTime << "\n\n";
+//    std::cout << "Earth: validation: " << partialOfSecondTimeDerivativeXwrtVelocityEarth[ 2 ] << "\n\n";
+//    std::cout << "Earth: numerical velocity partial of second partial Y wrt time - Vz: " << variationSecondPartialYwrtTime << "\n\n";
+//    std::cout << "Earth: validation: " << partialOfSecondTimeDerivativeYwrtVelocityEarth[ 2 ] << "\n\n";
+
+//    modifiedInstrumentalFramePosition = modifiedMutualApproximationScaling->getInstrumentalFrameRelativePosition( );
+//    modifiedInstrumentalFrameVelocity = modifiedMutualApproximationScaling->getInstrumentalFrameRelativeVelocity( );
+
+//    modifiedCubicPolynomialCoefficients[ 0 ] =
+//            modifiedSecondTimeDerivativeOfX * modifiedSecondTimeDerivativeOfX
+//            + modifiedSecondTimeDerivativeOfY * modifiedSecondTimeDerivativeOfY;
+//    modifiedCubicPolynomialCoefficients[ 1 ] =
+//            3.0 * ( modifiedSecondTimeDerivativeOfX * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedSecondTimeDerivativeOfY * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 2 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedSecondTimeDerivativeOfX
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedSecondTimeDerivativeOfY
+//            + modifiedInstrumentalFrameVelocity[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFrameVelocity[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+//    modifiedCubicPolynomialCoefficients[ 3 ] =
+//            2.0 * ( modifiedInstrumentalFramePosition[ 0 ] * modifiedInstrumentalFrameVelocity[ 0 ]
+//            + modifiedInstrumentalFramePosition[ 1 ] * modifiedInstrumentalFrameVelocity[ 1 ] );
+
+//    variationCubicPolynomialCoefficients =
+//            ( modifiedCubicPolynomialCoefficients - cubicPolynomialCoefficients ) / variationCentralInstantVelocityEuropaEarth[ 2 ];
+//    std::cout << "Earth: numerical velocity partial of cubic polynomial coefficients - Vz: " << variationCubicPolynomialCoefficients.transpose( ) << "\n\n";
+
+//}
+
+
+
+
+
+//BOOST_AUTO_TEST_CASE( testCentralInstantPartialsWrtLinkEndVelocity )
+//{
+//    std::cout.precision( 16 );
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////            USING STATEMENTS              //////////////////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    using namespace tudat;
+//    using namespace tudat::simulation_setup;
+//    using namespace tudat::propagators;
+//    using namespace tudat::numerical_integrators;
+//    using namespace tudat::orbital_element_conversions;
+//    using namespace tudat::basic_mathematics;
+//    using namespace tudat::gravitation;
+//    using namespace tudat::numerical_integrators;
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////     CREATE ENVIRONMENT AND VEHICLE       //////////////////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Load Spice kernels.
+//    spice_interface::loadStandardSpiceKernels( );
+
+//    // Set simulation time settings.
+//    const double simulationStartEpoch = 1300000.0; // 41680.0; //0.0;
+//    const double simulationEndEpoch = 2.0 * tudat::physical_constants::JULIAN_YEAR;
+
+//    // Define body settings for simulation.
+//    std::vector< std::string > bodiesToCreate;
+//    bodiesToCreate.push_back( "Sun" );
+//    bodiesToCreate.push_back( "Earth" );
+//    bodiesToCreate.push_back( "Jupiter" );
+//    bodiesToCreate.push_back( "Io" );
+//    bodiesToCreate.push_back( "Europa" );
+//    bodiesToCreate.push_back( "Ganymede" );
+
+//    // Create body objects.
+//    std::map< std::string, std::shared_ptr< BodySettings > > bodySettings =
+//            getDefaultBodySettings( bodiesToCreate, simulationStartEpoch - 300.0, simulationEndEpoch + 300.0 );
+//    for( unsigned int i = 0; i < bodiesToCreate.size( ); i++ )
+//    {
+//        bodySettings[ bodiesToCreate.at( i ) ]->ephemerisSettings->resetFrameOrientation( "J2000" );
+//        bodySettings[ bodiesToCreate.at( i ) ]->rotationModelSettings->resetOriginalFrame( "J2000" );
+//    }
+//    NamedBodyMap bodyMap = createBodies( bodySettings );
+
+//    // Finalize body creation.
+//    setGlobalFrameBodyEphemerides( bodyMap, "SSB", "J2000" );
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////            CREATE ACCELERATIONS          //////////////////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//    // Set accelerations between bodies that are to be taken into account (mutual point mass gravity between all bodies).
+//    SelectedAccelerationMap accelerationMap;
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsEarth;
+//    currentAccelerationsEarth[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEarth[ "Jupiter" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEarth[ "Io" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEarth[ "Europa" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEarth[ "Ganymede" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsJupiter;
+//    currentAccelerationsJupiter[ "Io" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsJupiter[ "Europa" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsJupiter[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsJupiter[ "Ganymede" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsIo;
+//    currentAccelerationsIo[ "Earth" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsIo[ "Jupiter" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsIo[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsIo[ "Europa" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsIo[ "Ganymede" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsEuropa;
+//    currentAccelerationsEuropa[ "Jupiter" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEuropa[ "Earth" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEuropa[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEuropa[ "Io" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsEuropa[ "Ganymede" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+//    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > currentAccelerationsGanymede;
+//    currentAccelerationsGanymede[ "Jupiter" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsGanymede[ "Earth" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsGanymede[ "Sun" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsGanymede[ "Io" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+//    currentAccelerationsGanymede[ "Europa" ].push_back( std::make_shared< AccelerationSettings >( basic_astrodynamics::central_gravity ) );
+
+
+//    accelerationMap[ "Ganymede" ] = currentAccelerationsGanymede;
+//    accelerationMap[ "Jupiter" ] = currentAccelerationsJupiter;
+//    accelerationMap[ "Io" ] = currentAccelerationsIo;
+//    accelerationMap[ "Europa" ] = currentAccelerationsEuropa;
+//    accelerationMap[ "Earth" ] = currentAccelerationsEarth;
+
+//    // Define list of bodies to propagate
+//    std::vector< std::string > bodiesToPropagate;
+//    bodiesToPropagate.push_back( "Earth" );
+//    bodiesToPropagate.push_back( "Jupiter" );
+//    bodiesToPropagate.push_back( "Io" );
+//    bodiesToPropagate.push_back( "Europa" );
+//    bodiesToPropagate.push_back( "Ganymede" );
+
+//    // Define central bodies to use in propagation.
+//    std::vector< std::string > centralBodies;
+//    centralBodies.push_back( "SSB" );
+//    centralBodies.push_back( "SSB" );
+//    centralBodies.push_back( "Jupiter" );
+//    centralBodies.push_back( "Jupiter" );
+//    centralBodies.push_back( "Jupiter" );
+
+//    // Create acceleration models and propagation settings.
+//    basic_astrodynamics::AccelerationMap accelerationModelMap = createAccelerationModelsMap(
+//                bodyMap, accelerationMap, bodiesToPropagate, centralBodies );
+
+
+
+//    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////             CREATE PROPAGATION SETTINGS            ///////////////////////////////////////
+//    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Get initial state vector as input to integration.
+//    Eigen::VectorXd systemInitialState = getInitialStatesOfBodies(
+//                bodiesToPropagate, centralBodies, bodyMap, simulationStartEpoch );
+
+
+//    // Define list of dependent variables to save.
+//    std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > dependentVariablesList;
+
+//    double limitValueImpactParameter = 10.0 / 3600.0 * mathematical_constants::PI / 180.0;
+
+
+//    for ( unsigned int currentBody = 2 ; currentBody < bodiesToPropagate.size( ) ; currentBody++ )
+//    {
+//        dependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                        relative_position_dependent_variable, bodiesToPropagate[ currentBody ], "Earth" ) );
+//    }
+
+//    for ( unsigned int currentBody = 2 ; currentBody < bodiesToPropagate.size( ) - 1 ; currentBody++ )
+//    {
+
+//        for ( unsigned int otherBody = currentBody + 1 ; otherBody < bodiesToPropagate.size( ) ; otherBody ++ )
+//        {
+//            dependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                  relative_distance_dependent_variable, bodiesToPropagate[ currentBody ],
+//                                                  bodiesToPropagate[ otherBody ] ) );
+//        }
+//    }
+
+//    std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > secondDependentVariablesList = dependentVariablesList;
+//    secondDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                    relative_velocity_dependent_variable, "Io", "Earth" ) );
+//    secondDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                    relative_velocity_dependent_variable, "Europa", "Earth" ) );
+
+//    // Create object with list of dependent variables
+//    std::shared_ptr< DependentVariableSaveSettings > dependentVariablesToSave =
+//            std::make_shared< DependentVariableSaveSettings >( secondDependentVariablesList );
+
+
+//    std::string observer = "Earth";
+//    std::vector< std::string > listOfObjects;
+//    listOfObjects.push_back( "Io" );
+//    listOfObjects.push_back( "Europa" );
+//    listOfObjects.push_back( "Ganymede" );
+//    bool useThresholdAsLowerLimit = true;;
+////    std::pair< std::string, std::string > bodiesInvolvedInMutualApproximations;
+//    std::function< bool( const double ) > customTerminationFunction =
+//            std::bind( &isApparentDistanceBelowThreshold, std::placeholders::_1, limitValueImpactParameter,
+//                       "Earth", listOfObjects, bodyMap, simulationEndEpoch, useThresholdAsLowerLimit); //, bodiesInvolvedInMutualApproximations );
+
+//    std::shared_ptr< PropagationTerminationSettings > customTerminationSettings =
+//            std::make_shared< PropagationCustomTerminationSettings >( customTerminationFunction );
+
+//    // Define propagator settings.
+//    std::shared_ptr< TranslationalStatePropagatorSettings< double > > propagatorSettings = std::make_shared< TranslationalStatePropagatorSettings< double > > (
+//                centralBodies, accelerationModelMap, bodiesToPropagate, systemInitialState, customTerminationSettings, cowell, dependentVariablesToSave );
+
+//    // Define numerical integrator settings.
+//    std::shared_ptr< IntegratorSettings< > > integratorSettings =
+//            std::make_shared< IntegratorSettings< > >( rungeKutta4, simulationStartEpoch, 3600.0 / 10.0 );
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////             PROPAGATE ORBITS            ///////////////////////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Create simulation object and propagate dynamics.
+//    SingleArcDynamicsSimulator< > dynamicsSimulator( bodyMap, integratorSettings, propagatorSettings );
+
+//    std::map< double, Eigen::VectorXd > integrationResult = dynamicsSimulator.getEquationsOfMotionNumericalSolution( );
+//    std::map< double, Eigen::VectorXd > dependentVariablesHistory = dynamicsSimulator.getDependentVariableHistory( );
+
+//    double epochEndFirstPropagation = integrationResult.rbegin( )->first;
+//    Eigen::VectorXd finalPropagatedState = integrationResult.rbegin( )->second;
+////    Eigen::VectorXd finalPropagatedStateIo = finalPropagatedState.segment( 12, 6 );
+////    Eigen::VectorXd finalPropagatedStateEuropa = finalPropagatedState.segment( 18, 6 );
+////    Eigen::VectorXd finalPropagatedStateGanymede = finalPropagatedState.segment( 24, 6 );
+
+////    Eigen::VectorXd finalDependentVariablesValues = dependentVariablesHistory.rbegin( )->second;
+
+////    Eigen::VectorXd finalRelativePositionIoEarth = finalDependentVariablesValues.segment( 0, 3 );
+////    Eigen::Matrix< double, 3, 1 > finalSphericalStateIo = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+////                finalRelativePositionIoEarth.segment( 0, 3 ) ).template cast< double >( );
+////    double rightAscensionIo = finalSphericalStateIo.z( );
+////    double declinationIo = mathematical_constants::PI / 2.0 - finalSphericalStateIo.y( );
+
+////    Eigen::VectorXd finalRelativePositionEuropaEarth = finalDependentVariablesValues.segment( 3, 3 );
+////    Eigen::Matrix< double, 3, 1 > finalSphericalStateEuropa = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+////                finalRelativePositionEuropaEarth.segment( 0, 3 ) ).template cast< double >( );
+////    double rightAscensionEuropa = finalSphericalStateEuropa.z( );
+////    double declinationEuropa = mathematical_constants::PI / 2.0 - finalSphericalStateEuropa.y( );
+
+////    Eigen::VectorXd finalRelativePositionGanymedeEarth = finalDependentVariablesValues.segment( 6, 3 );
+////    Eigen::Matrix< double, 3, 1 > finalSphericalStateGanymede = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+////                finalRelativePositionGanymedeEarth.segment( 0, 3 ) ).template cast< double >( );
+////    double rightAscensionGanymede = finalSphericalStateGanymede.z( );
+////    double declinationGanymede = mathematical_constants::PI / 2.0 - finalSphericalStateGanymede.y( );
+
+////    double deltaRightAscensionIoEuropa = rightAscensionEuropa - rightAscensionIo;
+////    double deltaDeclinationIoEuropa = declinationEuropa - declinationIo;
+////    double apparentDistanceIoEuropa = std::sqrt( ( deltaRightAscensionIoEuropa * std::cos( declinationIo ) ) * ( deltaRightAscensionIoEuropa * std::cos( declinationIo ) )
+////                                                 + deltaDeclinationIoEuropa * deltaDeclinationIoEuropa );
+
+////    double deltaRightAscensionIoGanymede = rightAscensionGanymede - rightAscensionIo;
+////    double deltaDeclinationIoGanymede = declinationGanymede - declinationIo;
+////    double apparentDistanceIoGanymede = std::sqrt( ( deltaRightAscensionIoGanymede * std::cos( declinationIo ) ) * ( deltaRightAscensionIoGanymede * std::cos( declinationIo ) )
+////                                                 + deltaDeclinationIoGanymede * deltaDeclinationIoGanymede );
+
+////    double deltaRightAscensionEuropaGanymede = rightAscensionGanymede - rightAscensionEuropa;
+////    double deltaDeclinationEuropaGanymede = declinationGanymede - declinationEuropa;
+////    double apparentDistanceEuropaGanymede = std::sqrt( ( deltaRightAscensionEuropaGanymede * std::cos( declinationEuropa ) ) * ( deltaRightAscensionEuropaGanymede * std::cos( declinationEuropa ) )
+////                                                 + deltaDeclinationEuropaGanymede * deltaDeclinationEuropaGanymede );
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    /////////////////           SECOND PROPAGATION CLOSE MUTUAL APPROXIMATION          ////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    Eigen::VectorXd newSystemInitialState = finalPropagatedState;
+
+
+//    useThresholdAsLowerLimit = false;
+//    std::vector< std::string > newListOfObjects;
+//    newListOfObjects.push_back( "Io" );
+//    newListOfObjects.push_back( "Europa" );
+//    std::function< bool( const double ) > newCustomTerminationFunction =
+//            std::bind( &isApparentDistanceBelowThreshold, std::placeholders::_1, limitValueImpactParameter,
+//                       "Earth", newListOfObjects, bodyMap, simulationEndEpoch, useThresholdAsLowerLimit );
+
+//    std::shared_ptr< PropagationTerminationSettings > newCustomTerminationSettings =
+//            std::make_shared< PropagationCustomTerminationSettings >( newCustomTerminationFunction );
+
+//    // Define propagator settings.
+//    std::shared_ptr< TranslationalStatePropagatorSettings< double > > newPropagatorSettings =
+//            std::make_shared< TranslationalStatePropagatorSettings< double > > (
+//                centralBodies, accelerationModelMap, bodiesToPropagate, newSystemInitialState,
+//                newCustomTerminationSettings, cowell, dependentVariablesToSave );
+
+//    // Define numerical integrator settings.
+//    std::shared_ptr< IntegratorSettings< > > newIntegratorSettings = std::make_shared< IntegratorSettings< > >
+//            ( rungeKutta4, epochEndFirstPropagation, 1.0 );
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////             PROPAGATE ORBIT AND VARIATIONAL EQUATIONS         /////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Create simulation object and propagate dynamics.
+//    SingleArcDynamicsSimulator< > newDynamicsSimulator( bodyMap, newIntegratorSettings, newPropagatorSettings, true, false, true );
+
+//    std::map< double, Eigen::VectorXd > newIntegrationResult = newDynamicsSimulator.getEquationsOfMotionNumericalSolution( );
+//    std::map< double, Eigen::VectorXd > newDependentVariablesHistory = newDynamicsSimulator.getDependentVariableHistory( );
+
+
+//    // Create map with apparent relative distances.
+//    std::map< double, Eigen::VectorXd > apparentDistanceHistory;
+////    std::map< double, Eigen::VectorXd > angularPositionsHistory;
+
+//    std::map< double, Eigen::VectorXd > XYhistory;
+
+//    for ( std::map< double, Eigen::VectorXd >::iterator itr = newDependentVariablesHistory.begin( ) ;
+//          itr != newDependentVariablesHistory.end( ) ; itr++ )
+//    {
+//        Eigen::VectorXd relativePositionIoEarth = itr->second.segment( 0, 3 );
+//        Eigen::VectorXd relativePositionEuropaEarth = itr->second.segment( 3, 3 );
+////        Eigen::VectorXd relativePositionGanymedeEarth = itr->second.segment( 6, 3 );
+
+//        Eigen::VectorXd relativeVelocityIoEarth = itr->second.segment( 12, 3 );
+//        Eigen::VectorXd relativeVelocityEuropaEarth = itr->second.segment( 15, 3 );
+
+//        Eigen::Matrix< double, 3, 1 > sphericalStateIo = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                    relativePositionIoEarth.segment( 0, 3 ) ).template cast< double >( );
+//        double currentRightAscensionIo = sphericalStateIo.z( );
+//        double currentDeclinationIo = mathematical_constants::PI / 2.0 - sphericalStateIo.y( );
+
+//        Eigen::Matrix< double, 3, 1 > sphericalStateEuropa = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                    relativePositionEuropaEarth.segment( 0, 3 ) ).template cast< double >( );
+//        double currentRightAscensionEuropa = sphericalStateEuropa.z( );
+//        double currentDeclinationEuropa = mathematical_constants::PI / 2.0 - sphericalStateEuropa.y( );
+
+////        Eigen::Matrix< double, 3, 1 > sphericalStateGanymede = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+////                    relativePositionGanymedeEarth.segment( 0, 3 ) ).template cast< double >( );
+////        double currentRightAscensionGanymede = sphericalStateGanymede.z( );
+////        double currentDeclinationGanymede = mathematical_constants::PI / 2.0 - sphericalStateGanymede.y( );
+
+//        double differenceRightAscensionIoEuropa = currentRightAscensionEuropa - currentRightAscensionIo;
+//        double differenceDeclinationIoEuropa = currentDeclinationEuropa - currentDeclinationIo;
+//        double currentApparentDistanceIoEuropa = std::sqrt( ( differenceRightAscensionIoEuropa * std::cos( currentDeclinationIo ) )
+//                                                            * ( differenceRightAscensionIoEuropa * std::cos( currentDeclinationIo ) )
+//                                                     + differenceDeclinationIoEuropa * differenceDeclinationIoEuropa );
+
+////        double differenceRightAscensionIoGanymede = currentRightAscensionGanymede - currentRightAscensionIo;
+////        double differenceDeclinationIoGanymede = currentDeclinationGanymede - currentDeclinationIo;
+////        double currentApparentDistanceIoGanymede = std::sqrt( ( differenceRightAscensionIoGanymede * std::cos( currentDeclinationIo ) )
+////                                                              * ( differenceRightAscensionIoGanymede * std::cos( currentDeclinationIo ) )
+////                                                     + differenceDeclinationIoGanymede * differenceDeclinationIoGanymede );
+
+////        double differenceRightAscensionEuropaGanymede = currentRightAscensionGanymede - currentRightAscensionEuropa;
+////        double differenceDeclinationEuropaGanymede = currentDeclinationGanymede - currentDeclinationEuropa;
+////        double currentApparentDistanceEuropaGanymede = std::sqrt( ( differenceRightAscensionEuropaGanymede * std::cos( currentDeclinationEuropa ) )
+////                                                                  * ( differenceRightAscensionEuropaGanymede * std::cos( currentDeclinationEuropa ) )
+////                                                     + differenceDeclinationEuropaGanymede * differenceDeclinationEuropaGanymede );
+
+//        Eigen::VectorXd currentApparentDistanceVector = Eigen::VectorXd::Zero( 1 );
+//        currentApparentDistanceVector[ 0 ] = currentApparentDistanceIoEuropa * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+////        currentApparentDistanceVector[ 1 ] = currentApparentDistanceIoGanymede * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+////        currentApparentDistanceVector[ 2 ] = currentApparentDistanceEuropaGanymede * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+
+//        apparentDistanceHistory[ itr->first ] = currentApparentDistanceVector;
+
+//        Eigen::VectorXd currentAngularPositionsVector = Eigen::VectorXd::Zero( 4 );
+//        currentAngularPositionsVector = ( Eigen::Vector6d( ) << currentRightAscensionIo, currentDeclinationIo,
+//                                          currentRightAscensionEuropa, currentDeclinationEuropa/*,
+//                                          currentRightAscensionGanymede, currentDeclinationGanymede*/ ).finished( );
+////        angularPositionsHistory[ itr->first ] = currentAngularPositionsVector;
+
+//    }
+
+
+//    input_output::writeDataMapToTextFile( apparentDistanceHistory,
+//                                          "nominalApparentDistancesHistory_testPartialsWrtVelocity.dat",
+//                                          "C:/Users/chamb/Documents/PhD/",
+//                                          "",
+//                                          std::numeric_limits< double >::digits10,
+//                                          std::numeric_limits< double >::digits10,
+//                                          "," );
+
+
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ///////////////////////    DEFINE PARAMETERS FOR WHICH SENSITIVITY IS TO BE COMPUTED   ////////////////////////////////
+//    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    // Define list of parameters to estimate.
+//    Eigen::Vector6d initialStateJupiter = newSystemInitialState.segment( 6, 6 );
+//    Eigen::Vector6d initialStateIo = newSystemInitialState.segment( 12, 6 );
+//    Eigen::Vector6d initialStateEuropa = newSystemInitialState.segment( 18, 6 );
+//    Eigen::Vector6d initialStateGanymede = newSystemInitialState.segment( 24, 6 );
+//    std::vector< std::shared_ptr< estimatable_parameters::EstimatableParameterSettings > > parameterNames;
+//    parameterNames.push_back( std::make_shared< estimatable_parameters::InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Earth", initialStateJupiter, "SSB" ) );
+//    parameterNames.push_back( std::make_shared< estimatable_parameters::InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Jupiter", initialStateJupiter, "SSB" ) );
+//    parameterNames.push_back( std::make_shared< estimatable_parameters::InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Io", initialStateIo, "Jupiter" ) );
+//    parameterNames.push_back( std::make_shared< estimatable_parameters::InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Europa", initialStateEuropa, "Jupiter" ) );
+//    parameterNames.push_back( std::make_shared< estimatable_parameters::InitialTranslationalStateEstimatableParameterSettings< double > >(
+//                                  "Ganymede", initialStateGanymede, "Jupiter" ) );
+
+//    // Create parameters
+//    std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate =
+//            createParametersToEstimate( parameterNames, bodyMap );
+
+
+//    double estimatedCentralInstant = 1.341664005849638e6; // from Matlab
+
+
+////    // Create light-time correction settings
+////    std::vector< std::string > perturbingBodies = { "Sun" };
+////    std::vector< std::shared_ptr< observation_models::LightTimeCorrectionSettings > > lightTimeCorrectionSettings;
+////    lightTimeCorrectionSettings.push_back( std::make_shared< observation_models::FirstOrderRelativisticLightTimeCorrectionSettings >(
+////                                                perturbingBodies ) );
+
+////    // Create observation settings
+////    std::shared_ptr< observation_models::ObservationSettings > observableSettings = std::make_shared< observation_models::ObservationSettings >
+////            ( observation_models::apparent_distance, lightTimeCorrectionSettings, std::make_shared< observation_models::ConstantObservationBiasSettings >(
+////                  ( Eigen::Vector1d( ) << 0.0 ).finished( ), true ) );
+
+//    observation_models::LinkEnds linkEnds;
+//    linkEnds[ observation_models::receiver ] = std::make_pair( "Earth" , ""  );
+//    linkEnds[ observation_models::transmitter ] = std::make_pair( "Io" , ""  );
+//    linkEnds[ observation_models::transmitter2 ] = std::make_pair( "Europa" , ""  );
+
+////    // Create apparent distance observation model.
+////    std::shared_ptr< observation_models::ObservationModel< 1, double, double > > apparentDistanceModel =
+////           observation_models::ObservationModelCreator< 1, double, double >::createObservationModel(
+////                linkEnds, observableSettings, bodyMap );
+
+//    std::vector< double > linkEndTimes;
+//    std::vector< Eigen::Vector6d > linkEndStates;
+////    Eigen::Vector1d observationFromReceptionTime = 3600.0 * 180.0 / mathematical_constants::PI * apparentDistanceModel->computeObservationsWithLinkEndData( estimatedCentralInstant, observation_models::receiver, linkEndTimes, linkEndStates );
+////    std::cout << "apparent distance at central instant from observation model: " << observationFromReceptionTime << "\n\n";
+////    std::cout << "link end times: " << linkEndTimes[ 0 ] << " & " << linkEndTimes[ 1 ] << " & " << linkEndTimes[ 2 ] << "\n\n";
+
+////    std::map< double, Eigen::VectorXd > lightTimeCorrectedApparentDistances;
+////    for ( double i = estimatedCentralInstant - 20.0 * 60.0 ; i <= estimatedCentralInstant + 30.0 * 60.0 ; i += 30.0 )
+////    {
+////        lightTimeCorrectedApparentDistances[ i ] = 3600.0 * 180.0 / mathematical_constants::PI *
+////                apparentDistanceModel->computeObservations( i, observation_models::receiver );
+////    }
+
+
+////    input_output::writeDataMapToTextFile( lightTimeCorrectedApparentDistances,
+////                                          "lightTimeCorrectedApparentDistancesHistory.dat",
+////                                          "C:/Users/chamb/Documents/PhD/",
+////                                          "",
+////                                          std::numeric_limits< double >::digits10,
+////                                          std::numeric_limits< double >::digits10,
+////                                          "," );
+
+
+//    // Define more complete list of dependent variables to save.
+//    std::vector< std::shared_ptr< SingleDependentVariableSaveSettings > > updatedDependentVariablesList;
+//    updatedDependentVariablesList = dependentVariablesList;
+
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Io", "Sun" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Io", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Io", "Europa" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Io", "Ganymede" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Europa", "Sun" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Europa", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Europa", "Ganymede" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_velocity_dependent_variable, "Io", "Earth" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_velocity_dependent_variable, "Europa", "Earth" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< SingleDependentVariableSaveSettings >(
+//                                                 relative_position_dependent_variable, "Earth", "Sun" ) );
+
+//    updatedDependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::total_acceleration_dependent_variable, "Io" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::total_acceleration_dependent_variable, "Europa" ) );
+//    updatedDependentVariablesList.push_back( std::make_shared< propagators::SingleDependentVariableSaveSettings >(
+//                    propagators::total_acceleration_dependent_variable, "Earth" ) );
+
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Io", "Io", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Io", "Earth", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Io", "Europa", "Jupiter" ) );
+
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Europa", "Europa", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Europa", "Earth", "Jupiter" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Europa", "Io", "Jupiter" ) );
+
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Earth", "Earth", "Sun" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Earth", "Io", "Sun" ) );
+//    updatedDependentVariablesList.push_back(
+//                std::make_shared< propagators::TotalAccelerationPartialWrtStateSaveSettings >(
+//                    "Earth", "Europa", "Sun" ) );
+
+//    // Create object with list of dependent variables
+//    std::shared_ptr< DependentVariableSaveSettings > updatedDependentVariablesToSave =
+//            std::make_shared< DependentVariableSaveSettings >( updatedDependentVariablesList );
+
+
+
+//    // Redefine propagator settings.
+//    newPropagatorSettings = std::make_shared< TranslationalStatePropagatorSettings< double > > (
+//                centralBodies, accelerationModelMap, bodiesToPropagate, newSystemInitialState,
+//                std::make_shared< propagators::PropagationTimeTerminationSettings > ( estimatedCentralInstant, true ),
+//                cowell, updatedDependentVariablesToSave );
+
+//    // Create simulation object and propagate dynamics.
+//    SingleArcVariationalEquationsSolver< > variationalEquationsSimulator(
+//                bodyMap, newIntegratorSettings, newPropagatorSettings, parametersToEstimate, true,
+//                std::shared_ptr< numerical_integrators::IntegratorSettings< double > >( ), false, true );
+
+
+//    // Retrieve dependent variables history.
+//    std::map< double, Eigen::VectorXd > dependentVariablesHistoryForInterface = variationalEquationsSimulator.getDynamicsSimulator( )->getDependentVariableHistory( );
+//    // Create dependent variables interpolator.
+//    std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd > > dependentVariablesInterpolator
+//            = std::make_shared< interpolators::LagrangeInterpolator< double, Eigen::VectorXd > >(
+//                utilities::createVectorFromMapKeys< Eigen::VectorXd, double >( dependentVariablesHistoryForInterface ),
+//                utilities::createVectorFromMapValues< Eigen::VectorXd, double >( dependentVariablesHistoryForInterface ), 4 );
+
+//    std::shared_ptr< propagators::SingleArcDependentVariablesInterface > dependentVariablesInterface = std::make_shared< propagators::SingleArcDependentVariablesInterface >(
+//                dependentVariablesInterpolator, updatedDependentVariablesToSave );
+
+//    std::shared_ptr< observation_partials::MutualApproximationScaling > mutualApproximationScaling =
+//            std::make_shared< observation_partials::MutualApproximationScaling >( dependentVariablesInterface );
+
+
+
+
+//    Eigen::VectorXd centralInstantRelativePositionIoEarth = variationalEquationsSimulator.getDynamicsSimulator( )
+//            ->getDependentVariableHistory( ).rbegin( )->second.segment( 0, 3 );
+//    Eigen::VectorXd centralInstantRelativePositionEuropaEarth = variationalEquationsSimulator.getDynamicsSimulator( )
+//            ->getDependentVariableHistory( ).rbegin( )->second.segment( 3, 3 );
+
+//    Eigen::VectorXd centralInstantDependentVariables = variationalEquationsSimulator.getDynamicsSimulator( )
+//            ->getDependentVariableHistory( ).rbegin( )->second;
+
+//    Eigen::Matrix< double, 3, 1 > centralInstantSphericalStateIo =
+//            tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                centralInstantRelativePositionIoEarth.segment( 0, 3 ) ).template cast< double >( );
+//    double centralInstantRightAscensionIo = centralInstantSphericalStateIo.z( );
+//    double centralInstantDeclinationIo = mathematical_constants::PI / 2.0 - centralInstantSphericalStateIo.y( );
+
+//    Eigen::Matrix< double, 3, 1 > centralInstantSphericalStateEuropa =
+//            tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                centralInstantRelativePositionEuropaEarth.segment( 0, 3 ) ).template cast< double >( );
+//    double centralInstantRightAscensionEuropa = centralInstantSphericalStateEuropa.z( );
+//    double centralInstantDeclinationEuropa = mathematical_constants::PI / 2.0 - centralInstantSphericalStateEuropa.y( );
+
+//    Eigen::Vector2d centralInstantInstrumentalFrameRelativePosition =
+//            ( Eigen::Vector2d( ) <<
+//              ( centralInstantRightAscensionEuropa - centralInstantRightAscensionIo )
+//                * std::cos( ( centralInstantDeclinationIo + centralInstantDeclinationEuropa ) / 2.0 ) ,
+//              ( centralInstantDeclinationEuropa - centralInstantDeclinationIo ) ).finished( );
+
+////    double centralInstantDifferenceRightAscensionIoEuropa = centralInstantRightAscensionEuropa - centralInstantRightAscensionIo;
+////    double centralInstantDifferenceDeclinationIoEuropa = centralInstantDeclinationEuropa - centralInstantDeclinationIo;
+////    double centralInstantApparentDistanceIoEuropa =
+////            std::sqrt( ( centralInstantDifferenceRightAscensionIoEuropa * std::cos( centralInstantDeclinationIo ) )
+////                       * ( centralInstantDifferenceRightAscensionIoEuropa * std::cos( centralInstantDeclinationIo ) )
+////                       + centralInstantDifferenceDeclinationIoEuropa * centralInstantDifferenceDeclinationIoEuropa );
+
+////    std::cout << "estimated central instant: " << estimatedCentralInstant << "\n\n";
+////    std::cout << "apparent distance between Io and Europa at estimated central instant: " <<
+////                 centralInstantApparentDistanceIoEuropa * 180.0 / mathematical_constants::PI * 3600.0 << "\n\n";
+
+//    std::map< double, Eigen::MatrixXd > stateTransitionResult =
+//            variationalEquationsSimulator.getNumericalVariationalEquationsSolution( ).at( 0 );
+
+//    Eigen::VectorXd centralInstantState = variationalEquationsSimulator.getDynamicsSimulator( )
+//            ->getEquationsOfMotionNumericalSolution( ).rbegin( )->second;
+
+//    Eigen::MatrixXd centralInstantStateTransitionMatrix = stateTransitionResult.rbegin( )->second;
+////    Eigen::Vector3d centralInstantVectorFromIoToEuropa = centralInstantState.segment( 18, 3 ) - centralInstantState.segment( 12, 3 );
+////    Eigen::Vector3d centralInstantUnitVectorFromIoToEuropa = centralInstantVectorFromIoToEuropa / centralInstantVectorFromIoToEuropa.norm( );
+////    double centralInstantDistanceIoEuropa = centralInstantVectorFromIoToEuropa.norm( );
+
+//    Eigen::Vector3d variationVelocityCentralInstant; // = centralInstantDistanceIoEuropa * 0.005
+////            * centralInstantUnitVectorFromIoToEuropa;
+
+
+//    for ( unsigned int testCase = 0 ; testCase < 1 ; testCase++ )
+//    {
+
+//        Eigen::VectorXd totalVariationVectorCentralInstant = Eigen::VectorXd::Zero( 6 * 5 );
+//        std::string nameOutputFile;
+//        double updatedCentralInstant;
+
+//        if ( testCase == 0 )
+//        {
+//            variationVelocityCentralInstant = ( Eigen::Vector3d( ) << centralInstantState[ 15 ] * 0.0001, 0.0 , 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 15, 3 ) = variationVelocityCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationVXio.dat";
+//            updatedCentralInstant = 1.341664009128704e+06;
+//        }
+//        else if ( testCase == 1 )
+//        {
+//            variationVelocityCentralInstant = ( Eigen::Vector3d( ) << 0.0, centralInstantState[ 16 ] * 0.0001, 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 15, 3 ) = variationVelocityCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationVYio.dat";
+//        }
+//        else if ( testCase == 2 )
+//        {
+//            variationVelocityCentralInstant = ( Eigen::Vector3d( ) << 0.0, 0.0, centralInstantState[ 17 ] * 0.0001 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 15, 3 ) = variationVelocityCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationVZio.dat";
+//        }
+//        else if ( testCase == 3 )
+//        {
+//            variationVelocityCentralInstant = ( Eigen::Vector3d( ) << centralInstantState[ 21 ] * 0.0001, 0.0, 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 21, 3 ) = variationVelocityCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationVXeuropa.dat";
+//        }
+//        else if ( testCase == 4 )
+//        {
+//            variationVelocityCentralInstant = ( Eigen::Vector3d( ) << 0.0, centralInstantState[ 22 ] * 0.0001, 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 21, 3 ) = variationVelocityCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationVYeuropa.dat";
+//        }
+//        else if ( testCase == 5 )
+//        {
+//            variationVelocityCentralInstant = ( Eigen::Vector3d( ) << 0.0, 0.0, centralInstantState[ 23 ] * 0.0001 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 21, 3 ) = variationVelocityCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationVZeuropa.dat";
+//        }
+//        else if ( testCase == 6 )
+//        {
+//            variationVelocityCentralInstant = ( Eigen::Vector3d( ) << centralInstantState[ 3 ] * 0.0001, 0.0, 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 3, 3 ) = variationVelocityCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationVXearth.dat";
+//        }
+//        else if ( testCase == 7 )
+//        {
+//            variationVelocityCentralInstant = ( Eigen::Vector3d( ) << 0.0, centralInstantState[ 4 ] * 0.0001, 0.0 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 3, 3 ) = variationVelocityCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationVYearth.dat";
+//        }
+//        else if ( testCase == 8 )
+//        {
+//            variationVelocityCentralInstant = ( Eigen::Vector3d( ) << 0.0, 0.0, centralInstantState[ 5 ] * 0.0001 ).finished( );
+//            totalVariationVectorCentralInstant.segment( 3, 3 ) = variationVelocityCentralInstant;
+//            nameOutputFile = "apparentDistancesHistory_variationVZearth.dat";
+//        }
+
+//        Eigen::VectorXd variationVectorInitialEpoch = centralInstantStateTransitionMatrix.inverse( ) * totalVariationVectorCentralInstant;
+
+//        std::cout << "variation vector initial epoch: " << variationVectorInitialEpoch.transpose( ) << "\n\n";
+
+
+//        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        ///////////////////////             PROPAGATE PERTURBED INITIAL STATE                 /////////////////////////////////
+//        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//        Eigen::VectorXd updatedSystemInitialState = newSystemInitialState + variationVectorInitialEpoch;
+
+//        // Define propagator settings.
+//        std::shared_ptr< TranslationalStatePropagatorSettings< double > > updatedPropagatorSettings =
+//                std::make_shared< TranslationalStatePropagatorSettings< double > > (
+//                    centralBodies, accelerationModelMap, bodiesToPropagate, updatedSystemInitialState,
+//                    newCustomTerminationSettings, cowell, dependentVariablesToSave );
+
+//        // Create simulation object and propagate dynamics.
+//        SingleArcDynamicsSimulator< > updatedDynamicsSimulator( bodyMap, newIntegratorSettings, updatedPropagatorSettings, true, false, true );
+//        std::map< double, Eigen::VectorXd > updatedDependentVariablesHistory = updatedDynamicsSimulator.getDependentVariableHistory( );
+//        std::map< double, Eigen::VectorXd > updatedStateHistory = updatedDynamicsSimulator.getEquationsOfMotionNumericalSolution( );
+
+//        std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd > > updatedStateHistoryInterpolator
+//                = std::make_shared< interpolators::LagrangeInterpolator< double, Eigen::VectorXd > >(
+//                    utilities::createVectorFromMapKeys< Eigen::VectorXd, double >( updatedStateHistory ),
+//                    utilities::createVectorFromMapValues< Eigen::VectorXd, double >( updatedStateHistory ), 4 );
+
+//        std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd > > updatedDependentVariablesInterpolator
+//                = std::make_shared< interpolators::LagrangeInterpolator< double, Eigen::VectorXd > >(
+//                    utilities::createVectorFromMapKeys< Eigen::VectorXd, double >( updatedDependentVariablesHistory ),
+//                    utilities::createVectorFromMapValues< Eigen::VectorXd, double >( updatedDependentVariablesHistory ), 4 );
+
+//        Eigen::VectorXd updatedStateAtCentralInstant = updatedStateHistoryInterpolator->interpolate( estimatedCentralInstant );
+
+//        std::cout << "DIFFERENCE UPDATED STATE AT CENTRAL INSTANT" << "\n\n";
+//        std::cout << "expected variation: " << totalVariationVectorCentralInstant.transpose( ) << "\n\n";
+//        std::cout << "actual variation: " << ( updatedStateAtCentralInstant - centralInstantState ).transpose( ) << "\n\n";
+
+
+//        // Create map with apparent relative distances.
+//        std::map< double, Eigen::VectorXd > updatedApparentDistancesHistory;
+
+//        for ( std::map< double, Eigen::VectorXd >::iterator itr = updatedDependentVariablesHistory.begin( ) ;
+//              itr != updatedDependentVariablesHistory.end( ) ; itr++ )
+//        {
+//            Eigen::VectorXd relativePositionIoEarth = itr->second.segment( 0, 3 );
+//            Eigen::VectorXd relativePositionEuropaEarth = itr->second.segment( 3, 3 );
+//            Eigen::VectorXd relativePositionGanymedeEarth = itr->second.segment( 6, 3 );
+
+//            Eigen::Matrix< double, 3, 1 > sphericalStateIo = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                        relativePositionIoEarth.segment( 0, 3 ) ).template cast< double >( );
+//            double currentRightAscensionIo = sphericalStateIo.z( );
+//            double currentDeclinationIo = mathematical_constants::PI / 2.0 - sphericalStateIo.y( );
+
+//            Eigen::Matrix< double, 3, 1 > sphericalStateEuropa = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                        relativePositionEuropaEarth.segment( 0, 3 ) ).template cast< double >( );
+//            double currentRightAscensionEuropa = sphericalStateEuropa.z( );
+//            double currentDeclinationEuropa = mathematical_constants::PI / 2.0 - sphericalStateEuropa.y( );
+
+//            Eigen::Matrix< double, 3, 1 > sphericalStateGanymede = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                        relativePositionGanymedeEarth.segment( 0, 3 ) ).template cast< double >( );
+//            double currentRightAscensionGanymede = sphericalStateGanymede.z( );
+//            double currentDeclinationGanymede = mathematical_constants::PI / 2.0 - sphericalStateGanymede.y( );
+
+//            double differenceRightAscensionIoEuropa = currentRightAscensionEuropa - currentRightAscensionIo;
+//            double differenceDeclinationIoEuropa = currentDeclinationEuropa - currentDeclinationIo;
+//            double currentApparentDistanceIoEuropa = std::sqrt( ( differenceRightAscensionIoEuropa * std::cos( currentDeclinationIo ) )
+//                                                                * ( differenceRightAscensionIoEuropa * std::cos( currentDeclinationIo ) )
+//                                                         + differenceDeclinationIoEuropa * differenceDeclinationIoEuropa );
+
+//            double differenceRightAscensionIoGanymede = currentRightAscensionGanymede - currentRightAscensionIo;
+//            double differenceDeclinationIoGanymede = currentDeclinationGanymede - currentDeclinationIo;
+//            double currentApparentDistanceIoGanymede = std::sqrt( ( differenceRightAscensionIoGanymede * std::cos( currentDeclinationIo ) )
+//                                                                  * ( differenceRightAscensionIoGanymede * std::cos( currentDeclinationIo ) )
+//                                                         + differenceDeclinationIoGanymede * differenceDeclinationIoGanymede );
+
+//            double differenceRightAscensionEuropaGanymede = currentRightAscensionGanymede - currentRightAscensionEuropa;
+//            double differenceDeclinationEuropaGanymede = currentDeclinationGanymede - currentDeclinationEuropa;
+//            double currentApparentDistanceEuropaGanymede = std::sqrt( ( differenceRightAscensionEuropaGanymede * std::cos( currentDeclinationEuropa ) )
+//                                                                      * ( differenceRightAscensionEuropaGanymede * std::cos( currentDeclinationEuropa ) )
+//                                                         + differenceDeclinationEuropaGanymede * differenceDeclinationEuropaGanymede );
+
+//            Eigen::VectorXd currentApparentDistancesVector = Eigen::VectorXd::Zero( 3 );
+//            currentApparentDistancesVector[ 0 ] = currentApparentDistanceIoEuropa * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+//            currentApparentDistancesVector[ 1 ] = currentApparentDistanceIoGanymede * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+//            currentApparentDistancesVector[ 2 ] = currentApparentDistanceEuropaGanymede * 180.0 / tudat::mathematical_constants::PI * 3600.0;
+
+//            updatedApparentDistancesHistory[ itr->first ] = currentApparentDistancesVector;
+
+//        }
+
+
+//        input_output::writeDataMapToTextFile( updatedApparentDistancesHistory,
+//                                              nameOutputFile,
+//                                              "C:/Users/chamb/Documents/PhD/",
+//                                              "",
+//                                              std::numeric_limits< double >::digits10,
+//                                              std::numeric_limits< double >::digits10,
+//                                              "," );
+
+
+//        // At new central instant.
+//        Eigen::VectorXd dependentVariablesAtNewCentralInstant = updatedDependentVariablesInterpolator->interpolate( updatedCentralInstant );
+//        Eigen::VectorXd relativePositionIoEarth = dependentVariablesAtNewCentralInstant.segment( 0, 3 );
+//        Eigen::VectorXd relativePositionEuropaEarth = dependentVariablesAtNewCentralInstant.segment( 3, 3 );
+//        Eigen::VectorXd relativeVelocityIoEarth = dependentVariablesAtNewCentralInstant.segment( 33, 3 );
+//        Eigen::VectorXd relativeVelocityEuropaEarth = dependentVariablesAtNewCentralInstant.segment( 36, 3 );
+
+//        Eigen::Matrix< double, 3, 1 > sphericalStateIo = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                    relativePositionIoEarth.segment( 0, 3 ) ).template cast< double >( );
+//        double currentRightAscensionIo = sphericalStateIo.z( );
+//        double currentDeclinationIo = mathematical_constants::PI / 2.0 - sphericalStateIo.y( );
+
+//        Eigen::Matrix< double, 3, 1 > sphericalStateEuropa = tudat::coordinate_conversions::convertCartesianToSpherical< double >(
+//                    relativePositionEuropaEarth.segment( 0, 3 ) ).template cast< double >( );
+//        double currentRightAscensionEuropa = sphericalStateEuropa.z( );
+//        double currentDeclinationEuropa = mathematical_constants::PI / 2.0 - sphericalStateEuropa.y( );
+
+//        double updatedAverageDeclination = ( currentDeclinationIo + currentDeclinationEuropa ) / 2.0;
+
+//        Eigen::Vector2d updatedInstrumentalFrameRelativePosition =
+//                ( Eigen::Vector2d( ) << ( currentRightAscensionEuropa - currentRightAscensionIo ) * std::cos( updatedAverageDeclination ),
+//                  currentDeclinationEuropa - currentDeclinationIo ).finished( );
+
+//        std::cout << "instrumental frame relative position: " << updatedInstrumentalFrameRelativePosition.transpose( ) << "\n\n";
+//        std::cout << "difference instrumental frame relative position: " <<
+//                     ( updatedInstrumentalFrameRelativePosition - centralInstantInstrumentalFrameRelativePosition ).transpose( ) << "\n\n";
+
+//    }
+
+
+
+//    Eigen::Vector3d centralInstantEarthToIo = centralInstantDependentVariables.segment( 0, 3 );
+//    Eigen::Vector3d centralInstantEarthToEuropa = centralInstantDependentVariables.segment( 3, 3 );
+
+//    Eigen::Vector3d centralInstantRelativeVelocityIoWrtEarth = centralInstantDependentVariables.segment( 33, 3 );
+//    Eigen::Vector3d centralInstantRelativeVelocityEuropaWrtEarth = centralInstantDependentVariables.segment( 36, 3 );
+
+
+//    double numericalEstimationPartialT0wrtVXio = 4.255142994225025e-05 / ( centralInstantState[ 15 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtVYio = -1.378690358251333e-04 / ( centralInstantState[ 16 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtVZio = 6.378022953867912e-05 / ( centralInstantState[ 17 ] * 0.0001 );
+
+//    double numericalEstimationPartialT0wrtVXeuropa = -1.584226265549660e-05 / ( centralInstantState[ 21 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtVYeuropa = 1.608179882168770e-04 / ( centralInstantState[ 22 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtVZeuropa = -2.368390560150147e-04 / ( centralInstantState[ 23 ] * 0.0001 );
+
+//    double numericalEstimationPartialT0wrtVXearth = -1.863022334873676e-04 / ( centralInstantState[ 3 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtVYearth = -7.163779810070992e-05 / ( centralInstantState[ 4 ] * 0.0001 );
+//    double numericalEstimationPartialT0wrtVZearth = 3.883661702275276e-05 / ( centralInstantState[ 5 ] * 0.0001 );
+
+
+//    // Update mutual approximation scaling.
+//    linkEndStates.clear( );
+//    Eigen::Vector6d currentStateForLinkEnd;
+//    currentStateForLinkEnd.segment( 0, 3 ) = centralInstantEarthToIo;
+//    currentStateForLinkEnd.segment( 3, 3 ) = centralInstantRelativeVelocityIoWrtEarth;
+//    linkEndStates.push_back( currentStateForLinkEnd );
+//    currentStateForLinkEnd.segment( 0, 3 ) = centralInstantEarthToEuropa;
+//    currentStateForLinkEnd.segment( 3, 3 ) = centralInstantRelativeVelocityEuropaWrtEarth;
+//    linkEndStates.push_back( currentStateForLinkEnd );
+//    linkEndStates.push_back( Eigen::Vector6d::Zero( ) );
+
+//    std::vector< double > times;
+//    times.push_back( estimatedCentralInstant );
+//    times.push_back( estimatedCentralInstant );
+//    times.push_back( estimatedCentralInstant );
+
+//    Eigen::VectorXd currentObservation;
+//    mutualApproximationScaling->update( linkEndStates, times, observation_models::receiver, linkEnds, currentObservation );
+//    Eigen::Matrix< double, 1, 3 > partialCentralInstantWrtFirstTransmitterVelocity =
+//            mutualApproximationScaling->getPartialsOfCentralInstantWrtFirstTransmitterVelocity( );
+//    Eigen::Matrix< double, 1, 3 > partialCentralInstantWrtSecondTransmitterVelocity =
+//            mutualApproximationScaling->getPartialsOfCentralInstantWrtSecondTransmitterVelocity( );
+//    Eigen::Matrix< double, 1, 3 > partialCentralInstantWrtReceiverVelocity =
+//            mutualApproximationScaling->getPartialsOfCentralInstantWrtReceiverVelocity( );
+
+////    std::cout << "partials central instant w.r.t. Io velocity: " << partialCentralInstantWrtFirstTransmitterVelocity << "\n\n";
+////    std::cout << "numerical partials central instant w.r.t. Io velocity: " << numericalEstimationPartialT0wrtVXio << "  " <<
+////              numericalEstimationPartialT0wrtVYio << "  " << numericalEstimationPartialT0wrtVZio << "\n\n";
+
+////    std::cout << "partials central instant w.r.t. Europa velocity: " << partialCentralInstantWrtSecondTransmitterVelocity << "\n\n";
+////    std::cout << "numerical partials central instant w.r.t. Europa velocity: " << numericalEstimationPartialT0wrtVXeuropa << "  " <<
+////              numericalEstimationPartialT0wrtVYeuropa << "  " << numericalEstimationPartialT0wrtVZeuropa << "\n\n";
+
+////    std::cout << "partials central instant w.r.t. Earth velocity: " << partialCentralInstantWrtReceiverVelocity << "\n\n";
+////    std::cout << "numerical partials central instant w.r.t. Earth velocity: " << numericalEstimationPartialT0wrtVXearth << "  " <<
+////              numericalEstimationPartialT0wrtVYearth << "  " << numericalEstimationPartialT0wrtVZearth << "\n\n";
+
+////    std::cout << "relative difference partial t0 wrt Vx Io: " <<
+////                 ( partialCentralInstantWrtFirstTransmitterVelocity[ 0 ] - numericalEstimationPartialT0wrtVXio ) / numericalEstimationPartialT0wrtVXio << "\n\n";
+////    std::cout << "relative difference partial t0 wrt Vy Io: " <<
+////                 ( partialCentralInstantWrtFirstTransmitterVelocity[ 1 ] - numericalEstimationPartialT0wrtVYio ) / numericalEstimationPartialT0wrtVYio << "\n\n";
+////    std::cout << "relative difference partial t0 wrt Vz Io: " <<
+////                 ( partialCentralInstantWrtFirstTransmitterVelocity[ 2 ] - numericalEstimationPartialT0wrtVZio ) / numericalEstimationPartialT0wrtVZio << "\n\n";
+
+
+////    std::cout << "relative difference partial t0 wrt Vx Europa: " <<
+////                 ( partialCentralInstantWrtSecondTransmitterVelocity[ 0 ] - numericalEstimationPartialT0wrtVXeuropa ) / numericalEstimationPartialT0wrtVXeuropa << "\n\n";
+////    std::cout << "relative difference partial t0 wrt Vy Europa: " <<
+////                 ( partialCentralInstantWrtSecondTransmitterVelocity[ 1 ] - numericalEstimationPartialT0wrtVYeuropa ) / numericalEstimationPartialT0wrtVYeuropa << "\n\n";
+////    std::cout << "relative difference partial t0 wrt Vz Europa: " <<
+////                 ( partialCentralInstantWrtSecondTransmitterVelocity[ 2 ] - numericalEstimationPartialT0wrtVZeuropa ) / numericalEstimationPartialT0wrtVZeuropa << "\n\n";
+
+
+////    std::cout << "relative difference partial t0 wrt Vx Earth: " <<
+////                 ( partialCentralInstantWrtReceiverVelocity[ 0 ] - numericalEstimationPartialT0wrtVXearth ) / numericalEstimationPartialT0wrtVXearth << "\n\n";
+////    std::cout << "relative difference partial t0 wrt Vy Earth: " <<
+////                 ( partialCentralInstantWrtReceiverVelocity[ 1 ] - numericalEstimationPartialT0wrtVYearth ) / numericalEstimationPartialT0wrtVYearth << "\n\n";
+////    std::cout << "relative difference partial t0 wrt Vz Earth: " <<
+////                 ( partialCentralInstantWrtReceiverVelocity[ 2 ] - numericalEstimationPartialT0wrtVZearth ) / numericalEstimationPartialT0wrtVZearth << "\n\n";
+
+//}
 
 
 BOOST_AUTO_TEST_SUITE_END( )

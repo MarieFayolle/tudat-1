@@ -524,10 +524,11 @@ public:
         centralInstantAsObservable_( centralInstantAsObservable ),
         observableType_( observableType )
     {
-        if ( ( observableType_ != mutual_approximation ) && ( observableType_ != mutual_approximation_with_impact_parameter )  )
+        if ( ( observableType_ != mutual_approximation ) && ( observableType_ != mutual_approximation_with_impact_parameter ) &&
+             ( observableType_ != impact_parameter_mutual_approx ) )
         {
             throw std::runtime_error( "Error when making mutual approximation settings, observable type should be either"
-                                      " mutual_approximation or mutual_approximation_with_impact_parameter." );
+                                      " mutual_approximation or mutual_approximation_with_impact_parameter or impact_parameter_mutual_approx." );
         }
     }
 
@@ -569,7 +570,7 @@ public:
     bool centralInstantAsObservable_;
 
     //! Observable type for the mutual approximation settings. Can be either mutual_approximation or
-    //! mutual_approximation_with_impact_parameter (default is mutual_approximation).
+    //! mutual_approximation_with_impact_parameter or impact_parameter_mutual_approx (default is mutual_approximation).
     ObservableType observableType_;
 
 };
@@ -1348,6 +1349,66 @@ public:
                             mutualApproximationSettings->checkExistenceMutualApproximation_, mutualApproximationSettings->checkObservableDuplicates_,
                             mutualApproximationSettings->rootFinderSettings_, mutualApproximationObservationBias, apparentDistancesObservationBias );
             }
+
+            break;
+        }
+        case impact_parameter_mutual_approx:
+        {
+            // Check consistency input.
+            if( linkEnds.size( ) != 3 )
+            {
+                std::string errorMessage =
+                        "Error when making impact parameter model (for mutual approximation), " +
+                        std::to_string( linkEnds.size( ) ) + " link ends found";
+                throw std::runtime_error( errorMessage );
+            }
+            if( linkEnds.count( receiver ) == 0 )
+            {
+                throw std::runtime_error( "Error when making impact parameter model (for mutual approximation), no receiver found." );
+            }
+            if( linkEnds.count( transmitter ) == 0 )
+            {
+                throw std::runtime_error( "Error when making impact parameter model (for mutual approximation), no transmitter found." );
+            }
+            if( linkEnds.count( transmitter2 ) == 0 )
+            {
+                throw std::runtime_error( "Error when making impact parameter model (for mutual approximation), no second transmitter found." );
+            }
+
+
+            std::shared_ptr< MutualApproximationObservationSettings > impactParameterSettings =
+                    std::dynamic_pointer_cast< MutualApproximationObservationSettings >( observationSettings );
+            if ( impactParameterSettings == nullptr )
+            {
+                throw std::runtime_error( "Error when making impact parameter model (for mutual approximation), inconsistent observation settings provided as input." );
+            }
+
+            std::shared_ptr< ObservationBias< 1 > > impactParameterObservationBias;
+            if( observationSettings->biasSettings_ != nullptr )
+            {
+                impactParameterObservationBias =
+                        createObservationBiasCalculator(
+                            linkEnds, observationSettings->observableType_, observationSettings->biasSettings_, bodyMap );
+            }
+
+            std::shared_ptr< ObservationBias< 1 > > apparentDistancesObservationBias;
+            if( impactParameterSettings->apparentDistancesBiasSettings_ != nullptr )
+            {
+                apparentDistancesObservationBias = createObservationBiasCalculator(
+                            linkEnds, apparent_distance, impactParameterSettings->apparentDistancesBiasSettings_, bodyMap );
+            }
+
+            // Create observation model.
+            observationModel = std::make_shared< ImpactParameterMutualApproxObservationModel<
+                    ObservationScalarType, TimeType > >(
+                        createLightTimeCalculator< ObservationScalarType, TimeType >(
+                            linkEnds.at( transmitter ), linkEnds.at( receiver ), bodyMap, observationSettings->lightTimeCorrectionsList_ ),
+                        createLightTimeCalculator< ObservationScalarType, TimeType >(
+                            linkEnds.at( transmitter2 ), linkEnds.at( receiver ), bodyMap, observationSettings->lightTimeCorrectionsList_ ),
+                        impactParameterSettings->frequencyApparentDistanceMeasurements_, impactParameterSettings->toleranceWrtCentralInstant_,
+                        impactParameterSettings->upperLimitImpactParameter_, impactParameterSettings->orderPolynomialFitting_,
+                        impactParameterSettings->checkExistenceMutualApproximation_, impactParameterSettings->checkObservableDuplicates_,
+                        impactParameterSettings->rootFinderSettings_, impactParameterObservationBias, apparentDistancesObservationBias );
 
             break;
         }

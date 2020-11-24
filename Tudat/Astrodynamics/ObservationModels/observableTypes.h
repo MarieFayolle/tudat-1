@@ -38,7 +38,8 @@ enum ObservableType
     velocity_observable = 8,
     apparent_distance = 9,
     mutual_approximation = 10,
-    mutual_approximation_with_impact_parameter = 11
+    mutual_approximation_with_impact_parameter = 11,
+    impact_parameter_mutual_approx = 12
 };
 
 //! Function to get the name (string) associated with a given observable type.

@@ -841,6 +841,15 @@ BOOST_AUTO_TEST_CASE( testModifiedMutualApproximationModel )
             * ( relativePositionInReceiverFrame[ 0 ] * relativeVelocityInReceiverFrame[ 0 ]
             + relativePositionInReceiverFrame[ 1 ] * relativeVelocityInReceiverFrame[ 1 ] );
 
+
+    // Manually compute the derivative of the apparent distance at central instant.
+    double modifiedApparentDistanceDown = apparentDistanceObservationModel->computeObservations( computedCentralInstant - 0.5, receiver )[ 0 ];
+    double modifiedApparentDistanceUp = apparentDistanceObservationModel->computeObservations( computedCentralInstant + 0.5, receiver )[ 0 ];
+    double derivativeApparentDistance = ( modifiedApparentDistanceUp - modifiedApparentDistanceDown ) / ( 2.0 * 0.5 );
+    std::cout << "manually computed derivative apparent distance: " << derivativeApparentDistance + 5e-13 << "\n\n";
+    std::cout << "computed modified mutual approximation observable: " << modifiedMutualApproximationObservable + 5e-13 << "\n\n";
+    std::cout << "modified mutual approximation observable from model: " << observationFromReceptionTime( 0 ) << "\n\n";
+
     BOOST_CHECK_CLOSE_FRACTION( modifiedMutualApproximationObservable + observationBias->getObservationBias(
                     std::vector< double >( ), std::vector< Eigen::Vector6d >( ) ).x( ),
                 observationFromReceptionTime( 0 ), std::numeric_limits< double >::epsilon( ) );

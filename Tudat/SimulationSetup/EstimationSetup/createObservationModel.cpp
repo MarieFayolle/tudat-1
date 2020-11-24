@@ -293,6 +293,28 @@ std::vector< std::pair< int, int > > getLinkEndIndicesForObservationViability(
             throw std::runtime_error( "Error, parsed irrelevant viability indices for mutual approximation with impact parameter." );
         }
         break;
+    case impact_parameter_mutual_approx:
+        if( ( linkEnds.at( transmitter ) == linkEndToCheck ) || ( ( linkEnds.at( transmitter ).first == linkEndToCheck.first ) &&
+                                                                  ( linkEndToCheck.second == "" ) ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 0, 2 ) );
+        }
+        else if( linkEnds.at( transmitter2 ) == linkEndToCheck || ( ( linkEnds.at( transmitter2 ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 1, 2 ) );
+        }
+        else if( linkEnds.at( receiver ) == linkEndToCheck || ( ( linkEnds.at( receiver ).first == linkEndToCheck.first ) &&
+                                                                linkEndToCheck.second == "" ) )
+        {
+            linkEndIndices.push_back( std::make_pair( 2, 0 ) );
+            linkEndIndices.push_back( std::make_pair( 2, 1 ) );
+        }
+        else
+        {
+            throw std::runtime_error( "Error, parsed irrelevant viability indices for impact parameter (of mutual approximation)." );
+        }
+        break;
     default:
         throw std::runtime_error( "Error, observable type " + std::to_string(
                                       observableType ) + " not recognized when making viability link ends" );
@@ -436,7 +458,8 @@ std::shared_ptr< MutualApproximationCalculator > createMutualApproximationCalcul
 //                                  observationViabilitySettings->getStringParameter( ) + " not found." );
 //    }
 
-    if ( ( observationType != mutual_approximation ) && ( observationType != mutual_approximation_with_impact_parameter ) )
+    if ( ( observationType != mutual_approximation ) && ( observationType != mutual_approximation_with_impact_parameter ) &&
+         ( observationType != impact_parameter_mutual_approx ) )
     {
         throw std::runtime_error( "Error when making mutual approximation calculator, inconsistent observation type." );
     }

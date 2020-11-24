@@ -54,7 +54,6 @@ Eigen::Matrix< double, 1, 3 > computePartialOfFirstTimeDerivativeRightAscensionW
         const Eigen::Vector3d& cartesianPositionVector,
         const Eigen::Vector3d& cartesianVelocityVector );
 
-
 //! Function to compute the partial w.r.t. position of observer or observed object of the first time derivative of the declination.
 Eigen::Matrix< double, 1, 3 > computePartialOfFirstTimeDerivativeDeclinationWrtLinkEndPosition(
         const Eigen::Vector3d& cartesianPositionVector,
@@ -77,6 +76,32 @@ Eigen::Matrix< double, 1, 3 > computePartialOfSecondTimeDerivativeDeclinationWrt
         const Eigen::Matrix3d& partialCartesianAccelerationWrtPosition,
         const bool wrtTransmitterPosition,
         const bool wrtOtherLinkEnd = false );
+
+
+//! Function to compute the partial w.r.t. velocity of observer or observed object of the first time derivative of the right ascension.
+Eigen::Matrix< double, 1, 3 > computePartialOfFirstTimeDerivativeRightAscensionWrtLinkEndVelocity(
+        const Eigen::Vector3d& cartesianPositionVector );
+
+//! Function to compute the partial w.r.t. velocity of observer or observed object of the first time derivative of the declination.
+Eigen::Matrix< double, 1, 3 > computePartialOfFirstTimeDerivativeDeclinationWrtLinkEndVelocity(
+        const Eigen::Vector3d& cartesianPositionVector );
+
+//! Function to compute the partial w.r.t. velocity of observer or observed object of the second time derivative of the right ascension.
+Eigen::Matrix< double, 1, 3 > computePartialOfSecondTimeDerivativeRightAscensionWrtLinkEndVelocity(
+        const Eigen::Vector3d& cartesianPositionVector,
+        const Eigen::Vector3d& cartesianVelocityVector,
+        const Eigen::Matrix3d& partialCartesianAccelerationWrtVelocity,
+        const bool wrtTransmitterPosition,
+        const bool wrtOtherLinkEnd = false );
+
+//! Function to compute the partial w.r.t. velocity of observer or observed object of the second time derivative of the declination.
+Eigen::Matrix< double, 1, 3 > computePartialOfSecondTimeDerivativeDeclinationWrtLinkEndVelocity(
+        const Eigen::Vector3d& cartesianPositionVector,
+        const Eigen::Vector3d& cartesianVelocityVector,
+        const Eigen::Matrix3d& partialCartesianAccelerationWrtPosition,
+        const bool wrtTransmitterPosition,
+        const bool wrtOtherLinkEnd = false );
+
 
 /// TO BE MOVED TO BASIC_MATHEMATICS FRAMEWORK
 //! Compute the angle theta used to derive the real solutions of the depressed cubic equation.
@@ -101,6 +126,8 @@ public:
         {
             std::cout << "dependent variables from interface ID: " << itr->first << "\n\n";
         }
+
+        currentLinkEndType_ = observation_models::receiver;
 //        referenceAngularPositionScaler_ = std::make_shared< AngularPositionScaling >( );
     }
 
@@ -249,6 +276,103 @@ public:
         return partialsOfInstrumentalFrameRelativeAccelerationWrtReceiverPosition_;
     }
 
+    //! Function to retrieve the partial of the relative position of the two transmitters in the instrumental frame w.r.t. first transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > getPartialsOfRelativePositionInInstrumentalFrameWrtFirstTransmitterVelocity( )
+    {
+        return partialsOfInstrumentalFrameRelativePositionWrtFirstTransmitterVelocity_;
+    }
+
+    //! Function to retrieve the partial of the relative position of the two transmitters in the instrumental frame w.r.t. second transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > getPartialsOfRelativePositionInInstrumentalFrameWrtSecondTransmitterVelocity( )
+    {
+        return partialsOfInstrumentalFrameRelativePositionWrtSecondTransmitterVelocity_;
+    }
+
+    //! Function to retrieve the partial of the relative position of the two transmitters in the instrumental frame w.r.t. receiver velocity.
+    Eigen::Matrix< double, 2, 3 > getPartialsOfRelativePositionInInstrumentalFrameWrtReceiverVelocity( )
+    {
+        return partialsOfInstrumentalFrameRelativePositionWrtReceiverVelocity_;
+    }
+
+    //! Function to retrieve the partial of the relative velocity of the two transmitters in the instrumental frame w.r.t. first transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > getPartialsOfRelativeVelocityInInstrumentalFrameWrtFirstTransmitterVelocity( )
+    {
+        return partialsOfInstrumentalFrameRelativeVelocityWrtFirstTransmitterVelocity_;
+    }
+
+    //! Function to retrieve the partial of the relative velocity of the two transmitters in the instrumental frame w.r.t. second transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > getPartialsOfRelativeVelocityInInstrumentalFrameWrtSecondTransmitterVelocity( )
+    {
+        return partialsOfInstrumentalFrameRelativeVelocityWrtSecondTransmitterVelocity_;
+    }
+
+    //! Function to retrieve the partial of the relative velocity of the two transmitters in the instrumental frame w.r.t. receiver velocity.
+    Eigen::Matrix< double, 2, 3 > getPartialsOfRelativeVelocityInInstrumentalFrameWrtReceiverVelocity( )
+    {
+        return partialsOfInstrumentalFrameRelativeVelocityWrtReceiverVelocity_;
+    }
+
+    //! Function to retrieve the partial of the relative acceleration of the two transmitters in the instrumental w.r.t. first transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > getPartialsOfInstrumentalFrameRelativeAccelerationWrtFirstTransmitterVelocity( )
+    {
+        return partialsOfInstrumentalFrameRelativeAccelerationWrtFirstTransmitterVelocity_;
+    }
+
+    //! Function to retrieve the partial of the relative acceleration of the two transmitters in the instrumental w.r.t. second transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > getPartialsOfInstrumentalFrameRelativeAccelerationWrtSecondTransmitterVelocity( )
+    {
+        return partialsOfInstrumentalFrameRelativeAccelerationWrtSecondTransmitterVelocity_;
+    }
+
+    //! Function to retrieve the partial of the relative acceleration of the two transmitters in the instrumental w.r.t. receiver velocity.
+    Eigen::Matrix< double, 2, 3 > getPartialsOfInstrumentalFrameRelativeAccelerationWrtReceiverVelocity( )
+    {
+        return partialsOfInstrumentalFrameRelativeAccelerationWrtReceiverVelocity_;
+    }
+
+    Eigen::Vector4d getCubicPolynomialCoefficients( )
+    {
+        return cubicPolynomialCoefficients_;
+    }
+
+
+
+    //! Function to retrieve the partial of the central instant w.r.t. first transmitter position.
+    Eigen::Matrix< double, 1, 3 > getPartialsOfCentralInstantWrtFirstTransmitterPosition( )
+    {
+        return partialsOfCentralInstantWrtFirstTransmitterPosition_;
+    }
+
+    //! Function to retrieve the partial of the central instant w.r.t. second transmitter position.
+    Eigen::Matrix< double, 1, 3 > getPartialsOfCentralInstantWrtSecondTransmitterPosition( )
+    {
+        return partialsOfCentralInstantWrtSecondTransmitterPosition_;
+    }
+
+    //! Function to retrieve the partial of the central instant w.r.t. receiver position.
+    Eigen::Matrix< double, 1, 3 > getPartialsOfCentralInstantWrtRceeiverPosition( )
+    {
+        return partialsOfCentralInstantWrtReceiverPosition_;
+    }
+
+    //! Function to retrieve the partial of the central instant w.r.t. first transmitter velocity.
+    Eigen::Matrix< double, 1, 3 > getPartialsOfCentralInstantWrtFirstTransmitterVelocity( )
+    {
+        return partialsOfCentralInstantWrtFirstTransmitterVelocity_;
+    }
+
+    //! Function to retrieve the partial of the central instant w.r.t. second transmitter velocity.
+    Eigen::Matrix< double, 1, 3 > getPartialsOfCentralInstantWrtSecondTransmitterVelocity( )
+    {
+        return partialsOfCentralInstantWrtSecondTransmitterVelocity_;
+    }
+
+    //! Function to retrieve the partial of the central instant w.r.t. receiver velocity.
+    Eigen::Matrix< double, 1, 3 > getPartialsOfCentralInstantWrtReceiverVelocity( )
+    {
+        return partialsOfCentralInstantWrtReceiverVelocity_;
+    }
+
 protected:
 
     //! Function to check whether all the required dependent variables are included in the interface.
@@ -266,9 +390,26 @@ protected:
 
     Eigen::Vector2d computeRelativeAccelerationInInstrumentalFrame( );
 
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativePositionWrtRightAscension( );
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativePositionWrtDeclination( );
+
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativeVelocityWrtRightAscension( );
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativeVelocityWrtDeclination( );
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativeVelocityWrtFirstTimeDerivativeRightAscension( );
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativeVelocityWrtFirstTimeDerivativeDeclination( );
+
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativeAccelerationWrtRightAscension( );
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativeAccelerationWrtDeclination( );
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativeAccelerationWrtFirstTimeDerivativeRightAscension( );
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativeAccelerationWrtFirstTimeDerivativeDeclination( );
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativeAccelerationWrtSecondTimeDerivativeRightAscension( );
+    Eigen::Matrix< double, 2, 2 > computePartialsOfInstrumentalFrameRelativeAccelerationWrtSecondTimeDerivativeDeclination( );
+
     void computePartialOfRelativePositionInInstrumentalFrameWrtLinkEndPosition( );
+    void computePartialOfRelativePositionInInstrumentalFrameWrtLinkEndPositionV2( );
 
     void computePartialOfRelativeVelocityInInstrumentalFrameWrtLinkEndPosition( );
+    void computePartialOfRelativeVelocityInInstrumentalFrameWrtLinkEndPositionV2( );
 
     void computePartialOfRelativeAccelerationInInstrumentalFrameWrtLinkEndPosition(
             Eigen::Vector3d relativeAccelerationFirstTransmitterWrtReceiver,
@@ -278,10 +419,30 @@ protected:
             Eigen::Matrix3d partialAccelerationSecondTransmitterWrtReceiverPosition,
             Eigen::Matrix3d partialAccelerationSecondTransmitterWrtTransmitterPosition,
             Eigen::Matrix3d partialAccelerationFirstTransmitterWrtOtherTransmitterPosition,
-            Eigen::Matrix3d partialAccelerationSecondTransmitterWrtOtherTransmitterPosition,
-            Eigen::Matrix< double, 2, 3 >& partialsOfInstrumentalFrameRelativeAccelerationWrtFirstTransmitterPosition,
-            Eigen::Matrix< double, 2, 3 >& partialsOfInstrumentalFrameRelativeAccelerationWrtSecondTransmitterPosition,
-            Eigen::Matrix< double, 2, 3 >& partialsOfInstrumentalFrameRelativeAccelerationWrtReceiverPosition );
+            Eigen::Matrix3d partialAccelerationSecondTransmitterWrtOtherTransmitterPosition );
+
+    void computePartialOfRelativeAccelerationInInstrumentalFrameWrtLinkEndPositionV2(
+            Eigen::Vector3d relativeAccelerationFirstTransmitterWrtReceiver,
+            Eigen::Vector3d relativeAccelerationSecondTransmitterWrtReceiver,
+            Eigen::Matrix3d partialAccelerationFirstTransmitterWrtReceiverPosition,
+            Eigen::Matrix3d partialAccelerationFirstTransmitterWrtTransmitterPosition,
+            Eigen::Matrix3d partialAccelerationSecondTransmitterWrtReceiverPosition,
+            Eigen::Matrix3d partialAccelerationSecondTransmitterWrtTransmitterPosition,
+            Eigen::Matrix3d partialAccelerationFirstTransmitterWrtOtherTransmitterPosition,
+            Eigen::Matrix3d partialAccelerationSecondTransmitterWrtOtherTransmitterPosition );
+
+
+    void computePartialOfRelativePositionInInstrumentalFrameWrtLinkEndVelocity( );
+
+    void computePartialOfRelativeVelocityInInstrumentalFrameWrtLinkEndVelocity( );
+
+    void computePartialOfRelativeAccelerationInInstrumentalFrameWrtLinkEndVelocity(
+            Eigen::Matrix3d partialAccelerationFirstTransmitterWrtReceiverPosition,
+            Eigen::Matrix3d partialAccelerationFirstTransmitterWrtTransmitterPosition,
+            Eigen::Matrix3d partialAccelerationSecondTransmitterWrtReceiverPosition,
+            Eigen::Matrix3d partialAccelerationSecondTransmitterWrtTransmitterPosition,
+            Eigen::Matrix3d partialAccelerationFirstTransmitterWrtOtherTransmitterPosition,
+            Eigen::Matrix3d partialAccelerationSecondTransmitterWrtOtherTransmitterPosition );
 
 
     Eigen::Vector4d computeCubicPolynomialCoefficients( );
@@ -291,6 +452,11 @@ protected:
             Eigen::Matrix< double, 4, 3 >& partialOfCubicPolynomialCoefficientsWrtSecondTransmitterPosition,
             Eigen::Matrix< double, 4, 3 >& partialOfCubicPolynomialCoefficientsWrtReceiverPosition );
 
+    void computePartialOfCubicPolynomialCoefficientsWrtCartesianVelocity(
+            Eigen::Matrix< double, 4, 3 >& partialOfCubicPolynomialCoefficientsWrtFirstTransmitterVelocity,
+            Eigen::Matrix< double, 4, 3 >& partialOfCubicPolynomialCoefficientsWrtSecondTransmitterVelocity,
+            Eigen::Matrix< double, 4, 3 >& partialOfCubicPolynomialCoefficientsWrtReceiverVelocity );
+
     Eigen::Vector3d computeDepressedCubicPolynomialCoefficients( );
 
     void computePartialOfDepressedCubicPolynomialCoefficientsWrtCartesianPosition(
@@ -298,8 +464,15 @@ protected:
             Eigen::Matrix< double, 3, 3 >& partialOfDepressedCubicPolynomialCoefficientsWrtSecondTransmitterPosition,
             Eigen::Matrix< double, 3, 3 >& partialOfDepressedCubicPolynomialCoefficientsWrtReceiverPosition );
 
+    void computePartialOfDepressedCubicPolynomialCoefficientsWrtCartesianVelocity(
+            Eigen::Matrix< double, 3, 3 >& partialOfDepressedCubicPolynomialCoefficientsWrtFirstTransmitterVelocity,
+            Eigen::Matrix< double, 3, 3 >& partialOfDepressedCubicPolynomialCoefficientsWrtSecondTransmitterVelocity,
+            Eigen::Matrix< double, 3, 3 >& partialOfDepressedCubicPolynomialCoefficientsWrtReceiverVelocity );
+
 
     void computePartialsOfCentralInstantWrtLinkEndPosition( const std::vector< double > times );
+
+    void computePartialsOfCentralInstantWrtLinkEndVelocity( const std::vector< double > times );
 
 
 //private:
@@ -372,6 +545,31 @@ protected:
     Eigen::Matrix3d partialAccelerationSecondTransmitterWrtOtherTransmitterPosition_;
 
 
+    //! Partial w.r.t. link end velocity of relative acceleration of first transmitter w.r.t. receiver (in cartesian coordinates).
+    //! (retrieved from dependent variables interface)
+    Eigen::Matrix3d partialAccelerationFirstTransmitterWrtReceiverVelocity_;
+
+    //! Partial w.r.t. link end velocity of relative acceleration of first transmitter w.r.t. first transmitter (in cartesian coordinates).
+    //! (retrieved from dependent variables interface)
+    Eigen::Matrix3d partialAccelerationFirstTransmitterWrtTransmitterVelocity_;
+
+    //! Partial w.r.t. link end velocity of relative acceleration of first transmitter w.r.t. second transmitter (in cartesian coordinates).
+    //! (retrieved from dependent variables interface)
+    Eigen::Matrix3d partialAccelerationFirstTransmitterWrtOtherTransmitterVelocity_;
+
+    //! Partial w.r.t. link end velocity of relative acceleration of second transmitter w.r.t. receiver (in cartesian coordinates).
+    //! (retrieved from dependent variables interface)
+    Eigen::Matrix3d partialAccelerationSecondTransmitterWrtReceiverVelocity_;
+
+    //! Partial w.r.t. link end velocity of relative acceleration of second transmitter w.r.t. second transmitter (in cartesian coordinates).
+    //! (retrieved from dependent variables interface)
+    Eigen::Matrix3d partialAccelerationSecondTransmitterWrtTransmitterVelocity_;
+
+    //! Partial w.r.t. link end velocity of relative acceleration of second transmitter w.r.t. first transmitter (in cartesian coordinates).
+    //! (retrieved from dependent variables interface)
+    Eigen::Matrix3d partialAccelerationSecondTransmitterWrtOtherTransmitterVelocity_;
+
+
     //! Computed right ascension of first transmitter as seen from receiver.
     double rightAscensionFirstTransmitter_;
 
@@ -439,6 +637,15 @@ protected:
     //! Partials of relative position between the two transmitters (in the instrumental frame of the receiver) w.r.t. receiver position.
     Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativePositionWrtReceiverPosition_;
 
+    //! Partials of relative position between the two transmitters (in the instrumental frame of the receiver) w.r.t. first transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativePositionWrtFirstTransmitterVelocity_;
+
+    //! Partials of relative position between the two transmitters (in the instrumental frame of the receiver) w.r.t. second transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativePositionWrtSecondTransmitterVelocity_;
+
+    //! Partials of relative position between the two transmitters (in the instrumental frame of the receiver) w.r.t. receiver velocity.
+    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativePositionWrtReceiverVelocity_;
+
 
     //! Partials of relative velocity between the two transmitters (in the instrumental frame of the receiver) w.r.t. first transmitter position.
     Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeVelocityWrtFirstTransmitterPosition_;
@@ -449,6 +656,15 @@ protected:
     //! Partials of relative velocity between the two transmitters (in the instrumental frame of the receiver) w.r.t. receiver position.
     Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeVelocityWrtReceiverPosition_;
 
+    //! Partials of relative velocity between the two transmitters (in the instrumental frame of the receiver) w.r.t. first transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeVelocityWrtFirstTransmitterVelocity_;
+
+    //! Partials of relative velocity between the two transmitters (in the instrumental frame of the receiver) w.r.t. second transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeVelocityWrtSecondTransmitterVelocity_;
+
+    //! Partials of relative velocity between the two transmitters (in the instrumental frame of the receiver) w.r.t. receiver velocity.
+    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeVelocityWrtReceiverVelocity_;
+
 
     //! Partials of relative acceleration between the two transmitters (in the instrumental frame of the receiver) w.r.t. first transmitter position.
     Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeAccelerationWrtFirstTransmitterPosition_;
@@ -458,6 +674,15 @@ protected:
 
     //! Partials of relative acceleration between the two transmitters (in the instrumental frame of the receiver) w.r.t. receiver position.
     Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeAccelerationWrtReceiverPosition_;
+
+    //! Partials of relative acceleration between the two transmitters (in the instrumental frame of the receiver) w.r.t. first transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeAccelerationWrtFirstTransmitterVelocity_;
+
+    //! Partials of relative acceleration between the two transmitters (in the instrumental frame of the receiver) w.r.t. second transmitter velocity.
+    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeAccelerationWrtSecondTransmitterVelocity_;
+
+    //! Partials of relative acceleration between the two transmitters (in the instrumental frame of the receiver) w.r.t. receiver velocity.
+    Eigen::Matrix< double, 2, 3 > partialsOfInstrumentalFrameRelativeAccelerationWrtReceiverVelocity_;
 
 
     //! Coefficients of the cubic polynomial.
@@ -475,6 +700,15 @@ protected:
 
     //! Partials of central instant w.r.t. receiver position.
     Eigen::Matrix< double, 1, 3 > partialsOfCentralInstantWrtReceiverPosition_;
+
+    //! Partials of central instant w.r.t. first transmitter velocity.
+    Eigen::Matrix< double, 1, 3 > partialsOfCentralInstantWrtFirstTransmitterVelocity_;
+
+    //! Partials of central instant w.r.t. second transmitter velocity.
+    Eigen::Matrix< double, 1, 3 > partialsOfCentralInstantWrtSecondTransmitterVelocity_;
+
+    //! Partials of central instant w.r.t. receiver position.
+    Eigen::Matrix< double, 1, 3 > partialsOfCentralInstantWrtReceiverVelocity_;
 
 };
 
@@ -534,6 +768,35 @@ public:
         else
         {
             throw std::runtime_error( "Error when retrieving the mutual approximation scaling factor, the link end type"
+                                      "is different from transmitter, transmitter2 or receiver" );
+        }
+    }
+
+
+    //! Function to retrieve the velocity scaling factor for specific link end
+    /*!
+     * Function to retrieve the velocity scaling factor for specific link end
+     * \param linkEndType Link end for which scaling factor is to be returned
+     * \return Position partial velocity scaling factor at current link end
+     */
+    Eigen::Matrix< double, 1, 3 > getVelocityScalingFactor(
+            const observation_models::LinkEndType linkEndType )
+    {
+        if ( linkEndType == observation_models::transmitter )
+        {
+            return partialsOfCentralInstantWrtFirstTransmitterVelocity_;
+        }
+        else if ( linkEndType == observation_models::transmitter2 )
+        {
+            return partialsOfCentralInstantWrtSecondTransmitterVelocity_;
+        }
+        else if ( linkEndType == observation_models::receiver )
+        {
+            return partialsOfCentralInstantWrtReceiverVelocity_;
+        }
+        else
+        {
+            throw std::runtime_error( "Error when retrieving the mutual approximation velocity scaling factor, the link end type"
                                       "is different from transmitter, transmitter2 or receiver" );
         }
     }
@@ -628,6 +891,43 @@ public:
         return scalingFactor;
     }
 
+    //! Function to retrieve the velocity scaling factor for specific link end
+    /*!
+     * Function to retrieve the velocity scaling factor for specific link end
+     * \param linkEndType Link end for which velocity scaling factor is to be returned
+     * \return Velocity partial scaling factor at current link end
+     */
+    Eigen::Matrix< double, 2, 3 > getVelocityScalingFactor(
+            const observation_models::LinkEndType linkEndType )
+    {
+
+        Eigen::Matrix< double, 2, 3 > scalingFactor = Eigen::Matrix< double, 2, 3 >::Zero( );
+
+        if ( linkEndType == observation_models::transmitter )
+        {
+            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtFirstTransmitterVelocity_;
+            scalingFactor.block( 1, 0, 1, 3 ) = partialsOfImpactParameterWrtFirstTransmitterVelocity_;
+        }
+        else if ( linkEndType == observation_models::transmitter2 )
+        {
+            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtSecondTransmitterVelocity_;
+            scalingFactor.block( 1, 0, 1, 3 ) = partialsOfImpactParameterWrtSecondTransmitterVelocity_;
+        }
+        else if ( linkEndType == observation_models::receiver )
+        {
+            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtReceiverVelocity_;
+            scalingFactor.block( 1, 0, 1, 3 ) = partialsOfImpactParameterWrtReceiverVelocity_;
+        }
+        else
+        {
+            throw std::runtime_error( "Error when retrieving the mutual approximation velocity scaling factor, the link end type"
+                                      "is different from transmitter, transmitter2 or receiver" );
+        }
+
+        return scalingFactor;
+    }
+
+
     //! Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
     /*!
      * Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
@@ -652,6 +952,8 @@ protected:
 
     void computePartialsOfImpactParameterWrtLinkEndPosition( );
 
+    void computePartialsOfImpactParameterWrtLinkEndVelocity( );
+
 private:
 
     //! Partials of apparent distance w.r.t. first transmitter position.
@@ -671,6 +973,15 @@ private:
 
     //! Partials of impact parameter w.r.t. receiver position.
     Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtReceiverPosition_;
+
+    //! Partials of impact parameter w.r.t. first transmitter velocity.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtFirstTransmitterVelocity_;
+
+    //! Partials of impact parameter w.r.t. second transmitter velocity.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtSecondTransmitterVelocity_;
+
+    //! Partials of impact parameter w.r.t. receiver velocity.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtReceiverVelocity_;
 
 
 };
@@ -717,19 +1028,48 @@ public:
     {
         if ( linkEndType == observation_models::transmitter )
         {
-            return partialsOfCentralInstantWrtFirstTransmitterPosition_;
+            return partialsOfModifiedObservableWrtFirstTransmitterPosition_;
         }
         else if ( linkEndType == observation_models::transmitter2 )
         {
-            return partialsOfCentralInstantWrtSecondTransmitterPosition_;
+            return partialsOfModifiedObservableWrtSecondTransmitterPosition_;
         }
         else if ( linkEndType == observation_models::receiver )
         {
-            return partialsOfCentralInstantWrtReceiverPosition_;
+            return partialsOfModifiedObservableWrtReceiverPosition_;
         }
         else
         {
             throw std::runtime_error( "Error when retrieving the mutual approximation scaling factor, the link end type"
+                                      "is different from transmitter, transmitter2 or receiver" );
+        }
+    }
+
+
+    //! Function to retrieve the velocity scaling factor for specific link end
+    /*!
+     * Function to retrieve the velocity scaling factor for specific link end
+     * \param linkEndType Link end for which velocity scaling factor is to be returned
+     * \return Position partial velocity scaling factor at current link end
+     */
+    Eigen::Matrix< double, 1, 3 > getVelocityScalingFactor(
+            const observation_models::LinkEndType linkEndType )
+    {
+        if ( linkEndType == observation_models::transmitter )
+        {
+            return partialsOfModifiedObservableWrtFirstTransmitterVelocity_;
+        }
+        else if ( linkEndType == observation_models::transmitter2 )
+        {
+            return partialsOfModifiedObservableWrtSecondTransmitterVelocity_;
+        }
+        else if ( linkEndType == observation_models::receiver )
+        {
+            return partialsOfModifiedObservableWrtReceiverVelocity_;
+        }
+        else
+        {
+            throw std::runtime_error( "Error when retrieving the mutual approximation velocity scaling factor, the link end type"
                                       "is different from transmitter, transmitter2 or receiver" );
         }
     }
@@ -756,6 +1096,8 @@ protected:
 
     void computePartialsOfModifiedObservableWrtLinkEndPosition( );
 
+    void computePartialsOfModifiedObservableWrtLinkEndVelocity( );
+
 private:
 
     //! Partials of modified mutual approximation observable w.r.t. first transmitter position.
@@ -767,7 +1109,180 @@ private:
     //! Partials of modified mutual approximation observable w.r.t. receiver position.
     Eigen::Matrix< double, 1, 3 > partialsOfModifiedObservableWrtReceiverPosition_;
 
+    //! Partials of modified mutual approximation observable w.r.t. first transmitter velocity.
+    Eigen::Matrix< double, 1, 3 > partialsOfModifiedObservableWrtFirstTransmitterVelocity_;
+
+    //! Partials of modified mutual approximation observable w.r.t. second transmitter velocity.
+    Eigen::Matrix< double, 1, 3 > partialsOfModifiedObservableWrtSecondTransmitterVelocity_;
+
+    //! Partials of modified mutual approximation observable w.r.t. receiver velocity.
+    Eigen::Matrix< double, 1, 3 > partialsOfModifiedObservableWrtReceiverVelocity_;
+
 };
+
+
+
+//! Derived class for scaling three-dimensional position partial to impact parameter (for mutual approximation) observable partial
+class ImpactParameterMutualApproxScaling: public MutualApproximationScalingBase
+{
+public:
+
+    //! Constructor
+    ImpactParameterMutualApproxScaling(
+            const std::shared_ptr< propagators::DependentVariablesInterface > dependentVariablesInterface ) :
+    MutualApproximationScalingBase( dependentVariablesInterface )
+    {  }
+
+    //! Destructor
+    ~ImpactParameterMutualApproxScaling( ){ }
+
+    //! Update the scaling object to the current times and states
+    /*!
+     *  Update the scaling object to the current times and states
+     *  \param linkEndStates List of states at each link end during observation Index of vector maps to link end for a
+     *  given ObsevableType through getLinkEndIndex function.
+     *  \param times List of times at each link end during observation.
+     *  \param fixedLinkEnd Link end at which observation time is defined, i.e. link end for which associated time
+     *  is kept constant when computing observable.
+     *  \param currentObservation Value of observation for which partial scaling is to be computed
+     */
+    void update( const std::vector< Eigen::Vector6d >& linkEndStates,
+                 const std::vector< double >& times,
+                 const observation_models::LinkEndType fixedLinkEnd,
+                 const observation_models::LinkEnds linkEnds,
+                 const Eigen::VectorXd currentObservation );
+
+    //! Function to retrieve the scaling factor for specific link end
+    /*!
+     * Function to retrieve the scaling factor for specific link end
+     * \param linkEndType Link end for which scaling factor is to be returned
+     * \return Position partial scaling factor at current link end
+     */
+    Eigen::Matrix< double, 1, 3 > getScalingFactor(
+            const observation_models::LinkEndType linkEndType )
+    {
+
+        Eigen::Matrix< double, 1, 3 > scalingFactor = Eigen::Matrix< double, 1, 3 >::Zero( );
+
+        if ( linkEndType == observation_models::transmitter )
+        {
+//            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtFirstTransmitterPosition_;
+            scalingFactor = partialsOfImpactParameterWrtFirstTransmitterPosition_;
+        }
+        else if ( linkEndType == observation_models::transmitter2 )
+        {
+//            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtSecondTransmitterPosition_;
+            scalingFactor = partialsOfImpactParameterWrtSecondTransmitterPosition_;
+        }
+        else if ( linkEndType == observation_models::receiver )
+        {
+//            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtReceiverPosition_;
+            scalingFactor = partialsOfImpactParameterWrtReceiverPosition_;
+        }
+        else
+        {
+            throw std::runtime_error( "Error when retrieving the mutual approximation scaling factor, the link end type"
+                                      "is different from transmitter, transmitter2 or receiver" );
+        }
+
+        return scalingFactor;
+    }
+
+    //! Function to retrieve the velocity scaling factor for specific link end
+    /*!
+     * Function to retrieve the velocity scaling factor for specific link end
+     * \param linkEndType Link end for which velocity scaling factor is to be returned
+     * \return Velocity partial scaling factor at current link end
+     */
+    Eigen::Matrix< double, 1, 3 > getVelocityScalingFactor(
+            const observation_models::LinkEndType linkEndType )
+    {
+
+        Eigen::Matrix< double, 1, 3 > scalingFactor = Eigen::Matrix< double, 1, 3 >::Zero( );
+
+        if ( linkEndType == observation_models::transmitter )
+        {
+//            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtFirstTransmitterVelocity_;
+            scalingFactor = partialsOfImpactParameterWrtFirstTransmitterVelocity_;
+        }
+        else if ( linkEndType == observation_models::transmitter2 )
+        {
+//            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtSecondTransmitterVelocity_;
+            scalingFactor = partialsOfImpactParameterWrtSecondTransmitterVelocity_;
+        }
+        else if ( linkEndType == observation_models::receiver )
+        {
+//            scalingFactor.block( 0, 0, 1, 3 ) = partialsOfCentralInstantWrtReceiverVelocity_;
+            scalingFactor = partialsOfImpactParameterWrtReceiverVelocity_;
+        }
+        else
+        {
+            throw std::runtime_error( "Error when retrieving the mutual approximation velocity scaling factor, the link end type"
+                                      "is different from transmitter, transmitter2 or receiver" );
+        }
+
+        return scalingFactor;
+    }
+
+
+    //! Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
+    /*!
+     * Function to retrieve the factor by which the light-time partials should be scaled in one-way observation partial.
+     * \return Factor by which the light-time partials should be scaled in one-way observation partial.
+     */
+    double getLightTimePartialScalingFactor( )
+    {
+//        XlightTimeCorrectionScalingFactor_ = XlightTimeCorrectionScalingFactors_.first
+//                + XlightTimeCorrectionScalingFactors_.second;
+//        YlightTimeCorrectionScalingFactor_ = YlightTimeCorrectionScalingFactors_.first
+//                + YlightTimeCorrectionScalingFactors_.second;
+
+        return 0.0; //1.0 / std::sqrt( XcoordinateReceiverFrame_ * XcoordinateReceiverFrame_ + YcoordinateReceiverFrame_ * YcoordinateReceiverFrame_ )
+//                * ( XcoordinateReceiverFrame_ * XlightTimeCorrectionScalingFactor_
+//                    + YcoordinateReceiverFrame_ * YlightTimeCorrectionScalingFactor_ );
+    }
+
+
+protected:
+
+    void computePartialsOfApparentDistanceWrtLinkEndPosition( );
+
+    void computePartialsOfImpactParameterWrtLinkEndPosition( );
+
+    void computePartialsOfImpactParameterWrtLinkEndVelocity( );
+
+private:
+
+    //! Partials of apparent distance w.r.t. first transmitter position.
+    Eigen::Matrix< double, 1, 3 > partialsOfApparentDistanceWrtFirstTransmitterPosition_;
+
+    //! Partials of apparent distance w.r.t. second transmitter position.
+    Eigen::Matrix< double, 1, 3 > partialsOfApparentDistanceWrtSecondTransmitterPosition_;
+
+    //! Partials of apparent distance w.r.t. receiver position.
+    Eigen::Matrix< double, 1, 3 > partialsOfApparentDistanceWrtReceiverPosition_;
+
+    //! Partials of impact parameter w.r.t. first transmitter position.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtFirstTransmitterPosition_;
+
+    //! Partials of impact parameter w.r.t. second transmitter position.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtSecondTransmitterPosition_;
+
+    //! Partials of impact parameter w.r.t. receiver position.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtReceiverPosition_;
+
+    //! Partials of impact parameter w.r.t. first transmitter velocity.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtFirstTransmitterVelocity_;
+
+    //! Partials of impact parameter w.r.t. second transmitter velocity.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtSecondTransmitterVelocity_;
+
+    //! Partials of impact parameter w.r.t. receiver velocity.
+    Eigen::Matrix< double, 1, 3 > partialsOfImpactParameterWrtReceiverVelocity_;
+
+
+};
+
 
 
 //! Class to compute the partial derivatives of a mutual approximation observation partial.
@@ -795,7 +1310,7 @@ public:
         mutualApproximationScaler_( mutualApproximationScaler ), positionPartialList_( positionPartialList ) //,
 //        lighTimeCorrectionPartials_( lighTimeCorrectionPartials )
     {
-        std::cout << "TEST -> CONSTRUCTOR MUTUAL APPROXIMATION PARTIAL" << "\n\n";
+//        std::cout << "TEST -> CONSTRUCTOR MUTUAL APPROXIMATION PARTIAL" << "\n\n";
 
         // Check if the correct scaling object is provided as input.
         if ( ( std::dynamic_pointer_cast< MutualApproximationScaling >( mutualApproximationScaler_ ) == nullptr )
@@ -1051,6 +1566,159 @@ protected:
 
     //! Scaling object used for mapping partials of positions to partials of observable
     std::shared_ptr< MutualApproximationWithImpactParameterScaling > mutualApproximationScaler_;
+
+    //! List of position partials per link end.
+    std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartial > > positionPartialList_;
+
+    //! Iterator over list of position partials per link end.
+    std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartial > >::iterator positionPartialIterator_;
+
+    //! List of light-time correction partial functions.
+    std::vector< std::function< SingleOneWayRangePartialReturnType(
+            const std::vector< Eigen::Vector6d >&, const std::vector< double >& ) > >
+    lighTimeCorrectionPartialsFunctionsFirstTransmitter_;
+
+    std::vector< std::function< SingleOneWayRangePartialReturnType(
+            const std::vector< Eigen::Vector6d >&, const std::vector< double >& ) > >
+    lighTimeCorrectionPartialsFunctionsSecondTransmitter_;
+
+    //! List of light-time correction partial objects.
+    std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > lighTimeCorrectionPartialsFirstTransmitter_;
+
+    std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > lighTimeCorrectionPartialsSecondTransmitter_;
+
+    //! Pre-declare partial for current link end.
+    std::pair< Eigen::Matrix< double, 1, Eigen::Dynamic >, double > currentLinkTimeCorrectionPartialFirstTransmitter_;
+
+    std::pair< Eigen::Matrix< double, 1, Eigen::Dynamic >, double > currentLinkTimeCorrectionPartialSecondTransmitter_;
+
+    //! Pre-declared state variable to be used in calculatePartial function.
+    Eigen::Vector6d currentState_;
+
+    //! Pre-declared time variable to be used in calculatePartial function.
+    double currentTime_;
+};
+
+
+//! Class to compute the partial derivatives of an impact parameter (of mutual approximation) observation partial.
+class ImpactParameterMutualApproxPartial: public ObservationPartial< 1 >
+{
+public:
+    typedef std::vector< std::pair< Eigen::Matrix< double, 1, Eigen::Dynamic >, double > > ImpactParameterMutualApproxPartialReturnType;
+    typedef std::pair< Eigen::Matrix< double, 1, Eigen::Dynamic >, double > SingleOneWayRangePartialReturnType;
+
+    //! Constructor
+    /*!
+     * Constructor
+     * \param apparentDistanceScaler Scaling object used for mapping partials of positions to partials of observable
+     * \param positionPartialList List of position partials per link end.
+     * \param parameterIdentifier Id of parameter for which instance of class computes partial derivatives.
+     * \param lighTimeCorrectionPartials List if light-time correction partial objects.
+     */
+    ImpactParameterMutualApproxPartial(
+            const std::shared_ptr< ImpactParameterMutualApproxScaling > impactParameterScaler,
+            const std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartial > >& positionPartialList,
+            const estimatable_parameters::EstimatebleParameterIdentifier parameterIdentifier,
+            const std::vector< std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > >& lighTimeCorrectionPartials =
+            std::vector< std::vector< std::shared_ptr< observation_partials::LightTimeCorrectionPartial > > >( ) ):
+        ObservationPartial< 1 >( parameterIdentifier ),
+        impactParameterScaler_( impactParameterScaler ), positionPartialList_( positionPartialList ) //,
+//        lighTimeCorrectionPartials_( lighTimeCorrectionPartials )
+    {
+        std::cout << "TEST -> CONSTRUCTOR IMPACT PARAMETER PARTIAL" << "\n\n";
+
+        if ( lighTimeCorrectionPartials.size( ) != 0 )
+        {
+            if ( lighTimeCorrectionPartials.size( ) != 2 )
+            {
+                throw std::runtime_error( "Error when making  impact parameter (mutual approximation) partials, light time corrections for "
+                                          + std::to_string( lighTimeCorrectionPartials.size( ) ) + " links found, instead of 2.");
+            }
+            else
+            {
+                lighTimeCorrectionPartialsFirstTransmitter_ = lighTimeCorrectionPartials[ 0 ];
+                lighTimeCorrectionPartialsSecondTransmitter_ = lighTimeCorrectionPartials[ 1 ];
+
+                if ( lighTimeCorrectionPartialsFunctionsFirstTransmitter_.size( ) !=
+                     lighTimeCorrectionPartialsFunctionsSecondTransmitter_.size( ) )
+                {
+                    throw std::runtime_error( "Error when making impact parameter (mutual approximation) partials, number of  light time "
+                                              "corrections partials functions not consistent between the first transmitter leg"
+                                              "and the second transmitter leg." );
+                }
+
+                // Create light time correction partial functions for link between receiver and first transmitter.
+                std::pair< std::function< SingleOneWayRangePartialReturnType(
+                            const std::vector< Eigen::Vector6d >&, const std::vector< double >& ) >, bool > lightTimeCorrectionPartialFirstTransmitter;
+                for( unsigned int i = 0; i < lighTimeCorrectionPartialsFirstTransmitter_.size( ); i++ )
+                {
+                    lightTimeCorrectionPartialFirstTransmitter = getLightTimeParameterPartialFunction(
+                                parameterIdentifier, lighTimeCorrectionPartialsFirstTransmitter_.at( i ) );
+                    if( lightTimeCorrectionPartialFirstTransmitter.second != 0 )
+                    {
+                        lighTimeCorrectionPartialsFunctionsFirstTransmitter_.push_back( lightTimeCorrectionPartialFirstTransmitter.first );
+                    }
+                }
+
+
+                // Create light time correction partial functions for link between receiver and second transmitter.
+                std::pair< std::function< SingleOneWayRangePartialReturnType(
+                            const std::vector< Eigen::Vector6d >&, const std::vector< double >& ) >, bool > lightTimeCorrectionPartialSecondTransmitter;
+                for( unsigned int i = 0; i < lighTimeCorrectionPartialsSecondTransmitter_.size( ); i++ )
+                {
+                    lightTimeCorrectionPartialSecondTransmitter = getLightTimeParameterPartialFunction(
+                                parameterIdentifier, lighTimeCorrectionPartialsSecondTransmitter_.at( i ) );
+                    if( lightTimeCorrectionPartialSecondTransmitter.second != 0 )
+                    {
+                        lighTimeCorrectionPartialsFunctionsSecondTransmitter_.push_back( lightTimeCorrectionPartialSecondTransmitter.first );
+                    }
+                }
+
+            }
+        }
+    }
+
+    //! Destructor.
+    ~ImpactParameterMutualApproxPartial( ){ }
+
+    //! Function to calculate the observation partial(s) at required time and state
+    /*!
+     *  Function to calculate the observation partial(s) at required time and state. State and time
+     *  are typically obtained from evaluation of observation model.
+     *  \param states Link end states. Index maps to link end for a given ObsevableType through getLinkEndIndex function.
+     *  \param times Link end time.
+     *  \param linkEndOfFixedTime Link end that is kept fixed when computing the observable.
+     *  \param currentObservation Value of the observation for which the partial is to be computed (default NaN for
+     *  compatibility purposes)
+     *  \return Vector of pairs containing partial values and associated times.
+     */
+    ImpactParameterMutualApproxPartialReturnType calculatePartial(
+            const std::vector< Eigen::Vector6d >& states,
+            const std::vector< double >& times,
+            const observation_models::LinkEndType linkEndOfFixedTime,
+            const Eigen::Vector1d& currentObservation = Eigen::Vector1d::Constant( TUDAT_NAN ) );
+
+    //! Function to get the number of light-time correction partial functions.
+    /*!
+     * Number of light-time correction partial functions.
+     * \return Number of light-time correction partial functions.
+     */
+    int getNumberOfLighTimeCorrectionPartialsFunctions( )
+    {
+//        if ( lighTimeCorrectionPartialsFunctionsFirstTransmitter_.size( ) !=
+//             lighTimeCorrectionPartialsFunctionsSecondTransmitter_.size( ) )
+//        {
+//            throw std::runtime_error( "Error when making apparent distance partials, number of  light time "
+//                                      "corrections partials functions not consistent between the first transmitter leg"
+//                                      "and the second transmitter leg." );
+//        }
+        return lighTimeCorrectionPartialsFunctionsFirstTransmitter_.size( );
+    }
+
+protected:
+
+    //! Scaling object used for mapping partials of positions to partials of observable
+    std::shared_ptr< ImpactParameterMutualApproxScaling > impactParameterScaler_;
 
     //! List of position partials per link end.
     std::map< observation_models::LinkEndType, std::shared_ptr< CartesianStatePartial > > positionPartialList_;

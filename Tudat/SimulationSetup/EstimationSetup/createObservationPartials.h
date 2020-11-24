@@ -211,6 +211,17 @@ PerLinkEndPerLightTimeSolutionCorrections getLightTimeCorrectionsList(
                             mutualApproximationModel->getLightTimeCalculatorSecondTransmitter( )->getLightTimeCorrection( ) );
                 break;
             }
+            case observation_models::impact_parameter_mutual_approx:
+            {
+                std::shared_ptr< observation_models::ImpactParameterMutualApproxObservationModel< ObservationScalarType, TimeType> > impactParameterModel =
+                        std::dynamic_pointer_cast< observation_models::ImpactParameterMutualApproxObservationModel
+                        < ObservationScalarType, TimeType > >( observationModelIterator->second );
+                currentLightTimeCorrections.push_back(
+                            impactParameterModel->getLightTimeCalculatorFirstTransmitter( )->getLightTimeCorrection( ) );
+                currentLightTimeCorrections.push_back(
+                            impactParameterModel->getLightTimeCalculatorSecondTransmitter( )->getLightTimeCorrection( ) );
+                break;
+            }
             default:
                 std::string errorMessage =
                         "Error in light time correction list creation, observable type " +
@@ -397,6 +408,24 @@ public:
             else
             {
                 throw std::runtime_error( "Error when creating mutual approximation partials, inconsistent observation model." );
+            }
+            break;
+        case observation_models::impact_parameter_mutual_approx:
+            if ( dependentVariablesInterface == nullptr )
+            {
+                throw std::runtime_error( "Error when creating impact parameter (for mutual approximation) partials, no dependent variables interface object found." );
+            }
+
+            if ( std::dynamic_pointer_cast< observation_models::ImpactParameterMutualApproxObservationModel< ObservationScalarType, TimeType > >
+                 ( observationModelList.begin( )->second ) != nullptr )
+            {
+                observationPartialList = createImpactParameterMutualApproxPartials< ObservationScalarType >(
+                            utilities::createVectorFromMapKeys( observationModelList ), bodyMap, parametersToEstimate,
+                            getLightTimeCorrectionsList( observationModelList ), dependentVariablesInterface );
+            }
+            else
+            {
+                throw std::runtime_error( "Error when creating impact parameter (for mutual approximation) partials, inconsistent observation model." );
             }
             break;
 

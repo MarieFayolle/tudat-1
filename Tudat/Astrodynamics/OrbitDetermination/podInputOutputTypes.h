@@ -189,6 +189,59 @@ public:
         }
     }
 
+
+    //! Function to set a specific weight value for each observation (not necessarily constant per observable type and per link ends)
+    /*!
+     * Function to set a specific weight value for each observation (not necessarily constant per observable type and per link ends)
+     * \param weightsPerObservation Values for observation weights, specific to each observation
+     */
+    void setPerObservationWeights(
+            const std::map< observation_models::ObservableType,
+            std::map< observation_models::LinkEnds, Eigen::VectorXd > > weightsPerObservation )
+    {
+        for( typename PodInputDataType::const_iterator observablesIterator = observationsAndTimes_.begin( );
+             observablesIterator != observationsAndTimes_.end( ); observablesIterator++ )
+        {
+            if( weightsPerObservation.count( observablesIterator->first ) == 0 )
+            {
+                std::string errorMessage =
+                        "Error when setting  weights per observable, observable " +
+                        std::to_string( observablesIterator->first  ) + " not found";
+                throw std::runtime_error( errorMessage );
+            }
+            else
+            {
+                for( typename SingleObservablePodInputType::const_iterator dataIterator =
+                     observablesIterator->second.begin( ); dataIterator != observablesIterator->second.end( ); dataIterator++  )
+                {
+                    if( weightsPerObservation.at( observablesIterator->first ).count( dataIterator->first ) == 0 )
+                    {
+                        std::string errorMessage =
+                                "Error when setting  weights per observable, link ends not found for observable " +
+                                std::to_string( observablesIterator->first  );
+                        throw std::runtime_error( errorMessage );
+                    }
+                    else
+                    {
+                        if ( weightsPerObservation.at( observablesIterator->first ).at( dataIterator->first ).size( ) == dataIterator->second.first.rows( ) )
+                        {
+                            weightsMatrixDiagonals_[ observablesIterator->first ][ dataIterator->first ] =
+                                    weightsPerObservation.at( observablesIterator->first ).at( dataIterator->first );
+                        }
+                        else
+                        {
+                            std::string errorMessage =
+                                    "Error when setting  weights per observable, the size of the weights vector and the number of observations are inconsistent.";
+                            throw std::runtime_error( errorMessage );
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+
     //! Function to define specific settings for estimation process
     /*!
      *  Function to define specific settings for estimation process
